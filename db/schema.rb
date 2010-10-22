@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101001183244) do
+ActiveRecord::Schema.define(:version => 20101022233133) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -60,6 +60,13 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
   add_index "assignments", ["review_questionnaire_id"], :name => "fk_assignments_review_questionnaires"
   add_index "assignments", ["review_strategy_id"], :name => "fk_assignments_review_strategies"
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
+
+  create_table "cheers", :force => true do |t|
+    t.integer "post_id"
+    t.integer "cheercount"
+    t.integer "uncheercount"
+    t.string  "name"
+  end
 
   create_table "comments", :force => true do |t|
     t.integer "participant_id", :null => false
@@ -134,6 +141,11 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
   add_index "due_dates", ["review_allowed_id"], :name => "idx_review_allowed"
   add_index "due_dates", ["review_of_review_allowed_id"], :name => "idx_review_of_review_allowed"
   add_index "due_dates", ["submission_allowed_id"], :name => "idx_submission_allowed"
+
+  create_table "followers", :force => true do |t|
+    t.string  "name"
+    t.integer "followeruserid"
+  end
 
   create_table "goldberg_content_pages", :force => true do |t|
     t.string   "title"
@@ -341,6 +353,12 @@ ActiveRecord::Schema.define(:version => 20101001183244) do
   create_table "plugin_schema_info", :id => false, :force => true do |t|
     t.string  "plugin_name"
     t.integer "version"
+  end
+
+  create_table "posts", :force => true do |t|
+    t.string  "name"
+    t.text    "posttext"
+    t.integer "parentpost"
   end
 
   create_table "question_advices", :force => true do |t|
