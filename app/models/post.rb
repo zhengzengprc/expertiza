@@ -39,9 +39,9 @@ class Post < ActiveRecord::Base
   # when one deletes a post, all the followers of that post get deleted too
   def self.delete_post_or_thread(id)    
     # find the post and any replies it may have, then delete them _and_ all the cheers associated with them
-    posts = Post.find(:all, :conditions => ["id == ? OR parentpost == ?", id, id])
+    posts = Post.find(:all, :conditions => ["id = ? OR parentpost = ?", id, id])
     posts.each do |p|
-      cheers = Cheer.find(:all, :conditions => ["post_id == ?", p.id])
+      cheers = Cheer.find(:all, :conditions => ["post_id = ?", p.id])
       cheers.each {|c| c.destroy}
       p.destroy
     end
@@ -136,12 +136,12 @@ class Post < ActiveRecord::Base
   
   # a search method for time-sorted posts (e.g. posts with no parents)
   def self.find_all_posts
-    Post.find(:all, :conditions => ["parentpost == ?",0], :order => "updated_at DESC")
+    Post.find(:all, :conditions => ["parentpost = ?",0], :order => "id DESC")
   end
   
   # a search method for time-sorted replies to a particular post
   def self.find_all_replies(post)
-    Post.find(:all, :conditions => ["parentpost == ?", post.id], :order => "updated_at DESC")
+    Post.find(:all, :conditions => ["parentpost = ?", post.id], :order => "id DESC")
   end
   
   
@@ -173,12 +173,12 @@ class Post < ActiveRecord::Base
     search_condition = "%" + search + "%"
     # find all posts with the search term in the name or posttext
     posts = find(:all, 
-                     :conditions => ['(posttext LIKE ? OR name LIKE ?) AND parentpost == ?', search_condition, search_condition, 0],
-                     :order => "updated_at DESC")
+                     :conditions => ['(posttext LIKE ? OR name LIKE ?) AND parentpost = ?', search_condition, search_condition, 0],
+                     :order => "id DESC")
     # find all the replies with the search term in the name or posttext
     replies = find(:all,
                      :conditions => ['(posttext LIKE ? OR name LIKE ?) AND parentpost >= ?', search_condition, search_condition, 0],
-                     :order => "updated_at DESC")
+                     :order => "id DESC")
     # get lists of post ids, and ids for _parents_ of replies                         
     post_ids = []
     reply_ids = []
@@ -202,7 +202,7 @@ class Post < ActiveRecord::Base
   # returns a list of posts _written by_ friends, nicely threaded
   def self.get_friends_threads(user)    
     # extract the ids of the input user's friends, then get a list of them from the 'users' table 
-    friends = Follower.find(:all, :conditions => ["name == ?", user.name])
+    friends = Follower.find(:all, :conditions => ["name = ?", user.name])
     friend_ids = []
     friends.each {|f| friend_ids << f.followeruserid}
     friend_ids << user.id              # let the user be his own friend
@@ -237,12 +237,12 @@ class Post < ActiveRecord::Base
     friends.each do |f|
       # find all posts belonging to our friends
       posts += find(:all,           # NOTE: array1 + array2 = concatenation of array1 and array2
-                  :conditions => ['name == ? AND parentpost == ?', f.name, 0],
-                  :order => "updated_at DESC")
+                  :conditions => ['name = ? AND parentpost = ?', f.name, 0],
+                  :order => "id DESC")
       # find all the replies for this user
       replies += find(:all,
-                    :conditions => ['name == ? AND parentpost >= ?', f.name, 0],
-                    :order => "updated_at DESC")
+                    :conditions => ['name = ? AND parentpost >= ?', f.name, 0],
+                    :order => "id DESC")
     end
     
     posts.each {|p| puts "...#{p.name}"}
@@ -261,7 +261,7 @@ class Post < ActiveRecord::Base
     # this is useful in that for replies with the search term, both their parents, and their fellow replies
     # may now be listed in order
     #puts "parent_ids: #{posts_and_replies.each}"
-    Post.find(posts_and_replies, :order => "updated_at DESC")
+    Post.find(posts_and_replies, :order => "id DESC")
   end
   
   
