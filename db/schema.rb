@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101022233133) do
+ActiveRecord::Schema.define(:version => 20101023043027) do
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -62,10 +62,11 @@ ActiveRecord::Schema.define(:version => 20101022233133) do
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
 
   create_table "cheers", :force => true do |t|
-    t.integer "post_id"
-    t.integer "cheercount"
-    t.integer "uncheercount"
-    t.string  "name"
+    t.integer  "post_id"
+    t.integer  "cheercount"
+    t.integer  "uncheercount"
+    t.string   "name"
+    t.datetime "timestamp"
   end
 
   create_table "comments", :force => true do |t|
@@ -143,8 +144,9 @@ ActiveRecord::Schema.define(:version => 20101022233133) do
   add_index "due_dates", ["submission_allowed_id"], :name => "idx_submission_allowed"
 
   create_table "followers", :force => true do |t|
-    t.string  "name"
-    t.integer "followeruserid"
+    t.string   "name"
+    t.integer  "followeruserid"
+    t.datetime "timestamp"
   end
 
   create_table "goldberg_content_pages", :force => true do |t|
@@ -356,9 +358,10 @@ ActiveRecord::Schema.define(:version => 20101022233133) do
   end
 
   create_table "posts", :force => true do |t|
-    t.string  "name"
-    t.text    "posttext"
-    t.integer "parentpost"
+    t.string   "name"
+    t.text     "posttext"
+    t.integer  "parentpost"
+    t.datetime "timestamp"
   end
 
   create_table "question_advices", :force => true do |t|

@@ -136,12 +136,12 @@ class Post < ActiveRecord::Base
   
   # a search method for time-sorted posts (e.g. posts with no parents)
   def self.find_all_posts
-    Post.find(:all, :conditions => ["parentpost = ?",0], :order => "id DESC")
+    Post.find(:all, :conditions => ["parentpost = ?",0], :order => "timestamp DESC")
   end
   
   # a search method for time-sorted replies to a particular post
   def self.find_all_replies(post)
-    Post.find(:all, :conditions => ["parentpost = ?", post.id], :order => "id DESC")
+    Post.find(:all, :conditions => ["parentpost = ?", post.id], :order => "timestamp DESC")
   end
   
   
@@ -174,11 +174,11 @@ class Post < ActiveRecord::Base
     # find all posts with the search term in the name or posttext
     posts = find(:all, 
                      :conditions => ['(posttext LIKE ? OR name LIKE ?) AND parentpost = ?', search_condition, search_condition, 0],
-                     :order => "id DESC")
+                     :order => "timestamp DESC")
     # find all the replies with the search term in the name or posttext
     replies = find(:all,
                      :conditions => ['(posttext LIKE ? OR name LIKE ?) AND parentpost >= ?', search_condition, search_condition, 0],
-                     :order => "id DESC")
+                     :order => "timestamp DESC")
     # get lists of post ids, and ids for _parents_ of replies                         
     post_ids = []
     reply_ids = []
@@ -238,11 +238,11 @@ class Post < ActiveRecord::Base
       # find all posts belonging to our friends
       posts += find(:all,           # NOTE: array1 + array2 = concatenation of array1 and array2
                   :conditions => ['name = ? AND parentpost = ?', f.name, 0],
-                  :order => "id DESC")
+                  :order => "timestamp DESC")
       # find all the replies for this user
       replies += find(:all,
                     :conditions => ['name = ? AND parentpost >= ?', f.name, 0],
-                    :order => "id DESC")
+                    :order => "timestamp DESC")
     end
     
     posts.each {|p| puts "...#{p.name}"}
@@ -261,7 +261,7 @@ class Post < ActiveRecord::Base
     # this is useful in that for replies with the search term, both their parents, and their fellow replies
     # may now be listed in order
     #puts "parent_ids: #{posts_and_replies.each}"
-    Post.find(posts_and_replies, :order => "id DESC")
+    Post.find(posts_and_replies, :order => "timestamp DESC")
   end
   
   
