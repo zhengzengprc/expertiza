@@ -1,0 +1,87 @@
+<div id="wrap">
+	<div id="header">
+		<h1 id="logo-text">NCSU TWITTER</h1>
+		<h2 id="slogan">Sam and Anup's Brilliant Answer to Twitter</h1>
+	</div>	
+
+<div  id="menu">
+		<ul>
+			<li id="current"><a href="">Home</a></li>
+			<li>Login</li>
+			<li>Contact</li>
+			</ul>
+	</div>
+		
+		 <div id="content-wrap">
+		 	</div>
+
+<div id="main">
+	<ul>
+
+
+<h1>WELCOME  </h1>
+<% if session[:name] %>
+<table>
+	<tr>
+	<td width="40%"><h2><%=h @user.fullname %></h2></td>
+	<td width="20%"> <%=link_to "Logout", :action => "logout" %></td>
+	<td width="20%"> <%=h link_to "Add Friends" ,:action => 'friends' %></td>
+	<td width="20%"><%=h link_to "View Friends" ,:controller => 'admin',:action => 'viewfriends' %></td>
+    </tr>
+</table>
+
+<% form_tag :controller => 'admin' , :action => 'userpost'  do %>
+	<%= text_field_tag :posttext, params[:posttext],:id =>'posttext_field' %> <!--need to find how to make it blank -->
+	<%= submit_tag "New Post", :action => 'userpost' %>
+<% end %>
+  
+
+<h3>Recent Posts Made by you</h3>
+<%@followers = Follower.find(:all, :conditions => ["name = ?",@user.name],:order => "updated_at DESC")%>
+<!-- Created Userarray to store name and all of user name friends-->
+<%userarray = []%>
+<%userarray << @user.name%>
+<%@followers.each do |follower|%>
+	<%fuser=User.find_by_id(follower.followeruserid) %>
+	<%userarray << fuser.name%>
+<%end%> 
+<%userarray.each do |ouserarray| %>
+
+<%@posts=Post.find(:all, :conditions => ["name = ?",ouserarray],:order => "updated_at DESC")%> 
+<table>
+	<% @posts.each do |post| %>
+	<% if post.parentpost == 0 %>
+    <tr class="<%= cycle('row-a', 'row-b')%>">
+  	<td class="first" ><%=h post.posttext %></td>
+	<td class="first"><%=h post.name %></td>
+	<td class="first"><%=h post.get_cheercount %></td>
+	<td class="first"><%=h link_to "Cheer",:controller => 'allthreads', :action => 'cheer_post', :id => post %></td>
+	<td class="first"><%=h post.get_uncheercount %></td>
+	<td class="first" ><%=h link_to "UnCheer", :controller => 'allthreads', :action => 'uncheer_post', :id => post  %></td>
+	<td class="first"><%=h link_to "Reply", :action => 'userreply' ,:id => post %></td>
+	</tr>
+	
+	
+		<%@replies = Post.find(:all, :conditions => ["parentpost == ?", post.id], :order => "updated_at DESC")%>
+		<% @replies.each do |reply| %>
+		<tr>
+		<td ><%=h reply.posttext %></td>
+	    <td ><%=h reply.name %></td>
+		<td><%=h reply.get_cheercount %></td>
+	    <td ><%=h link_to "Cheer",:controller => :allthreads, :action => :cheer_post, :id => reply %></td>
+		<td><%=h reply.get_uncheercount %></td>
+	    <td ><%=h link_to "UnCheer", :controller => :allthreads, :action => :uncheer_post, :id => reply  %></td>
+	    </tr>
+		<%end%>
+    <% end %>
+  <% end %>
+</table>
+ <%end%> 
+<p></p>
+	
+<% end %>
+</div>
+<div id="footer">
+    <p> &copy; 2010 <strong>NCSU Twitter Backchannel Application</strong> | Design by: Sam and Anup</p>
+  </div>
+</div>

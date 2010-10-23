@@ -1,0 +1,11 @@
+<h1>Hi <%=h @user.fullname %> you have following friends</h1> <br>
+<table>
+	<% @followers.each do |follower| %>
+	<tr bgcolor="#eeeeee">
+		<td>
+			<%fuser=User.find_by_id(follower.followeruserid) %>
+			<%= fuser.fullname%>
+		</td>
+	</tr>
+	<%end%>
+</table>
