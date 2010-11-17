@@ -30,30 +30,18 @@
        <%if @assignment.staggered_deadline?%>
            <%if map.type.to_s == "MetareviewResponseMap"%>
                <%if @assignment.get_current_stage(@participant.topic_id) == 'metareview'%>
-                   <td>
-                     <%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %>
-                   </td>
-                   <td>
-                     Reserved for review until: <%=h map.potential_response_deadline %>
-                   </td>
+                   <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
                <%else%>
                    <td>Begin</td><td> (Work has not yet been submitted)</td>
-                   <td>
-                     Reserved for review until: <%=h map.potential_response_deadline %>
-                   </td>
                <%end%>
            <%else%>
                 <%if @assignment.get_current_stage(@participant.topic_id) != 'submission'%>
                    <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
-                   <% if @assignment.dynamic_reviewer_assignments_enabled %>
-                     <td>Reserved for review until: <%=h map.potential_response_deadline %></td>
-                     <td><%= link_to "Release Review Reservation",{:controller => 'review_mapping', :action => 'release_reservation', :id => map.id} %></td>
-                   <% end %>
                 <%else%>
                    <td>Begin</td><td> (Work has not yet been submitted)</td>
                 <%end%>
            <%end%>
-       <%else%>
+       <% else # no staggered deadline %>
            <!-- if this contains a code review -->
     	   <% if @assignment.codereview %>
     		   <td><table>
@@ -65,12 +53,14 @@
     	   <% else %>
                <td><%= link_to "Begin", {:controller => 'response', :action => 'new', :id => map.id} %></td>
            <% end %>
-           <% if @assignment.dynamic_reviewer_assignments_enabled %>
-               <td>Reserved for review until: <%=h map.potential_response_deadline %></td>
-               <td><%= link_to "Release Review Reservation",{:controller => 'review_mapping', :action => 'release_reservation', :id => map.id} %></td>
-           <% end %>
 	   <%end%>
-  	 <% else %>
+
+       <% if @assignment.dynamic_reviewer_assignments_enabled %>
+           <td>Reserved for review until: <%=h map.potential_response_deadline %></td>
+           <td><%= link_to "Release Review Reservation",{:controller => 'review_mapping', :action => 'release_reservation', :id => map.id} %></td>
+       <% end %>
+
+  	 <% else # Deadline has passed, and the work was not submitted %>
   	   <td>Begin</td><td> (Work has not yet been submitted)</td>
      <% end %>       
      </tr>  
