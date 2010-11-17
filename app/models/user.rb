@@ -167,9 +167,10 @@ class User < ActiveRecord::Base
     
     # now send an email with the private key
     # TODO Mailer code doesn't work in dev environmant, so just dump to console
-    puts "Keys and certificate created for #{self.name}"
-    puts new_key.to_pem
-    send_pkey(new_key.to_pem)
+    # TODO disabling both private key console dump and email for final project
+    #puts "Keys and certificate created for #{self.name}"
+    #puts new_key.to_pem
+    #send_pkey(new_key.to_pem)
                 
   end
 
