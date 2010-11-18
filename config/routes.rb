@@ -1,5 +1,7 @@
 ActionController::Routing::Routes.draw do |map|
 
+  map.connect '/menu/profile', :controller =>'profile', :action =>'edit' # fix for user profile redirect from main menu
+
   map.connect '/suggestion/edit', :controller =>'suggestion', :action =>'edit' # added edit method to the suggestion controller
   map.connect '/suggestion/view_suggestion', :controller =>'suggestion', :action =>'view_suggestion' # added view_suggestion method to the
   # suggestion controller
