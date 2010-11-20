@@ -388,7 +388,19 @@ def add_participant(user_name)
     rounds
   end
 
-  
+ # SDN - E3 get stages of this assignment whos due dates have not passed
+ def find_pending_stages(topic_id=nil)
+     if self.staggered_deadline?
+      due_dates = TopicDeadline.find(:all,
+                   :conditions => ["topic_id = ? AND due_at > ?", topic_id, Time.now])
+    else
+      due_dates = DueDate.find(:all,
+                   :conditions => ["assignment_id = ? AND due_at > ?", self.id, Time.now])
+    end
+        
+    due_dates  
+ end
+ 
  def find_current_stage(topic_id=nil)
     if self.staggered_deadline?
       due_dates = TopicDeadline.find(:all,

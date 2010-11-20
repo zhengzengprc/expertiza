@@ -6,6 +6,94 @@ class StudentTaskController < ApplicationController
       redirect_to :controller => 'eula', :action => 'display'
     end
     @participants = AssignmentParticipant.find_all_by_user_id(session[:user].id, :order => "parent_id DESC")    
+
+   # E3 task lists
+   # generate the list of tasks for this user
+   #@task_list = generate_tasklist(@participants)
+   @task_list = []   # TODO disabled for initial checkin
+
+  end
+  
+  # E3 task lists
+  # generate the list of tasks for this user
+  def generate_tasklist(participants)
+   # loop thru all user assignments and build the submitter task list
+   task_list = []
+   for participant in participants 
+     if participant.assignment != nil 
+       # now get all submit tasks associated with this assignment
+      submitter_display_stages = DeadlineType.get_submitter_list_types
+      due_dates = participant.assignment.find_pending_stages(participant.topic_id)  # submit tasks would be here
+
+      for due_date in due_dates
+        # if this is a submitter stage type then include it
+        # TODO still need to set needs_attention if new review needing metareview, also link_info
+        if submitter_display_stages.include?(due_date.deadline_type_id)
+           new_task = { "name" => participant.assignment.name,\
+                        "course" => participant.get_course_string, \
+                        "topic" => participant.get_topic_string, \
+                        "due_at" => due_date.due_at.to_s, \
+                        "deadline_type" => DeadlineType.find(due_date.deadline_type_id).name, \
+                        "needs_attention" => true, \
+                        "link_info" => nil
+           }
+           task_list << new_task
+
+        end
+      end
+     end 
+   end 
+   
+   # now build the reviewer task list
+   # search for user in response maps and create a list of assignments
+   # TODO are team response maps picked up correctly?
+   #response_maps = ReviewResponseMap.get_responses_by_user(session[:user].id) #TODO this is wrong
+   user_participants = session[:user].participants;
+   # Note: cant directly reference participants.responses here since this picks up metareviews also
+   participant_ids = []
+   user_participants.each do |participant|
+     participant_ids << participant.id
+   end
+   if !user_participants.nil?
+     response_maps = ParticipantReviewResponseMap.find(:all, :conditions => ["reviewer_id IN (?)", participant_ids])
+   end
+   reviewed_assignments = []
+   if !response_maps.nil?
+     for rmap in response_maps
+       reviewed_assignments << rmap.assignment
+     end
+
+     for rev_assignment in reviewed_assignments 
+       if rev_assignment != nil 
+         # now get all submit tasks associated with this assignment
+        reviewer_display_stages = DeadlineType.get_reviewer_list_types
+        due_dates = rev_assignment.find_pending_stages()  
+
+        for due_date in due_dates
+          # if this is a submitter stage type then include it
+          # TODO still need to set needs_attention if new review needing metareview, also link_info
+          # TODO course and topic names need cleanup as above
+          if reviewer_display_stages.include?(due_date.deadline_type_id)
+             new_task = { "name" => rev_assignment.name,\
+                          "course" => rev_assignment.course, \
+                          "topic" => nil, \
+                          "due_at" => due_date.due_at.to_s, \
+                          "deadline_type" => DeadlineType.find(due_date.deadline_type_id).name, \
+                          "needs_attention" => true, \
+                          "link_info" => nil
+             }
+             task_list << new_task
+
+          end
+        end
+      end
+    end
+   end 
+
+   # sort by date
+   task_list.sort! {|a,b| a["due_at"] <=> b["due_at"] }
+   
+   return task_list
   end
   
   def view
