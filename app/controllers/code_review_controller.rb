@@ -5,8 +5,6 @@ class CodeReviewController < ApplicationController
   def create
     @participant = AssignmentParticipant.find(params[:participant_id])
     @code_review = CodeReview.new(params[:code_review])
-    @code_review.files_uploaded = 0
-    @code_review.save
     @participant.code_review = @code_review
     @participant.save
     
@@ -49,8 +47,18 @@ class CodeReviewController < ApplicationController
     @comments = ReviewComment.count(:conditions => ['review_file_id = ? and severity = ?', params[:id], "Comment"])
     @minors = ReviewComment.count(:conditions => ['review_file_id = ? and severity = ?', params[:id], "Minor"])
     @severes = ReviewComment.count(:conditions => ['review_file_id = ? and severity = ?', params[:id], "Severe"])
-    @fatals = ReviewComment.count(:conditions => ['review_file_id = ? and severity = ?', params[:id], "Fatal"])
     
+  end
+  
+  def delete_file
+    file = ReviewFile.find(params[:id])
+    file_id = file.id
+    File.delete(file.file_path);
+    #ost.delete_all("person_id = 5 AND (category = 'Something' OR category = 'Else')")
+    file.delete
+    ReviewComment.delete_all(["review_file_id = ?", file_id])
+    
+    redirect_to :back
   end
   
   def add_comment()
@@ -62,6 +70,7 @@ class CodeReviewController < ApplicationController
       review_comment.line_number = line
       review_comment.comment = params[:comment]
       review_comment.severity = params[:severity]
+      review_comment.user = session[:user]
       review_comment.save
     end
     
@@ -86,8 +95,41 @@ class CodeReviewController < ApplicationController
     render :text=>output_html
   end
   
+  def get_review_at_line()
+    file = params[:id]
+    line = params[:line]
+    
+    output_html = ""
+    review_comments = ReviewComment.find(:all, :conditions => ["review_file_id = ? and line_number = ?", file, line])
+
+    for com in review_comments
+      output_html << "&nbsp;&nbsp;&nbsp;<a href='#mark_#{com.line_number}'>#{com.comment}</a><br />\n"
+    end
+    
+    render :text=>output_html
+    
+  end
+  
+  def get_review_summary
+    file = params[:id]
+    review_comments = ReviewComment.find(:all, :group => 'line_number', :conditions => ["review_file_id = ?", file])
+    output_html = ""
+    if review_comments.length() == 0 
+      output_html << "No review comments."
+    else 
+      for com in review_comments
+        output_html << (com.line_number.to_s + " : ")
+        output_html << "<a href='#' onclick='javascript: show_comments_line(#{com.line_number}); return false;'>#{com.comment}</a><br />\n"
+        output_html << "<div class='review_area' id='line_comment_#{com.line_number}'>Loading.. Please wait..</div>\n"
+      end
+    end
+    
+    render :text=>output_html
+  end
+  
   def get_review_content
     @file_to_review = ReviewFile.find(params[:id])
+    color_map = {"Minor"=>'Cyan', "Comment"=>'Green', "Severe"=>'Red'}
     #Post.find(:all, :conditions => [ "replyto = ?", @post.id])
     line = params[:line]
     output_html = ""
@@ -98,31 +140,28 @@ class CodeReviewController < ApplicationController
     else
       output_html << "<span><table border='0'>"
       for review_comment in review_comments
-        output_html << "<tr><td width='70%'>"
-        output_html << ((review_comment.comment) + "</td><td width='30%' valign='top'>|")
-        output_html << (review_comment.severity + "</td>")
+        output_html << "<tr bgcolor='#{color_map[review_comment.severity]}'><td width='70%'>"
+        output_html << review_comment.comment + "</td>"
         output_html << "</ tr>"
       end
       output_html << "</table></span>"
     end
     action_url = "'/code_review/add_comment/" + (params[:id]) + "'"
     
-    output_html << "<br /><br />"
     output_html << "<form method='post' action="
     output_html << action_url
     output_html << ">\n"
     output_html << "<input type='hidden' name='authenticity_token' value='#{form_authenticity_token}' />\n"
     output_html << "<input type='hidden' name='line' value='" + line +  "' />\n";
-    output_html << "<textarea rows='2' cols='60' name='comment'></textarea>\n<br />";
+    output_html << "<table border='0'><tr><td><textarea rows='1' cols='60' name='comment'></textarea></td>";
     output_html << " 
-                    <select name='severity'>
+                    <td><select name='severity'>
                       <option value='Comment'>Comment</option>
                       <option value='Minor'>Minor</option>
                       <option value='Severe'>Severe</option>
-                      <option value='Fatal'>Fatal</option>
                     </select>"
 
-    output_html << "<input type='submit' value='Add Comment' />\n";
+    output_html << "<input type='submit' value='Add Comment' /></td></tr></table>\n";
     output_html << "</form>\n"
     render :text=>output_html
   end
@@ -163,10 +202,8 @@ class CodeReviewController < ApplicationController
       
       @review_file.accepted = false
       @review_file.code_review = @code_review
-      if (@code_review.files_uploaded)
-      	@code_review.files_uploaded = @code_review.files_uploaded + 1
-      else 
-      	@code_review.files_uploaded = 1 
+      
+      @code_review.files_uploaded = @code_review.files_uploaded + 1
       
       @code_review.save
       @review_file.save
@@ -181,6 +218,8 @@ class CodeReviewController < ApplicationController
     str.gsub(/</, "&lt;")
     str.gsub(/>/, "&rt;")
     str.gsub(/\&/, "&amps;")
+    
+    str
   end
   
 end
