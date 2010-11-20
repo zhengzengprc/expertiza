@@ -181,8 +181,6 @@ class CodeReviewController < ApplicationController
     str.gsub(/</, "&lt;")
     str.gsub(/>/, "&rt;")
     str.gsub(/\&/, "&amps;")
-    
-    str
   end
   
 end
