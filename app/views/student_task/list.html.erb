@@ -53,7 +53,15 @@
 	    <td><%= task["name"] %></td>
 	    <td><%= task["course"] %></td>
 	    <td><%= task["topic"] %></td>
+	    <% if (task["link_info"]) %>
+           <% if (task["deadline_type"].include? 'submission') %>
+        <td><%= link_to task["deadline_type"], {:controller => 'submitted_content', :action => 'edit', :id => task["link_info"]} %></td>
+           <% elsif (task["deadline_type"].include? 'review') %>
+        <td><%= link_to task["deadline_type"], {:controller => 'response', :action => (task["link_info"].response ? "edit" : "new"), :id => task["link_info"]} %></td>
+           <% end %>
+        <% else %>
         <td><%= task["deadline_type"] %></td>
+        <% end %>
 	    <td><%= task["due_at"] %></td>
 	    <td><%= task["needs_attention"] %></td>
       </tr>
