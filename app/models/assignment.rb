@@ -401,6 +401,19 @@ def add_participant(user_name)
     due_dates  
  end
  
+ def get_course_string
+    # if course with an empty title, or a course with a title that has no printing characters ...    
+    begin
+      course = Course.find(self.course.id)
+      if course.name.strip.length == 0
+        raise
+      end
+      return course.name 
+    rescue      
+      return "<center>&#8212;</center>" 
+    end
+end
+
  def find_current_stage(topic_id=nil)
     if self.staggered_deadline?
       due_dates = TopicDeadline.find(:all,

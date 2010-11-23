@@ -43,27 +43,25 @@
 	<th>Topic</th>
 	<th>Stage</th>
 	<th>Stage Deadline</th>
-	<th>Needs Attention</th>
    </tr>
 	
   <% for task in @task_list %>
     <% if task["name"] != nil %>
       <tr class="listingRow">
 	    <td>&nbsp;</td>
-	    <td><%= task["name"] %></td>
-	    <td><%= task["course"] %></td>
-	    <td><%= task["topic"] %></td>
-	    <% if (task["link_info"]) %>
-           <% if (task["deadline_type"].include? 'submission') %>
-        <td><%= link_to task["deadline_type"], {:controller => 'submitted_content', :action => 'edit', :id => task["link_info"]} %></td>
-           <% elsif (task["deadline_type"].include? 'review') %>
-        <td><%= link_to task["deadline_type"], {:controller => 'response', :action => (task["link_info"].response ? "edit" : "new"), :id => task["link_info"]} %></td>
+	    <td><%= task['name'] %></td>
+	    <td><%= task['course'] %></td>
+	    <td><%= task['topic'] %></td>
+	    <% if (task['link_info']) %>
+           <% if (task['link_type'] == 'submission') %>
+        <td><%= link_to task['deadline_type'], {:controller => 'submitted_content', :action => 'edit', :id => task['link_info']} %></td>
+           <% elsif (task['link_type'] == 'review') %>
+        <td><%= link_to task['deadline_type'], {:controller => 'response', :action => (task['link_info'].response ? "edit" : "new"), :id => task['link_info']} %></td>
            <% end %>
         <% else %>
-        <td><%= task["deadline_type"] %></td>
+        <td><%= task['deadline_type'] %></td>
         <% end %>
-	    <td><%= task["due_at"] %></td>
-	    <td><%= task["needs_attention"] %></td>
+	    <td><%= task['due_at'] %></td>
       </tr>
     <% end %>
   <% end %>

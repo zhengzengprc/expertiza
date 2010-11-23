@@ -58,16 +58,7 @@ class AssignmentParticipant < Participant
   end  
   
   def get_course_string
-    # if no course is associated with this assignment, or if there is a course with an empty title, or a course with a title that has no printing characters ...    
-    begin
-      course = Course.find(self.assignment.course.id)
-      if course.name.strip.length == 0
-        raise
-      end
-      return course.name 
-    rescue      
-      return "<center>&#8212;</center>" 
-    end
+       return assignment.get_course_string
   end
   
   def get_feedback

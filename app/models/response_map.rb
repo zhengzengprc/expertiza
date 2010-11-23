@@ -34,4 +34,14 @@ class ResponseMap < ActiveRecord::Base
   def show_feedback()
     return nil
   end
+  
+  # E3 task list - determine if info has been submitted but not reviewed
+  def ready_for_review()
+    true   # TODO
+  end
+
+  # E3 task list - determine if displayed task name should be overridden for this response_map
+  def task_name_override()
+    nil  
+  end
 end

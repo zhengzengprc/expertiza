@@ -94,4 +94,16 @@ class MetareviewResponseMap < ResponseMap
       index += 1
     end 
   end  
+  
+  # E3 task list - determine if info has been reviewed but not metareviewed
+  #    Override of response_map version for metareviews
+  def ready_for_review()
+    true   # TODO
+  end
+
+  # E3 task list - change displayed task name for metareviews
+  def task_name_override()
+    'metareview' 
+  end
+
 end
