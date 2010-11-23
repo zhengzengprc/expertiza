@@ -9,8 +9,8 @@ class StudentTaskController < ApplicationController
 
     # E3 task lists
     # generate the list of tasks for this user
-    #@task_list = generate_tasklist(@participants)
-    @task_list = []   # TODO disabled for initial checkin
+    @task_list = generate_tasklist(@participants)
+    #@task_list = []   # TODO disabled for initial checkin
   end
   
   # E3 task lists - generate the list of tasks for this user
@@ -46,7 +46,6 @@ class StudentTaskController < ApplicationController
             link_info = participant
           end
 
-          if session[:user].tasklist_greyout? || !link_info.nil? 
             new_task = { 'name' => participant.assignment.name,\
                         'course' => participant.get_course_string, \
                         'topic' => participant.get_topic_string, \
@@ -56,7 +55,6 @@ class StudentTaskController < ApplicationController
                         'link_info' => link_info
             }
             task_list << new_task
-          end
         end
       end
      end 
@@ -81,6 +79,7 @@ class StudentTaskController < ApplicationController
      # get defined reviewer stage_types 
      reviewer_display_stages = DeadlineType.get_reviewer_list_types
      for rmap in response_maps
+       
        rev_assignment = rmap.assignment
        if rev_assignment != nil 
          # now get all submit tasks associated with this assignment
@@ -97,7 +96,6 @@ class StudentTaskController < ApplicationController
               link_info = rmap.ready_for_review ? rmap : nil
             end
 
-            if session[:user].tasklist_greyout? || !link_info.nil? 
               new_task = { 'name' => rev_assignment.name,\
                           'course' => rev_assignment.get_course_string, \
                           'topic' => rmap.reviewer.get_topic_string, \
@@ -107,7 +105,6 @@ class StudentTaskController < ApplicationController
                           'link_info' => link_info
               }
               task_list << new_task
-            end
           end
         end
       end
