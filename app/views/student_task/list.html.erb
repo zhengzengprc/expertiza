@@ -47,7 +47,19 @@
 	
   <% for task in @task_list %>
     <% if task["name"] != nil %>
-      <tr class="listingRow">
+
+	  <% 
+         task_completed = (task['link_info'] && 
+                           (false ||
+                            task['link_type'] == 'review' && task['link_info'].response
+                           )
+                          )
+      %>
+
+	  <% if !task_completed || session[:user].tasklist_greyout? %>
+      <tr class="listingRow" 
+	  <% if task_completed %>style="color:#CCCCCC;"
+	  <% elsif task['link_info'] %>style="color:red;"<% end %>>
 	    <td>&nbsp;</td>
 	    <td><%= task['name'] %></td>
 	    <td><%= task['course'] %></td>
@@ -56,13 +68,20 @@
            <% if (task['link_type'] == 'submission') %>
         <td><%= link_to task['deadline_type'], {:controller => 'submitted_content', :action => 'edit', :id => task['link_info']} %></td>
            <% elsif (task['link_type'] == 'review') %>
-        <td><%= link_to task['deadline_type'], {:controller => 'response', :action => (task['link_info'].response ? "edit" : "new"), :id => task['link_info']} %></td>
+        <td>
+        	  <% if (task['link_info'].response) %>
+        	    <%= link_to task['deadline_type'], {:controller => 'response', :action => 'edit', :id => task['link_info'].response} %>
+              <% else %>
+        	    <%= link_to task['deadline_type'], {:controller => 'response', :action => 'new', :id => task['link_info']} %>
+              <% end %>
+		</td>
            <% end %>
         <% else %>
         <td><%= task['deadline_type'] %></td>
         <% end %>
 	    <td><%= task['due_at'] %></td>
       </tr>
+	  <% end %>
     <% end %>
   <% end %>
 </table>
