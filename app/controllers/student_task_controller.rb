@@ -93,7 +93,7 @@ class StudentTaskController < ApplicationController
             link_info = nil
             current_due_date = rev_assignment.find_current_stage(rmap.reviewee.topic_id)
             if (current_due_date.id == due_date.id)
-              link_info = rmap.ready_for_review ? rmap : nil
+              link_info = rmap
             end
 
               new_task = { 'name' => rev_assignment.name,\

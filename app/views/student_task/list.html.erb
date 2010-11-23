@@ -51,11 +51,11 @@
 	  <% 
          task_completed = (task['link_info'] && 
                            (false ||
-                            task['link_type'] == 'review' && task['link_info'].response
+                            task['link_type'] == 'review' && !task['link_info'].ready_for_review
                            )
                           )
       %>
-
+ 
 	  <% if !task_completed || session[:user].tasklist_greyout? %>
       <tr class="listingRow" 
 	  <% if task_completed %>style="color:#CCCCCC;"

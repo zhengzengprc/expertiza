@@ -37,7 +37,7 @@ class ResponseMap < ActiveRecord::Base
   
   # E3 task list - determine if info has been submitted but not reviewed
   def ready_for_review()
-    true   # TODO
+    self.response.nil?   # if no response submitted then ready to review 
   end
 
   # E3 task list - determine if displayed task name should be overridden for this response_map
