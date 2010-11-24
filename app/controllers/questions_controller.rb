@@ -1,5 +1,5 @@
 class QuestionsController < ApplicationController
-scaffold :answers
+#scaffold :answers
 
   # A question is a single entry within a questionnaire
   # Questions provide a way of scoring an object 

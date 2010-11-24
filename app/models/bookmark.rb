@@ -1,5 +1,5 @@
 class Bookmark < ActiveRecord::Base
-	acts_as_rateable
+	#acts_as_rateable
 	has_many :bmappings
 	
 ##SEARCH FUNCTIONS
