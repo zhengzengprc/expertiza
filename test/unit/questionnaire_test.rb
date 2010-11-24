@@ -5,17 +5,17 @@ class RubricTest < Test::Unit::TestCase
 
   def setup
     # Database was initialized with (at least) 3 questionnaires.
-    @questionnaire1 = Questionnaire.find(1)
-    @questionnaire2 = Questionnaire.find(2)
-    @questionnaire3 = Questionnaire.find(3)
+    @questionnaire1 = Questionnaire.find(questionnaires(:questionnaire1).id)
+    @questionnaire2 = Questionnaire.find(questionnaires(:questionnaire2).id)
+    @questionnaire3 = Questionnaire.find(questionnaires(:questionnaire3).id)
   end
   
   def test_create
     assert_kind_of Questionnaire, @questionnaire1
-    assert_equal "questionnaire1", @questionnaire1.name
+    assert_equal questionnaires(:questionnaire1).name, @questionnaire1.name
     
-    assert_equal 1, @questionnaire1.min_question_score
-    assert_equal 5, @questionnaire1.max_question_score
+    assert_equal questionnaires(:questionnaire1).min_question_score, @questionnaire1.min_question_score
+    assert_equal questionnaires(:questionnaire1).max_question_score, @questionnaire1.max_question_score
     assert_equal false, @questionnaire1.private
   end
   
