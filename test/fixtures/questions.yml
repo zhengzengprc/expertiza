@@ -12,10 +12,10 @@ question2:
  weight: 5
     
 question3:
- txt: This is test question 3?
+ txt: This is an invalid question?
  true_false: true
  questionnaire_id: <%= Fixtures.identify(:questionnaire0) %>
- weight: 5
+ weight: not_a_number
   
 question4:
  txt: This is test question 4?
