@@ -1,11 +1,11 @@
 # Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
 
 one:
-  contents: MyText
-  name: MyString
-  userid: 1
+  contents: 'Code review of One'
+  name: 'One'
+  participantid: 1
 
 two:
-  contents: MyText
-  name: MyString
-  userid: 1
+  contents: 'MyText'
+  name: 'MyString'
+  participantid: 2
