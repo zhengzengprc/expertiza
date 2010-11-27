@@ -66,7 +66,11 @@
 	    <td><%= task['topic'] %></td>
 	    <% if (task['link_info']) %>
            <% if (task['link_type'] == 'submission') %>
+        	  <% if (task['deadline_type'] == 'switch_topics') %>
+		<td> <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'signup_topics', :id => task['link_info'].parent_id%></td>
+              <% else %>
         <td><%= link_to task['deadline_type'], {:controller => 'submitted_content', :action => 'edit', :id => task['link_info']} %></td>
+              <% end %>
            <% elsif (task['link_type'] == 'review') %>
         <td>
         	  <% if (task['link_info'].response) %>
