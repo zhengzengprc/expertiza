@@ -32,6 +32,7 @@
 </table>
 
 <br/>
+
 <table id="questions_table">
 	<tr>
         <td colspan=2 style="padding-bottom: 5pt"><strong>Questions</strong>
@@ -64,6 +65,7 @@
 		<td align=center width=100>Scoring</td>
 		<td align=left>Weight</td>
 		<% end %>
+	
 	</tr>
 		
 	<% 	i = 1;
@@ -76,6 +78,7 @@
 			<td><%= select("question[]", :weight, Question::WEIGHTS)%></td>
 		<% end %>
 	</tr>
+
 	<% if @questionnaire.type == "QuizQuestionnaire" %>
 	<% p = @question.parse %>
 	<tr>
