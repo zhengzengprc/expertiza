@@ -1,0 +1,30 @@
+ 	
+	<div id="content-wrap">
+	</div>
+	
+	<div id ="main">
+  <h1>Reply to this post:</h1> 
+  <table>
+  	<% form_tag do %>
+  	<tr ><td class="first">
+   <%= @post.posttext %>
+   </td>
+    </tr>
+	<tr><td class="first">
+	<%= text_area_tag :posttext, params[:posttext] %>
+	</td></tr>
+	<tr><td class="first">
+	<%= submit_tag "Reply", :action => 'reply' %><br><br>
+	<%= link_to "Cancel and Return" , :action=> 'index' %>
+   
+   </td>
+   </tr>
+   <%end%>
+  </table>
+
+<p>
+	
+</p>
+</div>
+
+</div>

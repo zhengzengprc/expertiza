@@ -1,0 +1,17 @@
+<h1>Show cheer</h1>
+
+<p>
+  <b>Post:</b>
+  <%=h @cheer.post_id %>
+</p>
+<p>
+  <b>Cheers:</b>
+  <%=h @cheer.cheercount %>
+</p>
+<p>
+  <b>Uncheers:</b>
+  <%=h @cheer.uncheercount %>
+</p>
+
+<%= link_to 'Edit', edit_cheer_path(@cheer) %> |
+<%= link_to 'Back', cheers_path %>

@@ -1,0 +1,2 @@
+class AllthreadsController < ApplicationController
+end

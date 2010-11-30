@@ -1,0 +1,36 @@
+<% @posts1 = PostTopic.find(:all).collect{ |c| [c.topicname, c.id] }%>  
+<% form_tag :action => 'change_topic' do %>
+<table>
+ 		<tr class="row-b">
+ 			<!-- <td class="first">Avatar</td> -->
+ 			<td class="first">User</td>
+			<td class="first">Post/Reply</td>
+			<!-- <td class="first">Added</td> -->
+			<td class="first" colspan=4>Cheer/UnCheer</td>
+			<td class="first"></td>
+			<td class="first"></td>			
+		</tr>
+<% @threads.each do |thread| %>
+	<tr class="<%= thread.parentpost==0 ? "row-c" : "row-a" %>" %>
+		<!-- <td class="first"><%= image_tag("avatar.jpg" ,:size => "25x25") %></td> -->
+		<td class="first"><strong><%= thread.name %></strong></td>
+		<td class="<%= thread.parentpost==0 ? "first" : "second" %>" %><%= thread.posttext %></td>
+		<td class="first"><%= thread.get_cheercount %></td>
+		<td class="first"><%= thread.get_uncheercount %></td>
+		<% if thread.get_best(thread.id) == 0 then check_icon = "best_post.gif" else check_icon = "best_post_green.gif" end %>
+		<td class="first"><%= if ((@user!=thread.name) and (@mode!=-1) and (thread.parentpost != 0)) then link_to(image_tag(check_icon,:size=>"10x10",:title=>"Best"),{:action=>:best,:id=>thread}) end %></td>
+		<td class="first"><%= if ((@user!=thread.name) and (@mode!=-1)) then link_to(image_tag("icon_thumb_up.gif",:size=>"10x10",:title=>"Cheer"),{:action=>:cheer,:id=>thread}) end %></td>
+		<td class="first"><%= if ((@user!=thread.name) and (@mode!=-1)) then link_to(image_tag("icon_thumb_down.gif",:size=>"10x10",:title=>"Uncheer"),{:action=>:uncheer,:id=>thread}) end %></td>
+		<td class="first"><%= if (@mode==3) then link_to(image_tag("trashcan.png",:size=>"10x10",:title=>"Delete"),{:action=>:delete,:id=>thread}) end %></td>
+		<td class="first"><%= if (@mode!=-1) and (thread.parentpost == 0) then link_to("Reply",{:action=>:reply,:id=>thread}) end %></td>
+		<td class="first"><%= check_box 'activated',thread.id %></td>	
+	</tr>				
+<% end %>  
+	<tr>		
+		<td class="first" colspan=3><td><%= select_tag 'topic',options_for_select(@posts1)%></td></td>
+		<td class="first" colspan=2><%= submit_tag "Change Topic", :name => 'a[1]'%></td>
+		<td class="first" colspan=2><%= submit_tag "Move to Post", :name => 'a[2]'%></td>
+	</tr>
+</table>
+<% end %>	
+	

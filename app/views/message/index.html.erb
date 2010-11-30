@@ -1,0 +1,150 @@
+<div id="wrap">
+
+	<div id="content-wrap">
+	</div>
+	
+
+<!-- <% form_tag :action => 'change_topic' do %> -->
+			
+	<!-- put stuff on the sidebar -->
+	<div id="sidebar">
+		<%= render :partial => 'sidebar_options' %>	
+		<h1><%= link_to "View Posts By Friends" , :action => 'viewfriends' %></h1>
+			<table>
+				<tr class="row-a">
+					<td class="first">
+						<% form_tag :action => 'post' do %>
+							<%= text_area_tag :new_post_text, params[:new_post_text] %>
+							<%= hidden_field_tag :topic_id, params[:topic_id] %>
+							<%= submit_tag "Create New Post"%>
+						<% end %>
+						
+					</td>	
+				</tr>
+			</table>
+		
+		<p></p>
+		<p></p>
+		<% if @mode == 4 %>
+			<h1>Admin Features</h1>
+			<h1><%= link_to "See Cheer-Ratings" , :controller => 'home', :action => 'ratings' %></h1>
+		<% end %>
+	</div>
+
+<div id="main">
+	<table>
+		<tr class="row-a">
+			<td class="first">
+				<% form_tag do %>
+				<%= text_field_tag :search, params[:search] %>
+				<%= submit_tag "Search", :name => nil%>
+			</td>	
+			<% end %>
+			<td>
+				<%= link_to "Clear search", :action => :index %>
+			</td>
+		</tr>
+	</table>
+	
+	<!--<h2>Topic: <%= PostTopic.find(session[:current_topic_id]).topicname %></h2>-->
+	
+ <% @posts1 = PostTopic.find(:all).collect{ |c| [c.topicname, c.id] }%>  
+<% form_tag :action => 'change_topic' do %>
+
+<% @threads.each do |thread| %>
+	<div id="renderthreads" style="width:555px;" class="<%= thread.parentpost==0 ? "outer-c" : "outer-a" %>">
+		<div style="width:75px; float:left;" >
+			<div style="width:25px;padding-top:18px; float:left;">
+				<% if thread.get_best(thread.id) == 0 then check_icon = "best_post.gif" else check_icon = "best_post_green.gif" end %>
+				<%= if ((@user!=thread.name) and (@mode!=-1) and (thread.parentpost != 0)) then link_to(image_tag(check_icon,:size=>"25x25",:title=>"Best"),{:action=>:best,:id=>thread}) end %>
+	
+				<!-- <%= image_tag("checkbtn.png" ,:size => "25x25" ) %> -->
+			</div>
+			<div style="width:20px;padding-top:5px; float:left;"  >
+				<% if ((@user!=thread.name) and (@mode!=-1)) then %>
+					<%= link_to(image_tag("downarrow.gif",:size=>"20x20",:title=>"Cheer"),{:action=>:cheer,:id=>thread}) %>
+				<% else%>
+					<%= image_tag("downarrow.png" ,:size => "20x20" ) %>
+				<% end %>
+				<% if ((@user!=thread.name) and (@mode!=-1)) then %>
+					<%= link_to(image_tag("uparrow.gif",:size=>"20x20",:title=>"Uncheer"),{:action=>:uncheer,:id=>thread}) %>
+				<% else%>
+					<%= image_tag("uparrow.png" ,:size => "20x20" ) %>
+				<% end %>
+			</div>
+			<div style="width:20px;padding-top:5px; float:left;">
+				<div style="width:20px;padding-top:3px; float:left;"><%= thread.get_cheercount %></div>
+				<div style="width:20px;padding-top:5px; float:left;"><%= thread.get_uncheercount %></div>
+			</div>
+		</div>
+		<div style="float:left;" class="<%= thread.parentpost==0 ? "render-c" : "render-a" %>">
+			<%= thread.posttext %>	
+			<br/>
+			<div style="float:right; "><%= thread.name %>
+		</div>
+		</div>
+		<div style="width:30px; float:left; ">
+			<%= if (@mode==3) then link_to(image_tag("trashcan.png",:size=>"10x10",:title=>"Delete"),{:action=>:delete,:id=>thread}) end %>
+			<%= if (@mode!=-1) and (thread.parentpost == 0) then link_to("Reply",{:action=>:reply,:id=>thread}) end %>
+			<%= check_box 'activated',thread.id %>
+		</div>
+		<div style="clear:both;"></div>
+	</div>
+<% end %>
+
+<table>
+ 		<tr class="row-b">
+ 			<!-- <td class="first">Avatar</td> -->
+ 			<td class="first">User</td>
+			<td class="first">Post/Reply</td>
+			<!-- <td class="first">Added</td> -->
+			<td class="first" colspan=4>Cheer/UnCheer</td>
+			<td class="first"></td>
+			<td class="first"></td>			
+		</tr>
+
+<% @threads.each do |thread| %>
+	<tr class="<%= thread.parentpost==0 ? "row-c" : "row-a" %>" %>
+		<!-- <td class="first"><%= image_tag("avatar.jpg" ,:size => "25x25") %></td> -->
+		<td class="first"><strong><%= thread.name %></strong></td>
+		<td class="<%= thread.parentpost==0 ? "first" : "second" %>" %><%= thread.posttext %></td>
+		<td class="first"><%= thread.get_cheercount %></td>
+		<td class="first"><%= thread.get_uncheercount %></td>
+		<td class="first"><%= if ((@user!=thread.name) and (@mode!=-1)) then link_to(image_tag("icon_thumb_up.gif",:size=>"10x10",:title=>"Cheer"),{:action=>:cheer,:id=>thread}) end %></td>
+		<td class="first"><%= if ((@user!=thread.name) and (@mode!=-1)) then link_to(image_tag("icon_thumb_down.gif",:size=>"10x10",:title=>"Uncheer"),{:action=>:uncheer,:id=>thread}) end %></td>
+		<td class="first"><%= if (@mode==3) then link_to(image_tag("trashcan.png",:size=>"10x10",:title=>"Delete"),{:action=>:delete,:id=>thread}) end %></td>
+		<td class="first"><%= if (@mode!=-1) and (thread.parentpost == 0) then link_to("Reply",{:action=>:reply,:id=>thread}) end %></td>
+		<td class="first"><%= check_box 'activated',thread.id %></td>	
+	</tr>				
+<% end %>  
+	<tr>		
+		<td class="first" colspan=3><td><%= select_tag 'topic',options_for_select(@posts1)%></td></td>
+		<td class="first" colspan=2><%= submit_tag "Change Topic", :name => 'a[1]'%></td>
+		<td class="first" colspan=2><%= submit_tag "Move to Post", :name => 'a[2]'%></td>
+	</tr>
+</table>
+<% end %>	
+	
+	
+ 
+ <table>
+	<tr>
+		<td>	
+		<%= will_paginate @threads %>
+		</td>
+	</tr>
+</table>
+
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+
+<!-- <% end %> -->
+</div>
+
+  <div id="footer">
+    <p> &copy; 2010 <strong>NCSU Twitter Backchannel Application</strong> | Design by: Sam and Anup</p>
+  </div>
+</div>

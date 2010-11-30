@@ -1,0 +1,25 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  id: 1
+  name: kaliaanup
+  posttext: This is a parent post.
+  parentpost: 0
+
+two:
+  id: 2
+  name: sam
+  posttext: This is a reply post
+  parentpost: 1
+
+# make a bunch of posts
+# note that the names of these fixtures are actually hashes for thier
+# parent clas automatically. e.g. Post(:messages) will return this 
+# group of test data!
+messages:
+    name: <somebody>
+    # this fixture has embedded ruby, so we can make a bunch of entries
+    <% for i in 1..10 %>
+    posttext: This is post <%= i %>
+    <% end %>
+    parentpost: 0 

@@ -1,0 +1,61 @@
+<div id="wrap">
+	<div id="header">
+		<h1 id="logo-text">NCSU TWITTER</h1>
+		<h2 id="slogan">Sam and Anup's Brilliant Answer to Twitter</h2>
+		<div id="header-links">
+			<p> <% if @mode == -1 %>
+				<%= link_to "Log In", :controller => 'admin', :action => "login" %>
+				<%= link_to "Sign Up" , :controller => 'users', :action => 'new' %>
+				<% else %>
+				
+				<%= "Welcome #{@user}!" %>
+				<%= link_to "Log out?", :controller => 'home', :action => 'logout' %>
+				<% end %>
+			</p>
+		</div>
+	</div>
+
+		
+	<div id="content-wrap">
+	</div>
+	
+	<div id="sidebar">
+		<h1><%= link_to 'View All Topics', :controller=>'home',:action=>'topic' %></h1>
+	</div>
+
+
+<div id="main">
+	<h1>User Ratings By Their Cheers</h1>
+
+<table>
+  <tr >
+    <th class="first">Username</th>
+    <th class="first">Total Cheers</th>
+    <th class="first">Total UnCheers</th>
+  </tr>
+
+<% @ratings.each do |rate| %>
+  	<tr class="<%= cycle('row-a', 'row-b')%>">
+	    <td class="first"><%= rate.name %></td>
+	    <td class="first"><%= rate.cheer_sum %></td>
+	    <td class="first"><%= rate.uncheer_sum %></td>
+	</tr>
+<% end %>
+</table>
+
+<table>
+	<tr>
+		<td>
+			 <tr><td>
+		<%= will_paginate @ratings %>
+		</td>
+	</tr>
+		</td>
+	</tr>
+</table>
+</div>
+
+ <div id="footer">
+    <p> &copy; 2010 <strong>NCSU Twitter Backchannel Application</strong> | Design by: Sam and Anup</p>
+  </div>
+</div>

@@ -1,0 +1,57 @@
+<h1>Assign Credit to Voluntary Work </h1>
+
+<table>
+	<tr>
+		<td>
+			Voluntary Work	
+		</td>
+		<td>
+			Points
+		</td>
+	</tr>		
+</table>
+<hr>
+
+<% form_tag({:action => 'update', :id => @voluntary_work}) do%>
+<% global_index = 0%>
+<h4>Microtasks</h4>
+<% @all_microtasks.each do |task| %>
+  <% fields_for "tasks[#{global_index}]", task do |f| %>
+    <p><%= f.hidden_field :id%>
+	<%= task.name %>
+	<%= f.text_field :weight %></p>
+	<% global_index = global_index + 1%>
+  <% end %>
+<% end %>
+
+<h4>Message Board</h4>
+<% @message_board_task.each do |task| %>
+  <% fields_for "tasks[#{global_index}]", task do |f| %>
+    <p><%= f.hidden_field :id%>
+	<%= task.name %>
+	<%= f.text_field :weight %></p>
+	<% global_index = global_index + 1%>
+  <% end %>
+<% end %>
+
+<h4>Assignments for extra review</h4>
+<% @all_exta_review_tasks.each do |task| %>
+  <% fields_for "tasks[#{global_index}]", task do |f| %>
+    <p><%= f.hidden_field :id%>
+	<%= task.name %>
+	<%= f.text_field :weight %></p>
+	<% global_index = global_index + 1%>
+  <% end %>
+<% end %>
+
+<%= submit_tag "Save assignment" %>	
+<% end %>
+
+<% form_tag({:action => 'calculate_score', :id => @voluntary_work}) do%>
+	<%= submit_tag "Calculate Score" %>
+<% end %>
+</td>
+</tr>
+</table>
+
+ <%= link_to 'Back', :controller=> 'tree_display', :action=>'list'%>

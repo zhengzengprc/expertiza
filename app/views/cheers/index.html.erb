@@ -1,0 +1,24 @@
+<h1>Listing cheers</h1>
+
+<table>
+  <tr>
+  	<th>Postid</th>
+    <th>Cheers</th>
+    <th>Uncheers</th
+  </tr>
+
+<% @cheers.each do |cheer| %>
+  <tr>
+  	<td><%=h cheer.post_id %></td>
+    <td><%=h cheer.cheercount %></td>
+	<td><%=h cheer.uncheercount %></td>
+    <td><%= link_to 'Show', cheer %></td>
+    <td><%= link_to 'Edit', edit_cheer_path(cheer) %></td>
+    <td><%= link_to 'Destroy', cheer, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New cheer', new_cheer_path %>
