@@ -4,9 +4,14 @@ class AuthorFeedbackQuestionnaireTest < Test::Unit::TestCase
   #fixtures :author_feedback_questionnaires
    #TODO verify fixture
   fixtures :questionnaires, :assignments, :scores, :participants
+
   # Replace this with your real tests.
-  def test_truth
-    assert true
+  #def test_truth
+  #  assert true
+  #end
+
+  def setup
+    @participant = AssignmentParticipant.new
   end
 
   def test_get_weighted_score

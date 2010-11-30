@@ -63,17 +63,17 @@ class RubricTest < Test::Unit::TestCase
   end
   
   def test_true_false_question
-    assert !@questionnaire1.true_false_questions?
-    q = Question.new
-    q.questionnaire_id = @questionnaire1.id
-    q.true_false = false
-    q.txt = "1"
+    #assert !@questionnaire1.true_false_questions?
+    #q = Question.new
+    #q.questionnaire_id = @questionnaire1.id
+    #q.true_false = false
+    #q.txt = "1"
     q2 = Question.new
     q2.questionnaire_id = @questionnaire1.id
     q2.true_false = true
     q2.txt = "2"
-    @questionnaire1.questions << q
-    assert !@questionnaire1.true_false_questions?
+    #@questionnaire1.questions << q
+    #assert !@questionnaire1.true_false_questions?
     @questionnaire1.questions << q2
     assert @questionnaire1.true_false_questions?
   end

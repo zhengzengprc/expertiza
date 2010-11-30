@@ -4,7 +4,7 @@ class ResponseMap < ActiveRecord::Base
   
   def self.get_assessments_for(participant)
     responses = Array.new   
-    
+                                                                             
     if participant
       maps = find(:all, :conditions => ['reviewee_id = ? and type = ?',participant.id,self.to_s])
       maps.each{ |map|
