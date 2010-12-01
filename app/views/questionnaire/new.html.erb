@@ -12,6 +12,7 @@
 	<% form_tag :action => 'create_questionnaire' do %>
 	  	<%= render :partial => 'questionnaire' %>
 		<%= submit_tag "Create #{@questionnaire.display_type.downcase}", :name=>"save" %>
+		<!-- the above line references the 'edit' method in the controller !-->
 	    <script>
 	      for (var x = 1; x <= 5; x++) {addQuestions();}
 	    </script>
