@@ -12,8 +12,9 @@ class Question < ActiveRecord::Base
   # Class variables
   NUMERIC = 'Numeric' # Display string for NUMERIC questions
   TRUE_FALSE = 'True/False' # Display string for TRUE_FALSE questions
+  CHECKBOX = 'Checkbox'
   
-  GRADING_TYPES = [[NUMERIC,false],[TRUE_FALSE,true]]
+  GRADING_TYPES = [[NUMERIC,false],[TRUE_FALSE,true],[CHECKBOX,1]]
   WEIGHTS = [['1',1],['2',2],['3',3],['4',4],['5',5]]
   
   attr_accessor :checked
