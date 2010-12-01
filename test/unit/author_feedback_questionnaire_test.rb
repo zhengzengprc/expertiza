@@ -27,7 +27,7 @@ class AuthorFeedbackQuestionnaireTest < Test::Unit::TestCase
         | questionnaire |
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol] = Hash.new
         weighted_score = get_weighted_score(assignment,scores)
-        assert_not _nil(weighted_score)
+        assert_not_nil(weighted_score)
         }
       }
   end
