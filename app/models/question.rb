@@ -13,9 +13,10 @@ class Question < ActiveRecord::Base
   NUMERIC = 'Numeric' # Display string for NUMERIC questions
   TRUE_FALSE = 'True/False' # Display string for TRUE_FALSE questions
   CHECKBOX = 'Checkbox'
-  
+ 
   GRADING_TYPES = [[NUMERIC,false],[TRUE_FALSE,true],[CHECKBOX,1]]
   WEIGHTS = [['1',1],['2',2],['3',3],['4',4],['5',5]]
+  QUESTION_TYPES = [['CHECKBOX',1],['RADIO',2],['DESCRIPTIVE',3]]
   
   attr_accessor :checked
   
@@ -25,7 +26,10 @@ class Question < ActiveRecord::Base
   end
   
   def before_save
-     abc =   self.attributes;
+     
+     abc =   self.attributes['label']['1'];
+     pqr = abc;
+      xyz = pqr;
   end
   
   

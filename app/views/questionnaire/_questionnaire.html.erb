@@ -28,6 +28,7 @@
 		<td><%= select(:questionnaire, :private, [ ['no', false], 
 									 		['yes',  true]])%>
 		</td>
+		
 	</tr>
 </table>
 
@@ -37,8 +38,11 @@
 	<tr>
         <td colspan=2 style="padding-bottom: 5pt"><strong>Questions</strong>
 		  <input style="margin-left: 50pt" type="button" value="Add" onclick="addQuestions()">
+		  <%= select(:addQuestion, :type, Question::QUESTION_TYPES)%>
 		  <input id="numQuestionsToAdd" type="text" value="1" size=1>
 		  more question(s)</td>
+		  <td>
+		</td>
 		<td colspan=2><input type="button" value="Delete selected questions" onclick="deleteQuestions()"></td>
 	</tr>
 	
@@ -60,7 +64,7 @@
 	
 	<tr>
 		<td align=left width=30>Delete</td>
-		<td align=center width=300>Question</td>
+		<td align=center width=500>Question</td>
 		<% if @questionnaire.type != "QuizQuestionnaire" %>
 		<td align=center width=100>Scoring</td>
 		<td align=left>Weight</td>
