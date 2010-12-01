@@ -2,30 +2,9 @@
 // This file is automatically included by javascript_include_tag :defaults
 function checkForm()
 {
-	return checkTeamRotationInput() && checkWeights() && checkDeadlines();
+	return checkWeights() && checkDeadlines();
 }
 
-function checkTeamRotationInput()
-{
-	var category = document.getElementById("select_categories");
-	var other_category = document.getElementById("category_name");
-	var max_allowed_rot = document.getElementById("assignment_max_allowed_rotation");
-	if(max_allowed_rot.style.visibility = "visible" && (isNaN(max_allowed_rot.value) || max_allowed_rot.value <= 0) )
-	{
-		alert("The value for maximum Number of times a student can team with another student must be greater than 0");
-		return false;
-	}	
-	if (category.selectedIndex == 0) 
-	{
-		alert("Please select category in category select box");
-		return false;
-	}
-	var len = other_category.value.length;
-	if (((other_category.value == null) || (typeof(other_category) == 'undefined') || (other_category.value != "") ) && category.style.visibility == "visible" && category.value == 100) {
-		alert("Please specify other category");
-		return false;
-	}	
-}
 function checkWeights()
 {
 	var reviewWeight = document.getElementById('weights_review').value
@@ -86,7 +65,7 @@ function checkDeadlines()
 }
 
 function addElement() {
-
+  
   var ni = document.getElementById('extra_deadlines');
   var numReviews = document.getElementById('assignment_helper_no_of_reviews');
   if (numReviews.value>10 ||numReviews.value<=0 ||!numReviews.value.toString().match(/^[-]?\d*\.?\d*$/))

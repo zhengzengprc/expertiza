@@ -62,11 +62,66 @@ class CustomPermissions < ActiveRecord::Migration
     action.site_controller_id = controller.id
     action.permission_id = permission.id
     action.save
+    
+    controller = SiteController.find_by_name('review_mapping')
+    permission = Permission.find_by_name('do assignments')
+    action = ControllerAction.new
+    action.name ='add_reviewer'
+    action.site_controller_id = controller.id
+    action.permission_id = permission.id
+    action.save
+    
+      controller = SiteController.find_by_name('review_mapping')
+    permission = Permission.find_by_name('do assignments')
+    action = ControllerAction.new
+    action.name ='allow_same_topic_enabled'
+    action.site_controller_id = controller.id
+    action.permission_id = permission.id
+    action.save
+    
+        controller = SiteController.find_by_name('review_mapping')
+    permission = Permission.find_by_name('do assignments')
+    action = ControllerAction.new
+    action.name ='allow_different_topic_enabled'
+    action.site_controller_id = controller.id
+    action.permission_id = permission.id
+    action.save
+    
+        controller = SiteController.find_by_name('review_mapping')
+    permission = Permission.find_by_name('do assignments')
+    action = ControllerAction.new
+    action.name ='allow_same_topic'
+    action.site_controller_id = controller.id
+    action.permission_id = permission.id
+    action.save
+    
+        controller = SiteController.find_by_name('review_mapping')
+    permission = Permission.find_by_name('do assignments')
+    action = ControllerAction.new
+    action.name ='review_different_topic'
+    action.site_controller_id = controller.id
+    action.permission_id = permission.id
+    action.save
+    
+        controller = SiteController.find_by_name('review_mapping')
+    permission = Permission.find_by_name('do assignments')
+    action = ControllerAction.new
+    action.name ='add_dynamic_reviewer'
+    action.site_controller_id = controller.id
+    action.permission_id = permission.id
+    action.save
+    
+         controller = SiteController.find_by_name('submitted_content')
+    permission = Permission.find_by_name('do assignments')
+    action = ControllerAction.new
+    action.name ='show'
+    action.site_controller_id = controller.id
+    action.permission_id = permission.id
+    action.save
 
     Role.rebuild_cache
   end
 
-  
   def self.down
   end
 end

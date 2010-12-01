@@ -1,33 +1,215 @@
-<h2>Reviews for <%= @assignment.name %></h2>
 
-<% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.get_current_stage() == "Complete" %> 
-  <p>
-    You have completed <b><%=h pluralize(@num_reviews_completed, 'review') %></b>, 
-    with <b><%=h pluralize(@num_reviews_in_progress, 'review') %></b> outstanding.
-  </p>  
-  
+<% if @assignment.review_allowed(@reviewee_topic_id) or @assignment.get_current_stage() == "Complete" %>
+  <h3>Reviews for <%= @assignment.name %></h3>
   <%= render :partial => 'responses', :locals => {:mappings => @review_mappings, :title => 'Review'} %>
-  
-  <% if @assignment.dynamic_reviewer_assignments_enabled? %>
-    <h3>Review a New Submission</h3>
-    <% if @num_reviews_in_progress == 0 %>
-      <%= render :partial => 'set_dynamic_review', :locals => {:assignment => @assignment} %>
-    <% else %>
-      <em>Please complete (or release the reservation on) your current review before requesting another submission to review.</em> 
-    <% end %>  
-  <% end %>
+  <%@assignment.questionnaires.each do |a|%>
+  <%if a.display_type == "Review"%>
+  <%@questionnaire = a%>
+  <%end%>
+  <%end%>
+  <%@is_static = Questionnaire.find(@questionnaire.id)%>
+  <%if @is_static.is_static==0 %>
+   
+ <% form_tag :controller => 'review_mapping', :action => 'add_dynamic_reviewer', :id => @assignment.id, :user_id => session[:user].id, :participant_id => @participant_id do %>
+ 
+<!-- No team with sign up topics--> 
+ 
+<%if @assignment.sign_up_topics.size != 0%>
 
-<% else %>
-  <p><em>Reviews cannot be performed at this time</em></p>
+
+<%if (@is_static.review_granularity == "topic_review_least_number")%>
+  =============================================================================================  
+    
+  <p><div class="flash_note">Select a topic from the list below to begin a new review. <b>You will be able to select only topics with least overall reviews.</b></div></p>
+   <%@topic_review= SignUpTopic.find_all_by_assignment_id(@assignment.id,:order => "no_of_reviews")%>
+   <%@review=Array.new%>
+   <%@topic_review.each do |t|%>
+   <%@review << t.no_of_reviews%>
+   <%@min_review = @review.min%>
+   <%end%>
+   <%@topic_review.each do |topic| %>
+   <%@review << topic.no_of_reviews%>
+   <%@min_review = @review.min%>
+   <%if ((topic.no_of_reviews)==@min_review)%>
+    <%= radio_button_tag 'topic_id', topic.id %> <%= link_to topic.topic_name,:controller => "submitted_content",:action => "show", :topic_id => topic.id, :assignment => @assignment,:parti_id => @participant_id %><br>	
+   <%else%>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%= link_to topic.topic_name,:controller => "submitted_content",:action => "show", :topic_id => topic.id, :assignment => @assignment,:parti_id => @participant_id %><br>
+	<% end %>
+	<% end %>
+   <br>
+   <br/><br/>
+   <%if !(@is_static.review_granularity == "any_submission_review" || @is_static.review_granularity == "submission_review_least_number")%>
+  <input type='submit' value='Request a New Submission to Review'/>
+  <%end%>
+   ============================================================<br>
+   <%else%>
+  <p><div class="flash_note">Select any topic from the list below to begin a new review.</div></p>
+    <%@assignment.sign_up_topics.each do |topic| %>
+    <%= radio_button_tag 'topic_id', topic.id %> <%= link_to topic.topic_name,:controller => "submitted_content",:action => "show", :topic_id => topic.id, :assignment => @assignment,:parti_id => @participant_id %><br>
+	<% end %>
+   <br>
+   <br/><br/>
+    <%if !(@is_static.review_granularity == "any_submission_review" || @is_static.review_granularity == "submission_review_least_number")%>
+  <input type='submit' value='Request a New Submission to Review'/>
+  <%end%>
+  
+ <%end%> 
+<%else%>
+<%if @assignment.team_assignment%>
+<%if (@is_static.review_granularity == "submission_review_least_number") %>
+====================================================================================================
+<p><div class="flash_note">Select a submission from the list below to begin a new review. <b>You will be able to select only submissions with least overall reviews.</b></div></p>
+<%@review=Array.new%>
+<%@teamname.each do |topic_teamname|%>
+<%@review << topic_teamname.number_of_assigned_reviews%>
+   <%@min_review = @review.min%>
+   <%end%>
+   <%@teamname.each do |topic_teamname|%>
+   <%if ((topic_teamname.number_of_assigned_reviews)==@min_review)%>
+   <input type="radio" name="contributor_id" value=<%=topic_teamname.id%>>&nbsp;<%= topic_teamname.name%><br></br>
+   <%else%>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<%= topic_teamname.name%><br></br>
+   <%end%>
+   <%@user_id= TeamsUser.find_by_team_id(topic_teamname.id)%>
+
+<%@participant= AssignmentParticipant.find_by_user_id_and_parent_id(@user_id.user_id,@assignment.id)%>
+
+<% if @participant.get_hyperlinks.length > 0 %>
+	<%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => @participant} %><br/>
 <% end %>
 
-<h2>Metareviews for <%= @assignment.name %></h2>
+<% if @participant.assignment.wiki_type_id == 1%>
+	<% current_folder = DisplayOption.new 
+	current_folder.name = "" %>
+  	<%@files = @participant.get_files(@participant.get_path + current_folder.name) %>
+<table>
+         <tr><td> </td><td><div id="1_myDiv"><%= display_directory_tree(@participant, @files, true) %> </div></td></tr>
+</table>
+
+<%else%>
+  <%= render :partial => 'submitted_content/wiki', :locals => {:participant => @participant} %>
+  
+<%end%>
+<%end%>
+  <br/><br/>
+  <input type='submit' value='Request a New Submission to Review'/>
+
+   
+======================================================================================================
+<%else%>
+<p><div class="flash_note">Select a submission from the list below to begin a new review.</div></p>
+ <%@teamname.each do |topic_teamname|%>
+<input type="radio" name="contributor_id" value=<%=topic_teamname.id%>>&nbsp;<%= topic_teamname.name%><br></br>
+
+<%@user_id= TeamsUser.find_by_team_id(topic_teamname.id)%>
+
+<%@participant= AssignmentParticipant.find_by_user_id_and_parent_id(@user_id.user_id,@assignment.id)%>
+
+<% if @participant.get_hyperlinks.length > 0 %>
+	<%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => @participant} %><br/>
+<% end %>
+
+<% if @participant.assignment.wiki_type_id == 1%>
+	<% current_folder = DisplayOption.new 
+	current_folder.name = "" %>
+  	<%@files = @participant.get_files(@participant.get_path + current_folder.name) %>
+<table>
+         <tr><td> </td><td><div id="1_myDiv"><%= display_directory_tree(@participant, @files, true) %> </div></td></tr>
+</table>
+
+<%else%>
+  <%= render :partial => 'submitted_content/wiki', :locals => {:participant => @participant} %>
+  
+<%end%>
+<%end%>
+<%end%>
+<%if !(@is_static.review_granularity == "submission_review_least_number") %>
+  <br/><br/>
+  <input type='submit' value='Request a New Submission to Review'/>
+  <%end%>
+ <!-- No team with no sign up topics--> 
+<%else%>
+  <%@count=0%>
+  <%if (@is_static.review_granularity == "submission_review_least_number") %>
+  ======================================================================================================
+  <p><div class="flash_note">Select a submission from the list below to begin a new review. <b>You will be able to select only submissions with least overall reviews.</b></div></p>
+<%@review=Array.new%>
+<%@all_participants.each do |participant|%>
+<%@review << participant.no_of_reviews%>
+   <%@min_review = @review.min%>
+   <%end%>
+  <%@all_participants.each do |participant|%>
+  <%@count = @count+1%>
+  <%if ((participant.no_of_reviews)==@min_review)%>
+   <input type="radio" name="contributor_id" value=<%=participant.id%>>&nbsp;Paticipant id is <%=participant.id%> submission <%=@count%><br></br>
+   <%else%>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Participant Id is <%=participant.id%> submission <%=@count%><br></br>
+   <%end%>
+<% if participant.get_hyperlinks.length > 0 %>
+	<%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant} %><br/>
+<% end %>
+
+<% if participant.assignment.wiki_type_id == 1%>
+	<% current_folder = DisplayOption.new 
+	current_folder.name = "" %>
+  	<%@files = participant.get_files(participant.get_path + current_folder.name) %>
+<table>
+         <tr><td> </td><td><div id="1_myDiv"><%=display_directory_tree(participant, @files, true) %> </div></td></tr>
+</table>
+
+<%else%>
+
+  <%= render :partial => 'submitted_content/wiki', :locals => {:participant => participant} %>
+  
+<%end%>
+  <%end%>
+  <br/><br/>
+  <input type='submit' value='Request a New Submission to Review'/>
+  
+  ======================================================================================================
+  <%else%>
+  <p><div class="flash_note">Select a submission from the list below to begin a new review.</div></p>
+  <%@count=0%>
+  <%@all_participants.each do |participant|%>
+  <%@count = @count+1%>
+<input type="radio" name="contributor_id" value=<%=participant.id%>>&nbsp;submission <%=@count%><br></br>
+<% if participant.get_hyperlinks.length > 0 %>
+	<%= render :partial => 'submitted_content/hyperlink', :locals => {:participant => participant} %><br/>
+<% end %>
+
+<% if participant.assignment.wiki_type_id == 1%>
+	<% current_folder = DisplayOption.new 
+	current_folder.name = "" %>
+  	<%@files = participant.get_files(participant.get_path + current_folder.name) %>
+<table>
+         <tr><td> </td><td><div id="1_myDiv"><%=display_directory_tree(participant, @files, true) %> </div></td></tr>
+</table>
+
+<%else%>
+
+  <%= render :partial => 'submitted_content/wiki', :locals => {:participant => participant} %>
+  
+<%end%>
+  <%end%>
+  <%end%>
+  <%if !(@is_static.review_granularity == "submission_review_least_number") %>
+  <br/><br/>
+  <input type='submit' value='Request a New Submission to Review'/>
+  <%end%>
+  <%end%>
+  <%end%>
+<% end %> 
+ <% end %> 
+<% else %>
+  <h3>Reviews cannot be performed at this time</h3>
+<% end %>
+<BR/>
 
 <% if @assignment.metareview_allowed(@meta_reviewee_topic_id) or @assignment.get_current_stage() == "Complete" %>
+  <h3>Metareviews for <%= @assignment.name %></h3>
   <%= render :partial => 'responses', :locals => {:mappings => @metareview_mappings, :title => 'Metareview'} %>
-  <br/>
 <% else %> 
-  <p><em>Metareviews cannot be performed at this time.</em></p>
+  <h3>Metareviews cannot be performed at this time</h3>
 <% end %>
-
+<BR/>
 <a href="javascript:window.history.back()">Back</a>

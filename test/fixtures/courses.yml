@@ -18,10 +18,3 @@ course_e_commerce:
   directory_path: csc511
   info: E Commerce Class
   private: 0
-
-course_nil:
- name: InvalidCourse
- instructor_id:
- directory_path:
- info: InvalidCourse
- private: 0

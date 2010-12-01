@@ -1,69 +1,6 @@
-
-<table width=1000>
-<tr><td width=500 valign=top>
-<h1>Tasks</h1>
-
-<table class="listing" cellpadding=2>
-  <tr>
-	<th>&nbsp;</th>
-	<th>Assignment</th>
-	<th>Course</th>
-	<th>Topic</th>
-	<th>Stage</th>
-	<th>Stage Deadline</th>
-   </tr>
-	
-  <% for task in @task_list %>
-    <% if task["name"] != nil %>
-
-	  <% 
-         task_completed = (task['link_info'] && 
-                           (false ||
-                            task['link_type'] == 'review' && !task['link_info'].ready_for_review
-                           )
-                          )
-      %>
- 
-	  <% if !task_completed || session[:user].tasklist_greyout? %>
-      <tr class="listingRow" 
-	  <% if task_completed %>style="color:#CCCCCC;"
-	  <% elsif task['link_info'] %>style="color:red;"<% end %>>
-	    <td>&nbsp;</td>
-	    <td><%= task['name'] %></td>
-	    <td><%= task['course'] %></td>
-	    <td><%= task['topic'] %></td>
-	    <% if (task['link_info']) %>
-           <% if (task['link_type'] == 'submission') %>
-        	  <% if (task['deadline_type'] == 'switch_topics') %>
-		<td> <%= link_to 'Signup sheet', :controller=>'sign_up_sheet', :action => 'signup_topics', :id => task['link_info'].parent_id%></td>
-              <% else %>
-        <td><%= link_to task['deadline_type'], {:controller => 'submitted_content', :action => 'edit', :id => task['link_info']} %></td>
-              <% end %>
-           <% elsif (task['link_type'] == 'review') %>
-        <td>
-        	  <% if (task['link_info'].response) %>
-        	    <%= link_to task['deadline_type'], {:controller => 'response', :action => 'edit', :id => task['link_info'].response} %>
-              <% else %>
-        	    <%= link_to task['deadline_type'], {:controller => 'response', :action => 'new', :id => task['link_info']} %>
-              <% end %>
-		</td>
-           <% end %>
-        <% else %>
-        <td><%= task['deadline_type'] %></td>
-        <% end %>
-	    <td><%= task['due_at'] %></td>
-      </tr>
-	  <% end %>
-    <% end %>
-  <% end %>
-</table>
-
-
-</td><td width=500 valign=top>
-
 <h1>Assignments</h1>
 <br/>
-<div class="flash_note">To begin, click on an assignment from the list below or <%= link_to 'click here', :controller => 'publishing', :action => 'view' %> to set <b>publishing rights</b> for your work.</div>
+<div class="flash_note">To begin, click on an assignment from the list above or <%= link_to 'click here', :controller => 'publishing', :action => 'view' %> to set <b>publishing rights</b> for your work.</div>
 <br/>
 <table class="listing" cellpadding=2>
   <tr>
@@ -94,5 +31,3 @@
     <% end %>
   <% end %>
 </table>
-<br/>
-</td></tr></table>

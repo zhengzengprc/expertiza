@@ -1,7 +1,7 @@
 require File.dirname(__FILE__) + '/../test_helper'
 require 'assignment_participant'
 
-class AssignmentParticipantTest < ActiveSupport::TestCase
+class AssignmentParticipantTest < Test::Unit::TestCase
   fixtures :assignments, :users
   
   def test_import
@@ -14,9 +14,8 @@ class AssignmentParticipantTest < ActiveSupport::TestCase
     session = Hash.new
     session[:user] = users(:superadmin)
     
-    id = assignments(:assignment1).id
-    #id = assignments(:assignment1).id
-    #id = 1
+    id = assignments(:first).id
+    
     pc = AssignmentParticipant.count
     AssignmentParticipant.import(row,session,id)
     # verify that a single user was added to participants table

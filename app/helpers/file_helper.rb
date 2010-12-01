@@ -22,14 +22,10 @@ module FileHelper
   
   def self.update_file_location(oldpath,newpath)
     begin
-      if oldpath and newpath
-        create_directory_from_path(newpath)    
-        oldcontents = Dir.glob(oldpath + "/*")        
-        FileUtils.mv(oldcontents,newpath)
-        FileUtils.remove_dir(oldpath)
-      elsif newpath # nil oldpath
-        create_directory_from_path(newpath)    
-      end
+      create_directory_from_path(newpath)    
+      oldcontents = Dir.glob(oldpath + "/*")        
+      FileUtils.mv(oldcontents,newpath)
+      FileUtils.remove_dir(oldpath)
     rescue
       puts $!
     end
@@ -54,10 +50,10 @@ module FileHelper
     begin
       entries = Dir.entries(in_object.get_path)    
       if entries and entries.size == 2
-        FileUtils.remove_dir(in_object.get_path)          
-      end 
+         FileUtils.remove_dir(in_object.get_path)          
+     end 
     rescue PathError
-      # No action required
+      # No action required 
     rescue
       raise "An error was encountered while deleting the directory: "+$!
     end      
@@ -88,4 +84,4 @@ module FileHelper
       raise "An error was encountered while creating this directory: "+$!
     end   
   end   
-end   
+end

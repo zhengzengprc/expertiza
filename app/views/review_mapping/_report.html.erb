@@ -3,13 +3,13 @@
 <div class = "reviewreport">
     <table width="100%" cellspacing="0" cellpadding="2" border="0">
         <tr bgcolor="#CCCCCC">
-            <th width = "16%">
+            <th width = "22%">
                 Reviewer
             </th>
-            <th width = "14%">
+            <th width = "16%">
                # reviews done
             </th>
-            <th width = "20%">
+            <th width = "22%">
             	<% if @assignment.team_assignment %>
                 Team reviewed
 				<% else %>
@@ -19,14 +19,14 @@
             <th width = "8%">
                 Score awarded
             </th>
-			<th width = "8%">
-                Avg. score
-            </th>
-            <th width = "16%">
-                Score range
+			<th width = "14%">
+                Avg. score received
             </th>
             <th width = "20%">
-                Reviewed at 
+                Range of scores received
+            </th>
+            <th width = "10%">
+                Review completed 
             </th>
         </tr>
 		
@@ -89,8 +89,8 @@
                             <%else %>
                                 <td bgcolor="#DDDDBB" align = 'center'>
                             <%end %>
-                            <%=  Response.find(:first,:conditions=>["map_id = ?", ri.id]).updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
-                               </td>
+                            Yes 
+                        </td>
                         <tr/>
 
                         <%else %>
@@ -112,8 +112,7 @@
                             <%else %>
                                 <td bgcolor="#DDDDBB" align = 'center'>
                             <%end %>
-                                   <%=  Response.find(:first,:conditions=>["map_id = ?", ri.id]).updated_at.to_time.strftime("%m/%d/%Y - %I:%M%p") %>
-                            
+                                    Yes 
                             </td>
                             <tr/>
                         <%end %>

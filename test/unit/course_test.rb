@@ -1,24 +1,24 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class CourseTest < ActiveSupport::TestCase
+class CourseTest < Test::Unit::TestCase
   fixtures :courses
 
   def setup
-    @course = Course.find(courses(:course1).id)
+    @course = Course.find(1)
   end
   
   def test_retrieval
     assert_kind_of Course, @course
-    assert_equal courses(:course1).name, @course.name
-    assert_equal courses(:course1).id, @course.id
-    assert_equal courses(:course1).instructor_id, @course.instructor_id
-    assert_equal courses(:course1).directory_path, @course.directory_path
-    assert_equal courses(:course1).info, @course.info
+    assert_equal "My Course", @course.name
+    assert_equal 1, @course.id
+    assert_equal 1, @course.instructor_id
+    assert_equal 'abc123', @course.directory_path
+    assert_equal 'This is info', @course.info
     assert @course.private
   end
  
   def test_update
-    assert_equal courses(:course1).name, @course.name
+    assert_equal "My Course", @course.name
     @course.name = "Object-Oriented"
     @course.save
     @course.reload

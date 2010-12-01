@@ -1,12 +1,18 @@
 class StudentReviewController < ApplicationController
+  helper :SubmittedContent
   def list
-    #  Clean up any stale review reservations first.
-    DynamicReviewAssignmentHelper::remove_all_expired_reservations
-  
-    @participant = AssignmentParticipant.find(params[:id])
-    @assignment  = @participant.assignment
     
-    # Find the current phase that the assignment is in.
+    @participant = AssignmentParticipant.find(params[:id])
+    #Need to copy this because partial _responses modifies it but need to use this after the partial
+    @participant_id = @participant 
+    @assignment = @participant.assignment
+    if @assignment.team_assignment
+      @teamname = Team.find_all_by_parent_id(@assignment.id, :order => "number_of_assigned_reviews")
+    else
+      @all_participants = Participant.find_all_by_parent_id(@assignment.id, :order => "no_of_reviews")  
+    end
+    
+    # Finding the current phase that we are in
     @review_phase = @assignment.get_current_stage(AssignmentParticipant.find(params[:id]).topic_id)
     
     if @assignment.team_assignment
@@ -14,21 +20,7 @@ class StudentReviewController < ApplicationController
     else           
       @review_mappings = ParticipantReviewResponseMap.find_all_by_reviewer_id(@participant.id)
     end
-    @metareview_mappings = MetareviewResponseMap.find_all_by_reviewer_id(@participant.id)  
-
-    # Calculate the number of reviews that the user has completed so far. Probably a more
-    # efficient way to do this.
-    @num_reviews_completed = 0
-    @review_mappings.each do |map|
-      @num_reviews_completed += 1 if map.potential_response_deadline.nil?
-    end
-
-    # Calculate the number of reviews that are in progress for the current user for
-    # this assignment.
-    @num_reviews_in_progress = 0
-    @review_mappings.each do |map|
-      @num_reviews_in_progress += 1 unless map.potential_response_deadline.nil?
-    end
+    @metareview_mappings = MetareviewResponseMap.find_all_by_reviewer_id(@participant.id)    
 
     if @assignment.staggered_deadline?
       @review_mappings.each { |review_mapping|
@@ -75,7 +67,8 @@ class StudentReviewController < ApplicationController
             end
           end
        }
-    end
+   end
+   
 
   end  
   

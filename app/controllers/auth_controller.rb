@@ -15,7 +15,6 @@ class AuthController < ApplicationController
       if user and user.check_password(params[:login][:password])
         logger.info "User #{params[:login][:name]} successfully logged in"
         session[:user] = user
-        
         AuthController.set_current_role(user.role_id,session)
         
         respond_to do |wants|          
@@ -55,7 +54,7 @@ class AuthController < ApplicationController
   def self.authorised?(session, params)
     authorised = false  # default
     check_controller = false
-
+  
     if params[:controller] == 'content_pages' and
         params[:action] == 'view'
       if session[:credentials].pages.has_key?(params[:page_name].to_s)
@@ -71,8 +70,10 @@ class AuthController < ApplicationController
     else
       # Check if there's a specific permission for an action
       if session[:credentials].actions.has_key?(params[:controller])
+          
+          
         if session[:credentials].actions[params[:controller]].has_key?(params[:action])
-          if session[:credentials].actions[params[:controller]][params[:action]]
+           if session[:credentials].actions[params[:controller]][params[:action]]
             logger.info "Action: authorised"
             authorised = true
           else
@@ -101,6 +102,7 @@ class AuthController < ApplicationController
     
     logger.info "Authorised? #{authorised.to_s}"
     return authorised
+    
   end
 
 
@@ -134,13 +136,11 @@ class AuthController < ApplicationController
     session[:menu] = nil
     session[:clear] = true
     session[:assignment_id] = nil
-    session[:dsig] = nil
   end
 
 #clears any identifying info from session
   def self.clear_user_info(session, assignment_id)
     session[:user_id] = nil
-    session[:dsig] = nil
     session[:user] = ""  #sets user to an empty string instead of nil, to show that the user was logged in
     role = Role.find(1)
       if role

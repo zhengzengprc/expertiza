@@ -9,25 +9,10 @@ function onChange(){
 		count.style.display = "";
 		hidden.style.display = "none";
 		document.poppedLayer3.style.display = "";
-		var rdolist = document.getElementsByName("radio_rotcond");
-		if(rdolist[1].checked == false && rdolist[2].checked == false)
-			rdolist[0].checked = true;
-		rdolist[0].disabled = false;
-		rdolist[1].disabled = false;
-		rdolist[2].disabled = false;
-		
 	}else{
 		count.style.display = "none";
 		hidden.style.display  = "";
 		document.poppedLayer3.style.display = "none";
-		var rdolist = document.getElementsByName("radio_rotcond");
-		rdolist[0].checked = true;
-		rdolist[0].disabled = true;
-		rdolist[1].disabled = true;
-		rdolist[2].disabled = true;
-		document.getElementsByName("max_num")[0].style.visibility = "hidden";
-		document.getElementsByName("select_categories")[0].style.visibility = "hidden";
-		document.getElementsByName("other_category")[0].style.visibility = "hidden";
 	}
 }
 
@@ -97,16 +82,6 @@ function get_assignment_startdate() {
       </select>
     <% end %>
   </td>
-</tr>
-<tr>
-  <!-- added for code review option -->
-  <td><label for="codereview">Code Review assignment:</label></td>
-  <td>
-  		<select id="codereviewselect" name="assignment[codereview]">
-  		 <option value=false style="width:75px">No</option>
-         <option value=true style="width:75px" <% if @assignment.codereview %>SELECTED<%end%>>Yes</option>      
-        </select>
-  </td>  
 </tr>
 <tr>
   <td><label for="team_assignment">Team assignment:</label></td>
