@@ -13,7 +13,7 @@ class Question < ActiveRecord::Base
   NUMERIC = 'Numeric' # Display string for NUMERIC questions
   TRUE_FALSE = 'True/False' # Display string for TRUE_FALSE questions
   CHECKBOX = 'Checkbox'
- 
+  
   GRADING_TYPES = [[NUMERIC,false],[TRUE_FALSE,true],[CHECKBOX,1]]
   WEIGHTS = [['1',1],['2',2],['3',3],['4',4],['5',5]]
   QUESTION_TYPES = [['CHECKBOX',1],['RADIO',2],['DESCRIPTIVE',3]]
@@ -24,15 +24,7 @@ class Question < ActiveRecord::Base
     QuestionAdvice.find_all_by_question_id(self.id).each{|advice| advice.destroy}
     self.destroy
   end
-  
-  def before_save
-     
-     abc =   self.attributes['label']['1'];
-     pqr = abc;
-      xyz = pqr;
-  end
-  
-  
+    
   def parse
     q_and_a = txt.split(/\{|\}/).collect do |x| x.strip end
     answers = q_and_a[1]
@@ -63,17 +55,36 @@ class Question < ActiveRecord::Base
 end
 
 def before_save
-  if self.label.length < 1
-    return nil
-  else
-    for each in self.label
-      label += each.to_s;
-      label += "|";
-    end
-    self.labels = label
-  end   
+  p = self.attributes
+  q = p['label']
+  label = ""
+  q.each { |key, value| label += (value.to_s)+"|" }
+  self.labels = label
+end
+
+class Array
+  def to_h(key_definition)
+    result_hash = Hash.new()    
+    counter = 0
+    key_definition.each do |definition|
+      if not self[counter] == nil then
+        result_hash[definition] = self[counter].strip      
+      end      
+      counter = counter + 1
+    end    
+    return result_hash
+  end
 end
 
 def after_find
-  self.label = labels.split('|').collect! {|n| n.to_i}
+  arr = Array.new()
+  arr = self.labels.split('|')
+  index = (1..arr.length).to_a
+  for each in index
+    each = each.to_s
+  end
+  label =Hash.new()
+  label = arr.to_h(index)
+  return label
 end
+
