@@ -678,6 +678,17 @@ ActiveRecord::Schema.define(:version => 201010180105450) do
 
   add_index "users", ["role_id"], :name => "fk_user_role_id"
 
+  create_table "voluntary_works", :force => true do |t|
+    t.string   "name"
+    t.float    "weight"
+    t.string   "task_type"
+    t.integer  "course_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "voluntary_works", ["course_id"], :name => "fk_course_voluntary_works"
+
   create_table "wiki_types", :force => true do |t|
     t.string "name", :default => "", :null => false
   end
