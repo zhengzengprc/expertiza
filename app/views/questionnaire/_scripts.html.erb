@@ -44,7 +44,10 @@ function addQuestion(){
 	column.innerHTML = "<input id=new_question_" + id + "_txt name=new_question[" + id + "][type] size=10 type=text/>";
 	row.appendChild(column);
 	column = document.createElement("td");
-	column.innerHTML = "<input id=new_question_" + id + "_txt name=new_question[" + id + "][label] size=10 type=text/>";
+	column.innerHTML = "<input id=new_question_" + id + "_txt name=new_question[" + id + "][labels][1] size=10 type=text/>";
+	row.appendChild(column);
+	column = document.createElement("td");
+	column.innerHTML = "<input id=new_question_" + id + "_txt name=new_question[" + id + "][labels][2] size=10 type=text/>";
 	row.appendChild(column);
 	/* this is code that adds stuff */
 	
