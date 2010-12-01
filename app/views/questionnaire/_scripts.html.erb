@@ -41,7 +41,10 @@ function addQuestion(){
 	
 	/* this is code that adds an additional field: since we are using text strings this is a good test case */
 	column = document.createElement("td");
-	column.innerHTML = "<input id=new_question2_" + id + "_txt name=new_question[" + id + "][txt] size=70 type=text value='abc'/>";
+	column.innerHTML = "<input id=new_question_" + id + "_txt name=new_question[" + id + "][type] size=10 type=text/>";
+	row.appendChild(column);
+	column = document.createElement("td");
+	column.innerHTML = "<input id=new_question_" + id + "_txt name=new_question[" + id + "][label] size=10 type=text/>";
 	row.appendChild(column);
 	/* this is code that adds stuff */
 	
