@@ -24,6 +24,11 @@ class Question < ActiveRecord::Base
     self.destroy
   end
   
+  def before_save
+     abc =   self.attributes;
+  end
+  
+  
   def parse
     q_and_a = txt.split(/\{|\}/).collect do |x| x.strip end
     answers = q_and_a[1]
