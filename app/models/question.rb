@@ -52,3 +52,19 @@ class Question < ActiveRecord::Base
     output
   end
 end
+
+def before_save
+  if self.label.length < 1
+    return nil
+  else
+    for each in self.label
+      label += each.to_s;
+      label += "|";
+    end
+    self.labels = label
+  end   
+end
+
+def after_find
+  self.label = labels.split('|').collect! {|n| n.to_i}
+end
