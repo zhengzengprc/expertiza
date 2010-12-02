@@ -1,3 +1,8 @@
+# This locally extends the Array class with one more function. 
+# This function convertes an array type to a hash type. This
+# functionality is needed by the Javascript code that implements
+# the extended question types (checkbox, dropdown, radio, etc.).
+# See the function 'after_find' below.
 class Array
   def to_h(key_definition)
     result_hash = Hash.new()    
@@ -10,14 +15,13 @@ class Array
     end    
     return result_hash
   end
-end                 
+end            
+
 class Question < ActiveRecord::Base
   belongs_to :questionnaire # each question belongs to a specific questionnaire
   belongs_to :review_score  # each review_score pertains to a particular question
   belongs_to :review_of_review_score  # ditto
-  has_many :question_advices, :order => 'score' # for each question, there is 
-
-separate advice about each possible score
+  has_many :question_advices, :order => 'score' # for each question, there is separate advice about each possible score
   has_many :signup_choices # ?? this may reference signup type questionnaires
   
   validates_presence_of :txt # user must define text content for a question
@@ -70,7 +74,8 @@ separate advice about each possible score
     output
   end
 
-
+# These two functions are for saving the labels
+# generated for radio, checkbox, and dropdown question types.
 def before_save
   if self.label.nil?
     self.labels = ""
@@ -82,13 +87,11 @@ def before_save
    end
 end
 
-
-
 def after_find
   
   arr = Array.new()
   index1 = Array.new()
-  if self.labels ==""
+  if self.labels.nil?
     self.label = nil
   else
     arr = self.labels.split('|')
