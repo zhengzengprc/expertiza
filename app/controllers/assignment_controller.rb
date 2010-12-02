@@ -43,6 +43,7 @@ class AssignmentController < ApplicationController
   end  
   
   def new
+    flash[:notice] = "Under Construction: if you do not enter all manditory information correctly you will generate a runtime error"
     #creating new assignment and setting default values using helper functions
     if params[:parent_id]
       @course = Course.find(params[:parent_id])   
@@ -70,7 +71,6 @@ class AssignmentController < ApplicationController
     
     # The Assignment Directory field to be filled in is the path relative to the instructor's home directory (named after his user.name)
     # However, when an administrator creates an assignment, (s)he needs to preface the path with the user.name of the instructor whose assignment it is.
-    
     
     #CHECK TO ENSURE THAT BOTH SWITCH AND SUBMISSION DEADLINE ARE PROVIDED FOR SURE
 if params[:submit_deadline][:due_at] == "" || params[:submit_deadline][:due_at].nil? 
@@ -213,9 +213,26 @@ end
     params[:questionnaires].each{
       | key, value |       
       if value.to_i > 0 and Questionnaire.find(value)
-        @assignment.questionnaires << Questionnaire.find(value)
+      
+      	an_assignment_questionnaire = AssignmentQuestionnaires.new
+      	an_assignment_questionnaire.questionnaire_id = value
+      	an_assignment_questionnaire.questionnaire_type = key
+      	an_assignment_questionnaire.user_id = session[:user].id
+        @assignment.assignment_questionnaires << an_assignment_questionnaire
       end
-    }     
+    }
+    params[:team_questionnaires].each{
+      | key, value |       
+      if value.to_i > 0 and Questionnaire.find(value)
+      
+      	an_assignment_questionnaire = AssignmentQuestionnaires.new
+      	an_assignment_questionnaire.questionnaire_id = value
+      	an_assignment_questionnaire.questionnaire_type = "TeamReview"
+      	an_assignment_questionnaire.questionnaire_job = params[:job_title][key]
+      	an_assignment_questionnaire.user_id = session[:user].id
+        @assignment.assignment_questionnaires << an_assignment_questionnaire
+      end
+    }       
   end   
   
   def get_limits_and_weights 
@@ -229,16 +246,22 @@ end
     end
     
     default = AssignmentQuestionnaires.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)   
-    
+
+    @limits[:selfassessment] = default.notification_limit
     @limits[:review] = default.notification_limit
     @limits[:metareview] = default.notification_limit
     @limits[:feedback] = default.notification_limit
+    @limits[:supervisor] = default.notification_limit
     @limits[:teammate] = default.notification_limit
-   
+    @limits[:reader] = default.notification_limit
+
+	@weights[:selfassessment] = 0
     @weights[:review] = 100
     @weights[:metareview] = 0
     @weights[:feedback] = 0
-    @weights[:teammate] = 0    
+    @weights[:supervisor] = 0
+    @weights[:teammate] = 0  
+    @weights[:reader] = 0  
     
     @assignment.questionnaires.each{
       | questionnaire |
@@ -260,13 +283,15 @@ end
     @assignment.questionnaires.each{
       | questionnaire |
       aq = AssignmentQuestionnaires.find_by_assignment_id_and_questionnaire_id(@assignment.id, questionnaire.id)
-      if params[:limits][questionnaire.symbol].length > 0
-        aq.update_attribute('notification_limit',params[:limits][questionnaire.symbol])
-      else
-        aq.update_attribute('notification_limit',default.notification_limit)
-      end
+	  if !params[:limits][questionnaire.symbol].nil?
+      	if params[:limits][questionnaire.symbol].length > 0
+      	  aq.update_attribute('notification_limit',params[:limits][questionnaire.symbol])
+      	else
+       	 aq.update_attribute('notification_limit',default.notification_limit)
+      	end
       aq.update_attribute('questionnaire_weight',params[:weights][questionnaire.symbol])
       aq.update_attribute('user_id',user_id)
+      end
     }
   end
   
