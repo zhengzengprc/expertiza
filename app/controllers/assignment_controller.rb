@@ -247,13 +247,17 @@ end
     
     default = AssignmentQuestionnaires.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)   
 
-    @limits[:selfassessment] = default.notification_limit
-    @limits[:review] = default.notification_limit
-    @limits[:metareview] = default.notification_limit
-    @limits[:feedback] = default.notification_limit
-    @limits[:supervisor] = default.notification_limit
-    @limits[:teammate] = default.notification_limit
-    @limits[:reader] = default.notification_limit
+	#Something is causing default to be null; probably the changes made to the assignment_questionnaires table
+
+	if !default.nil?
+	    @limits[:selfassessment] = default.notification_limit
+	    @limits[:review] = default.notification_limit
+	    @limits[:metareview] = default.notification_limit
+	    @limits[:feedback] = default.notification_limit
+	    @limits[:supervisor] = default.notification_limit
+	    @limits[:teammate] = default.notification_limit
+	    @limits[:reader] = default.notification_limit
+	end
 
 	@weights[:selfassessment] = 0
     @weights[:review] = 100
