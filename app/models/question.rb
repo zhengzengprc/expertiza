@@ -1,8 +1,23 @@
+class Array
+  def to_h(key_definition)
+    result_hash = Hash.new()    
+    counter = 0
+    key_definition.each do |definition|
+      if not self[counter] == nil then
+        result_hash[definition] = self[counter].strip      
+      end      
+      counter = counter + 1
+    end    
+    return result_hash
+  end
+end                 
 class Question < ActiveRecord::Base
   belongs_to :questionnaire # each question belongs to a specific questionnaire
   belongs_to :review_score  # each review_score pertains to a particular question
   belongs_to :review_of_review_score  # ditto
-  has_many :question_advices, :order => 'score' # for each question, there is separate advice about each possible score
+  has_many :question_advices, :order => 'score' # for each question, there is 
+
+separate advice about each possible score
   has_many :signup_choices # ?? this may reference signup type questionnaires
   
   validates_presence_of :txt # user must define text content for a question
@@ -19,6 +34,8 @@ class Question < ActiveRecord::Base
   QUESTION_TYPES = [['CHECKBOX',1],['RADIO',2],['DESCRIPTIVE',3]]
   
   attr_accessor :checked
+  attr_accessor :type
+  attr_accessor :label
   
   def delete      
     QuestionAdvice.find_all_by_question_id(self.id).each{|advice| advice.destroy}
@@ -52,39 +69,36 @@ class Question < ActiveRecord::Base
     end
     output
   end
-end
+
 
 def before_save
-  p = self.attributes
-  q = p['label']
-  label = ""
-  q.each { |key, value| label += (value.to_s)+"|" }
-  self.labels = label
+  if self.label.nil?
+    self.labels = ""
+  else
+    q = self.label
+    labelT = ""
+    q.each { |key, value| labelT += (value.to_s)+"|" }
+    self.labels = labelT
+   end
 end
 
-class Array
-  def to_h(key_definition)
-    result_hash = Hash.new()    
-    counter = 0
-    key_definition.each do |definition|
-      if not self[counter] == nil then
-        result_hash[definition] = self[counter].strip      
-      end      
-      counter = counter + 1
-    end    
-    return result_hash
-  end
-end
+
 
 def after_find
+  
   arr = Array.new()
-  arr = self.labels.split('|')
-  index = (1..arr.length).to_a
-  for each in index
-    each = each.to_s
+  index1 = Array.new()
+  if self.labels ==""
+    self.label = nil
+  else
+    arr = self.labels.split('|')
+    index = (1..arr.length).to_a
+    for each in index
+      index1[each-1] = each.to_s
+    end
+    #self.label = Hash.new()
+    self.label = arr.to_h(index1)
   end
-  label =Hash.new()
-  label = arr.to_h(index)
-  return label
+  return
 end
-
+end
