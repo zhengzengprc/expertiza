@@ -1,4 +1,13 @@
+<% if session[:user].role.name == "Teaching Assistant"
+      user_id = Ta.get_my_instructor(session[:user].id)
+   else
+      user_id = session[:user].id
+   end %>
+
 <script type="text/javascript">
+
+num_jobs = 0;
+
 function onChange(){
 	count = document.getElementById("team_count1");
 	hidden = document.getElementById("team_count2");
@@ -15,6 +24,34 @@ function onChange(){
 		document.poppedLayer3.style.display = "none";
 	}
 }
+
+	function addJobs() {
+	
+		for (var x = 1; x <= document.getElementById("team_count").value; x++) {addJob();}
+		
+	}
+
+	function addJob(){
+	
+		num_jobs ++;
+
+		table = document.getElementById("teammate_review");
+
+		var row = table.insertRow(-1);
+		
+		column = document.createElement("td");
+
+		column.innerHTML = "<input name='job_title[" + num_jobs + "]' size='25' type='text' value='Job Name'>";
+
+		row.appendChild(column);
+	
+		column = document.createElement("td");
+
+		column.innerHTML = "<% selected = @assignment.questionnaires.find_by_type('TeammateReviewQuestionnaire') %><select style='width:500px' name='team_questionnaires[" + num_jobs + "]'><option value='0' <%if selected.nil?%>selected='yes'<%end%>>--None--</option><% TeammateReviewQuestionnaire.find(:all, :conditions => ['private = 0 or instructor_id = ?',user_id]).each{| questionnaire | %><option value='<%=questionnaire.id%>' <% if selected != nil and questionnaire.id == selected.id%>selected='yes'<%end%>><%=questionnaire.name %></option><% } %></select>";
+
+		row.appendChild(column);
+
+	}
 
 function get_assignment_startdate() {
     //var start_date = document.getElementById("assignment_startdate");
@@ -106,7 +143,7 @@ function get_assignment_startdate() {
 
 <tr id="team_count1" style="display:none">  
   <td valign="top" width="250" height="50"><label for="team_count">Maximum number of participants per team:</label></td>   
-  <td valign="top"><%= text_field 'assignment', 'team_count', :size => 5%></td>  
+  <td valign="top"><%= text_field 'assignment', 'team_count', :size => 5, "onchange" => "addJobs();", "id"=>"team_count"%></td>  
   </td> 
 </tr>
 
