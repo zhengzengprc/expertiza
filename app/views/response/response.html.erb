@@ -26,17 +26,16 @@
             <input type="checkbox" name=<%= "responses["+question.id.to_s+"]["+answerCounter.to_s+"]" %> value=<%= answer %>><%= answer %><br>
             <% answerCounter+=1 %>
         <% } %>
-    <% else %>
+    <% else %>		
 
-        <%= question.txt %><BR/>
+       <%= question.txt %><BR/>	
         <% if controller.action_name != 'new' and @review_scores[i].comments != nil %>
             <% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
             <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><%= text %></textarea>
         <% else %>
             <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ></textarea>
-
         <% end %>
-
+					
        <% if question.true_false? %>
           <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
              <%if controller.action_name != 'new' %>
@@ -58,6 +57,24 @@
               <% end %>
           </select>
       <% end %>
+	  
+	  <% if (question['qtype'] == "1") %>	
+	  	<% arr=Array.new() %>	
+			<% if controller.action_name != 'new' and @review_scores[i].comments != nil %>
+            	<% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
+				<%	arr = text.split('|')	%>
+        	<% end %>
+		
+			<%	for each in question.label %>
+				<br><!--<input type="checkbox" name='responses[][Lanswer]' value=abc>-->
+				<input type="checkbox" name=<%= "responses["+i.to_s+"][objectives]["+each[0].to_s+"]" %> <% if arr.include?(each[0].to_s) %>  checked="checked" <% end%>    ><br> 
+				<%= each[1]  %>
+			<% end %>
+		<% elsif (question['qtype'] == "2") %>
+			<%	for each in question.label %>	
+				<br><input type="radio" name=abcd value=abcd>		<%= each[1]  %>
+			<% end %>
+		<% end %>
 
   <%if question.question_advices.size > 0%>
       <%= render :partial => 'advice', :locals => {:i => i, :advice_list => question.question_advices} %>
