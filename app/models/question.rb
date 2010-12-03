@@ -88,9 +88,9 @@ def before_save
 end
 
 def after_find
-  
   arr = Array.new()
   index1 = Array.new()
+  
   if self.labels.nil?
     self.label = nil
   else
