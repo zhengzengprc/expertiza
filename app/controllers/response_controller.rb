@@ -48,8 +48,25 @@ class ResponseController < ApplicationController
       params[:responses].each_pair do |k,v|
         score = Score.find_by_response_id_and_question_id(@response.id, questions[k.to_i].id)
         score.update_attribute('score',v[:score])
-        score.update_attribute('comments',v[:comment])
+        
+        if v.has_key? "objectives" 
+          if v[:objectives].length>0
+            str = ""
+            v[:objectives].each_pair do |k1,v1|
+              str += (k1 + "|") 
+            end
+            score.update_attribute('comments',str)
+          end
+        else
+          if questions[k.to_i].qtype == "1"
+            score.update_attribute('comments',"")
+          else
+            score.update_attribute('comments',v[:comment])  
+          end
+          
+        end
       end    
+      
     rescue
       msg = "Your response was not saved. Cause: "+ $!
     end
@@ -111,9 +128,7 @@ class ResponseController < ApplicationController
   end
   
   def create
-    
     @map = ResponseMap.find(params[:id])
-    
     @res = 0
     msg = ""
     begin
