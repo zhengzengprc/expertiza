@@ -1,6 +1,6 @@
 class Score < ActiveRecord::Base
   belongs_to :question  
-  
+  attr_accessor :Lanswers
   # Computes the total score for a list of assessments
   # parameters
   #  assessments - a list of assessments of some type (e.g., author feedback, teammate review)
