@@ -3,9 +3,11 @@ deadline_type_submission:
   name: submission
 deadline_type_review:
   name: review
+  in_submitter_tasklist: true
 deadline_type_resubmission:
   name: resubmission
 deadline_type_rereview:
   name: rereview
 deadline_type_metareview:
   name: metareview
+  in_reviewer_tasklist: true
