@@ -10,6 +10,36 @@
   <hr/>
   <%= render :partial => 'users/email' %>
   <hr/>
+  <!-- E03 task list functionality 
+  if role is student then show radio buttons to show task preference  -->
+  <% if @user.role_id == Role::STUDENT %>
+
+  <b>Tasks</b>
+  <br>
+  Show my completed tasks as:
+
+  <% #fetch the value of the grayed or ungrayed from the task_grayed table and populate radio button %>
+     <% if(@taskf and @taskf.grayed == 1) %>
+         
+        <input type='radio' name='RadioAddition[check]' id='radio_grayed' value='1' checked  >
+        <label for='radio_grayed'>Grayed</label>
+        <input type='radio' name='RadioAddition[check]' id='radio_donotshow' value='0'>
+        <label for='radio_grayed'>Hidden</label>
+
+
+     <% else %>
+
+        <input type='radio' name='RadioAddition[check]' id='radio_grayed' value='1' >
+        <label for='radio_grayed'>Grayed</label>
+        <input type='radio' name='RadioAddition[check]' id='radio_donotshow' value='0' checked  >
+        <label for='radio_grayed'>Hidden</label>
+
+        
+     <% end %>
+
+  <% end %>
+  <!-- E03 task list functionality end -->
+	
   <%= render :partial => 'users/prefs' %>
   <%= render :partial => 'handle' %>  
   <% if @user.role.parent_id != nil %>

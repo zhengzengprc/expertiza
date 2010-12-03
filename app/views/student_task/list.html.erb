@@ -1,3 +1,11 @@
+<table border='0' width=100% cellpadding =2>
+  <tr valign=top><td><h1>Current Tasks</h1><br/>
+
+<!--# E03 task list functionality, partial added for showing tasks-->    
+<div class="flash_note">Click on any task from the list below to start.</div><br>
+ <%= render :partial => 'student_task/student_tasks' %>
+                            
+</td> <td>
 <h1>Assignments</h1>
 <br/>
 <div class="flash_note">To begin, click on an assignment from the list above or <%= link_to 'click here', :controller => 'publishing', :action => 'view' %> to set <b>publishing rights</b> for your work.</div>
@@ -26,4 +34,6 @@
       </tr>
     <% end %>
   <% end %>
+  </table>
+
 </table>

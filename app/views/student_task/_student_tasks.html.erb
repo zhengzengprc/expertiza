@@ -1,0 +1,135 @@
+<!-- E03 task list functionality
+html added to show all the tasks for the student -->
+<table border=0 class="listing" cellpadding="1">
+  <% if @tasks.size>0 %>
+  <tr>
+	<th>Pending Task</th>
+	<th>Stage Deadline</th>
+  </tr>
+ <% end %>
+  
+<% for participant in @tasks %>
+    <% nonactivelink=false %>
+    <% if participant.assignment != nil %>
+          <tr class="listingRow"> <td>
+            <% if @tasks_name[(participant.assignment.id.to_s+'-signup').to_sym]
+                    @tasks_name[(participant.assignment.id.to_s+'-signup').to_sym]=false
+                    if @active_link[(participant.assignment.id.to_s+'-signup').to_sym] %>
+                         <%=  link_to participant.assignment.name+'-sign up', :controller=>'sign_up_sheet', :action => 'signup_topics', :id => participant.parent_id%>
+                    <% else %>
+                           <% nonactivelink=true %>
+                           <% if @showgrayed==1 %>
+                           <font color="gray"><%= participant.assignment.name+'-signup'%></font>
+                           <% end %>
+                    <%end%>
+
+
+
+            <% elsif @tasks_name[(participant.assignment.id.to_s+'-submission').to_sym]
+                 @tasks_name[(participant.assignment.id.to_s+'-submission').to_sym]=false
+                  if @active_link[(participant.assignment.id.to_s+'-submission').to_sym]
+                      if @waitlist_flag[(participant.assignment.id.to_s+'-signup').to_sym]                                                       %>
+                            <%=link_to '<font color=red>'+participant.assignment.name+'-sign up (waitlisted)</font>', :controller=>'sign_up_sheet', :action => 'signup_topics', :id => participant.parent_id%>
+                      <%else
+                         if participant.assignment.submission_allowed(participant.topic_id) %>
+                            <%= link_to participant.assignment.name+'-submission', :controller => 'submitted_content', :action => 'edit', :id => participant.id %>
+                         <%else %>
+                            <%= link_to participant.assignment.name+'-submission', :controller => 'submitted_content', :action => 'view', :id => participant.id %>
+                         <%end%>
+                      <%end%>
+                  <%else%>
+                     
+							 <%  nonactivelink=true %>
+                             <% if @showgrayed==1 %>
+							 <font color="gray"><%= participant.assignment.name+'-submission'%>  </font>
+							 <% end %>
+
+				  <% end %>
+
+             <%elsif @tasks_name[(participant.assignment.id.to_s+'-resubmission').to_sym]
+                  @tasks_name[(participant.assignment.id.to_s+'-resubmission').to_sym]=false
+                  if @active_link[(participant.assignment.id.to_s+'-resubmission').to_sym]
+                     if participant.assignment.submission_allowed(participant.topic_id) %>
+                      <%= link_to participant.assignment.name+'-resubmission', :controller => 'submitted_content', :action => 'edit', :id => participant.id %>
+                    <% else %>
+                      <%= link_to participant.assignment.name+'-resubmission', :controller => 'submitted_content', :action => 'view', :id => participant.id %>
+                    <% end %>
+                  <% else  %>
+                      <% nonactivelink=true %>
+                      <% if @showgrayed==1%>
+                       <font color="gray"> <%= participant.assignment.name+'-resubmission'%> </font>
+                      <% end %>
+                  <% end%>
+             <% elsif @tasks_name[(participant.assignment.id.to_s+'-review').to_sym]
+                      @tasks_name[(participant.assignment.id.to_s+'-review').to_sym]=false
+                      if @active_link[(participant.assignment.id.to_s+'-review').to_sym]%>
+                           <%= link_to participant.assignment.name+'-review' ,{:controller => 'student_review', :action => 'list', :id => participant.id} %>
+                       <% else %>
+                            <% nonactivelink=true %>
+                            <% if @showgrayed==1%>
+                               <font color="gray"> <%=participant.assignment.name+'-review'%></font>
+                            <% end %>
+                      <% end  %>
+            <% elsif @tasks_name[(participant.assignment.id.to_s+'-rereview').to_sym]
+                                  @tasks_name[(participant.assignment.id.to_s+'-rereview').to_sym]=false
+                                  if @active_link[(participant.assignment.id.to_s+'-rereview').to_sym]%>
+                                       <%= link_to participant.assignment.name+'-rereview' ,{:controller => 'student_review', :action => 'list', :id => participant.id} %>
+                                   <% else %>
+                                      <% nonactivelink=true %>
+                                      <% if @showgrayed==1 %>
+                                       <font color="gray"> <%=participant.assignment.name+'-rereview'%>      </font>
+                                      <% end %>
+                                  <% end  %>
+
+
+               <%elsif  @tasks_name[(participant.assignment.id.to_s+'-author feedback').to_sym]
+                      @tasks_name[(participant.assignment.id.to_s+'-author feedback').to_sym]=false
+                      if @active_link[(participant.assignment.id.to_s+'-author feedback').to_sym]%>
+                        <%= link_to participant.assignment.name+'-author feedback' ,{:controller => 'grades', :action => 'view_my_scores', :id => participant.id} %>
+                      <% else %>
+                         <% nonactivelink=true %>
+                         <% if @showgrayed==1  %>
+                            <font color="gray"><%=participant.assignment.name+'-author feedback'%> </font>
+                         <% end %>
+                      <% end  %>
+              <%elsif  @tasks_name[(participant.assignment.id.to_s+'-teammate review').to_sym]
+                                  @tasks_name[(participant.assignment.id.to_s+'-teammate review').to_sym]=false
+                                  if @active_link[(participant.assignment.id.to_s+'-teammate review').to_sym]%>
+                                    <%= link_to participant.assignment.name+'-teammate review' ,{:controller=>'student_team', :action => 'view', :id => participant.id} %>
+                                  <% else %>
+                                     <% nonactivelink=true %>
+                                     <% if @showgrayed==1  %>
+                                       <font color="gray"> <%=participant.assignment.name+'-teammate review'%>      </font>
+                                     <% end %>
+                                  <% end  %>
+
+               <%elsif @tasks_name[(participant.assignment.id.to_s+'-metareview').to_sym]
+                      @tasks_name[(participant.assignment.id.to_s+'-metareview').to_sym]=false %>
+
+                  <% if @active_link[(participant.assignment.id.to_s+'-metareview').to_sym]%>
+                       <%= link_to participant.assignment.name+'-metareview' ,{:controller => 'student_review', :action => 'list', :id => participant.id} %>
+                  <% else %>
+                            <% nonactivelink=true %>
+							<% if @showgrayed==1%>
+                           <font color="gray"><%=participant.assignment.name+'-metareview'%> </font>
+                       <% end %>
+                   <% end  %>
+              <% end %>
+          </td>
+            <td>
+                    <% if nonactivelink %>
+
+						<% if @showgrayed==1 %>
+						  <%= participant.assignment.get_stage_deadline(participant.topic_id) %>
+						<% end %>
+
+                    <% else %>
+						<%= participant.assignment.get_stage_deadline(participant.topic_id) %>
+                    <% end %>
+            </td>
+
+         </tr>
+    <% end %>
+      <% end %>
+
+</table>

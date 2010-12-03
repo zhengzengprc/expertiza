@@ -6,7 +6,10 @@ class ProfileController < ApplicationController
  def edit 
     @user = session[:user]    
     @user.confirm_password = ''   
-    @assignment_questionnaires = AssignmentQuestionnaires.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',@user.id])     
+    @assignment_questionnaires = AssignmentQuestionnaires.find(:first, :conditions => ['user_id = ? and assignment_id is null and questionnaire_id is null',@user.id])    
+	
+    # E03 task list functionality get task preference for the user
+    @taskf = TaskGray.find_by_userid(@user.id)
  end
   
  #store parameters to user object
@@ -18,6 +21,17 @@ class ProfileController < ApplicationController
       aq.update_attribute('notification_limit',params[:assignment_questionnaires][:notification_limit])                    
     end
     
+	# E03 task list functionality create new task preference is not already there
+    if @taskf.nil?
+       new_task=TaskGray.new
+       new_task.userid=@user.id
+       new_task.grayed= params[:RadioAddition][:check]
+       new_task.save
+    else # else update based on user selection
+        @taskf.update_attribute(:grayed,params[:RadioAddition][:check])
+    end
+    
+	
     if params[:user][:clear_password].blank?
       params[:user].delete('clear_password')
     end
