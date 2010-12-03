@@ -91,5 +91,9 @@ class CourseNode < Node
   end
   def get_creation_date
     Course.find(self.node_object_id).created_at
-  end   
+  end
+
+  def get_id
+    Course.find(self.node_object_id).id
+  end     
 end

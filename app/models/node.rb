@@ -44,6 +44,10 @@ class Node < ActiveRecord::Base
   
   # Retrieves the node's object create_at
   def get_creation_date
+  end  
+  
+  # Retrieves the node's object create_at
+  def get_id
   end
   
   # Retrieves the type of children this node has

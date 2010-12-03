@@ -88,6 +88,11 @@ class AssignmentNode < Node
     TeamNode.get(self.node_object_id)
   end
 
+  # Gets any TeamNode id
+  def get_id
+    Assignment.find(self.node_object_id).id
+  end
+  
   def get_course
     if Assignment.find(self.node_object_id).course_id
       Course.find(Assignment.find(self.node_object_id).course_id).name
