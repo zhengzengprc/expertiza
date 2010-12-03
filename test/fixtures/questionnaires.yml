@@ -16,6 +16,7 @@ questionnaire1:
  type: "ReviewQuestionnaire"
  display_type: "Review"
  
+ 
 questionnaire2:
  name: questionnaire2
  instructor_id: <%= Fixtures.identify(:instructor2) %>

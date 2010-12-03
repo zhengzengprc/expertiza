@@ -1,24 +1,17 @@
 module SubmittedContentHelper
   
-  def display_directory_tree(participant, files, flag)     
-    
+  def display_directory_tree(participant, files, flag)        
         index = 0
-       
-       if(participant.assignment.team_assignment)
-       check_stage = "review"
-       else
-        check_stage = participant.assignment.get_current_stage(participant.topic_id)
-        end
-        
-       
-       
+        participant = @participant if @participant # TODO: Verify why this is needed
+        assignment = participant.assignment # participant is @map.contributor
+        topic_id = participant.topic_id     # participant is @map.reviewer
+        check_stage = assignment.get_current_stage(topic_id)
+
         ret = "\n<table id='file_table' cellspacing='5'>"
         ret += "\n   <tr><th>Name</th><th>Size</th><th>Type</th><th>Date Modified</th></tr>"
-        
         for file in files
                 ret += "\n   <tr>"
                 ret += "\n   <td valign = top>\n      "
-                
                 if check_stage != "Complete" && flag == false
                         ret += "<input type=radio id='chk_files' name='chk_files' value='#{index}'>"
                 else
@@ -26,15 +19,12 @@ module SubmittedContentHelper
                 end
                 ret += "\n      <input type=hidden id='filenames_#{index}' name='filenames[#{index}]' value='#{File.basename(file)}'>"
                 ret += "\n      <input type=hidden id='directories_#{index}' name='directories[#{index}]' value='#{File.dirname(file)}'>"
-                  
                 if File.directory?(file)
                         #ret += "\n      <a title='Expand/Collapse' href='#' onclick='javascript:collapseSubDirectory(#{index}); return false;'><img id='expand.#{index}' alt='Expand/Collapse' title='Expand/Collapse' src='/images/up.png'></a>&nbsp;"
                         ret += link_to File.basename(file), :controller => 'submitted_content', :action => 'edit', :id => participant.id, "current_folder[name]" =>  file
                         #ret += list_sub_directories(file, participant)
-                          
                 else
                         ret += "\n      "
-                          
                         parentFolder = File.dirname(file)
                         if parentFolder != participant.get_path
                           parentFolder.sub!(participant.get_path+"/","")
@@ -56,7 +46,6 @@ module SubmittedContentHelper
                 index += 1
         end
         ret += "\n</table>"
-  
         return ret
   end  
   

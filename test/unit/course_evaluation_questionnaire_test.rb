@@ -1,8 +1,9 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
 class CourseEvaluationQuestionnaireTest < Test::Unit::TestCase
-  fixtures :course_evaluation_questionnaires
-
+ # fixtures :course_evaluation_questionnaires
+  #TODO verify fixture
+  fixtures :questionnaires
   # Replace this with your real tests.
   def test_truth
     assert true

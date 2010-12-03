@@ -93,9 +93,6 @@ end
     ## feedback added
     ##
     
-    #Save team rotation constraints parameters in assignment table
-    saveTeamRotation
-    
     if params[:days].nil? && params[:weeks].nil?
       @days = 0
       @weeks = 0
@@ -182,34 +179,10 @@ end
     end
     
   end
-  def saveTeamRotation
-    #Checking if team rotation constraint is specified
-    if(params[:radio_rotcond] != nil or params[:radio_rotcond] != "0")
-      @assignment.rotation_condition = params[:radio_rotcond]
-      #Choosing already available category
-      if(params[:category][:id] != "100") #category - Other Default id - 100                 
-        @assignment.category_id = params[:category][:id]
-        puts "Choosing already available category"
-      #Specifying new category
-      elsif(params[:category][:name] != '')
-          @category = Category.new
-          @category.name = params[:category][:name]
-          puts "Specifying new category"
-          puts @category.id
-          @category.save        
-          @assignment.category_id = @category.id
-      end                
-    end
-  end
-  
- 
   
   def edit
     @assignment = Assignment.find(params[:id])
 
- 		if(@assignment.category_id != nil)
-      @category = Category.find(@assignment.category_id)
-    end
     if !@assignment.days_between_submissions.nil?
       @weeks = @assignment.days_between_submissions/7
       @days = @assignment.days_between_submissions - @weeks*7
@@ -256,14 +229,12 @@ end
     end
     
     default = AssignmentQuestionnaires.find_by_user_id_and_assignment_id_and_questionnaire_id(user_id,nil,nil)   
-
-    if default!= nil    
+    
     @limits[:review] = default.notification_limit
     @limits[:metareview] = default.notification_limit
     @limits[:feedback] = default.notification_limit
     @limits[:teammate] = default.notification_limit
-    end
-
+   
     @weights[:review] = 100
     @weights[:metareview] = 0
     @weights[:feedback] = 0
@@ -298,9 +269,8 @@ end
       aq.update_attribute('user_id',user_id)
     }
   end
-
   
-def update      
+  def update      
     if params[:assignment][:course_id]
       begin
         Course.find(params[:assignment][:course_id]).copy_participants(params[:id])
@@ -332,32 +302,9 @@ def update
 
     # The update call below updates only the assignment table. The due dates must be updated separately.
     if @assignment.update_attributes(params[:assignment])
-           #This is added to edit and save team rotation constraint related information
-      if(params[:radio_rotcond] == nil or params[:radio_rotcond] == "0")
-        @assignment.rotation_condition = 0
-        @assignment.category_id = nil
-        @assignment.max_num_times_can_partner = nil
-      elsif(params[:radio_rotcond] == "1")
-        @assignment.rotation_condition = 1
-        @assignment.category_id = nil
-      else
-        @assignment.rotation_condition = 2
-        if(params[:category][:id] != 100)
-          @assignment.category_id = params[:category][:id]
-        elsif(params[:category][:name] != '')
-          @category = Category.new
-          @category.name = params[:category][:name]
-          @category.save        
-          @assignment.category_id = @category.id
-        end   
-      end     
-      @assignment.save
-
-      if params[:questionnaires] and params[:limits] and params[:weights]
-        set_questionnaires
-        set_limits_and_weights
-      end
-
+      
+      set_questionnaires
+      set_limits_and_weights
       begin
         newpath = @assignment.get_path        
       rescue
@@ -436,10 +383,10 @@ def update
   
   def remove_assignment_from_course    
     assignment = Assignment.find(params[:id])
-    oldpath = assignment.get_path rescue nil
+    oldpath = assignment.get_path
     assignment.course_id = nil    
     assignment.save
-    newpath = assignment.get_path rescue nil
+    newpath = assignment.get_path
     FileHelper.update_file_location(oldpath,newpath)
     redirect_to :controller => 'tree_display', :action => 'list'
   end  

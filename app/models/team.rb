@@ -75,4 +75,9 @@ class Team < ActiveRecord::Base
    parent = Object.const_get(self.get_parent_model).find(parent_id)
    Object.const_get(self.get_node_type).create(:parent_id => parent.id, :node_object_id => self.id)
  end 
+ 
+ def topic_id
+   nil
+ end
+ 
 end

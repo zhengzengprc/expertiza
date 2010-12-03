@@ -19,6 +19,21 @@ class Assignment < ActiveRecord::Base
   belongs_to  :instructor, :class_name => 'User', :foreign_key => 'instructor_id'    
   has_many :sign_up_topics, :foreign_key => 'assignment_id', :dependent => :destroy  
     
+    # Join to Response_Maps Table
+	# Added by: Jason Vorenkamp
+	# Added on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assessment
+
+	has_many :response_maps, :foreign_key => 'reviewed_object_id', :class_name => 'ResponseMap'
+
+	# Join to Response Table
+	# Added by: Jason Vorenkamp
+	# Added on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assessment
+
+	# TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using this:
+	# has_many :responses, :through => :response_maps, :source => 'response'
+    
   validates_presence_of :name
   validates_uniqueness_of :scope => [:directory_path, :instructor_id]
     
@@ -56,7 +71,9 @@ class Assignment < ActiveRecord::Base
         | questionnaire |
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol] = Hash.new
         scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments] = questionnaire.get_assessments_for(participant)
-        scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Score.compute_scores(scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments], questions[questionnaire.symbol])        
+        #scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = Score.compute_scores(scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:assessments], questions[questionnaire.symbol])
+        #Changed code to use the score_cache instead of computing scores individually...10312010 SRS
+        scores[:participants][participant.id.to_s.to_sym][questionnaire.symbol][:scores] = ScoreCache.get_participant_score(participant, id, questionnaire.display_type)
       } 
       scores[:participants][participant.id.to_s.to_sym][:total_score] = participant.compute_total_score(scores[:participants][participant.id.to_s.to_sym])
     }        
@@ -69,7 +86,7 @@ class Assignment < ActiveRecord::Base
         scores[:teams][index.to_s.to_sym] = Hash.new
         scores[:teams][index.to_s.to_sym][:team] = team
         assessments = TeamReviewResponseMap.get_assessments_for(team)
-        scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])
+        scores[:teams][index.to_s.to_sym][:scores] = Score.compute_scores(assessments, questions[:review])  #    ScoreCache.get_participant_score(team, id, questionnaire.display_type)
         index += 1
       }
     end
@@ -311,7 +328,11 @@ def add_participant(user_name)
   end
   participant = AssignmentParticipant.find_by_parent_id_and_user_id(self.id, user.id)   
   if !participant
-    newpart = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted)      
+      if !user.master_permission_granted.nil?
+        p_permission_updated_at = user.permission_updated_at;
+        p_digital_signature = user.digital_signature;
+      end
+    newpart = AssignmentParticipant.create(:parent_id => self.id, :user_id => user.id, :permission_granted => user.master_permission_granted, :permission_updated_at => p_permission_updated_at, :digital_signature => p_digital_signature)      
     newpart.set_handle()         
   else
     raise "The user \""+user.name+"\" is already a participant."
@@ -335,16 +356,11 @@ def add_participant(user_name)
         return "Unknown"
       end
     end
-    
     due_date = find_current_stage(topic_id)
-    
     if due_date == nil or due_date == COMPLETE
-      
       return COMPLETE
     else
-       
-       return DeadlineType.find(due_date.deadline_type_id).name
-             
+      return DeadlineType.find(due_date.deadline_type_id).name
     end
   end
 
@@ -373,7 +389,32 @@ def add_participant(user_name)
     rounds
   end
 
-  
+ # SDN - E3 get stages of this assignment whos due dates have not passed
+ def find_pending_stages(topic_id=nil)
+     if self.staggered_deadline?
+      due_dates = TopicDeadline.find(:all,
+                   :conditions => ["topic_id = ? AND due_at > ?", topic_id, Time.now])
+    else
+      due_dates = DueDate.find(:all,
+                   :conditions => ["assignment_id = ? AND due_at > ?", self.id, Time.now])
+    end
+        
+    due_dates  
+ end
+ 
+ def get_course_string
+    # if course with an empty title, or a course with a title that has no printing characters ...    
+    begin
+      course = Course.find(self.course.id)
+      if course.name.strip.length == 0
+        raise
+      end
+      return course.name 
+    rescue      
+      return "<center>&#8212;</center>" 
+    end
+end
+
  def find_current_stage(topic_id=nil)
     if self.staggered_deadline?
       due_dates = TopicDeadline.find(:all,
@@ -469,5 +510,174 @@ end
       end
     end
     end
+    
+    	# getTotalReviewsAssigned()
+	# Returns the number of reviewers assigned to a particular assignment
+	# Created by: Jason Vorenkamp
+	# Created on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assessment
+
+	def getTotalReviewsAssigned()
+
+		self.response_maps.size
+
+	end
+
+	# getTotalReviewsAssignedByType()
+	# Returns the number of reviewers assigned to a particular assignment by the type of review
+	# Param: type - String (ParticipantReviewResponseMap, etc.)
+	# Created by: Jason Vorenkamp
+	# Created on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assessment
+
+	def getTotalReviewsAssignedByType(type)
+
+		count = 0
+
+		self.response_maps.each { |x| if x.type == type then count = count + 1 end }
+
+		count
+
+	end
+
+	# getTotalReviewsCompleted()
+	# Returns the number of reviews completed for a particular assignment
+	# Created by: Jason Vorenkamp
+	# Created on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assessment
+
+	def getTotalReviewsCompleted()
+
+		# TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using the proper syntax :
+
+		# self.responses.size
+
+		responseCount = 0
+
+		self.response_maps.each do |response_map|
+
+			if !response_map.response.nil? then responseCount = responseCount + 1
+
+			end
+
+		end
+
+		responseCount
+
+	end
+
+	# getTotalReviewsCompletedByType()
+	# Returns the number of reviews completed for a particular assignment by type of review
+	# Param: type - String (ParticipantReviewResponseMap, etc.)
+	# Created by: Jason Vorenkamp
+	# Created on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assessment
+
+	def getTotalReviewsCompletedByType(type)
+
+		# TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using the proper syntax :
+
+		# self.responses.size
+
+		responseCount = 0
+
+		self.response_maps.each do |response_map|
+
+			if !response_map.response.nil? then 
+
+				if response_map.type == type then 
+
+					responseCount = responseCount + 1
+
+				end
+
+			end
+
+		end
+
+		responseCount
+
+	end
+
+	# getTotalReviewsCompletedByTypeByDate()
+	# Returns the number of reviews completed for a particular assignment by type of review
+	# Param: type - String (ParticipantReviewResponseMap, etc.)
+	# Param: date - Filter reviews that were not created on this date
+	# Created by: Jason Vorenkamp
+	# Created on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assessment
+
+	def getTotalReviewsCompletedByTypeByDate(type, date)
+
+
+		# TODO A bug in Rails http://dev.rubyonrails.org/ticket/4996 prevents us from using the proper syntax :
+
+		# self.responses.size
+
+		responseCount = 0
+
+		self.response_maps.each do |response_map|
+
+			if !response_map.response.nil? then 
+
+				if response_map.type == type then
+
+					if (response_map.response.created_at.to_datetime.to_date <=> date) == 0 then
+
+						responseCount = responseCount + 1
+
+					end
+
+				end
+
+			end
+
+		end
+
+		responseCount
+
+	end
+
+	# getPercentageReviewsCompleted()
+	# Returns the percentage of reviews completed as an integer (0-100)
+	# Created by: Jason Vorenkamp
+	# Created on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assessment
+
+	def getPercentageReviewsCompleted()
+
+		if getTotalReviewsAssigned() == 0 then 0
+
+		else ((getTotalReviewsCompleted().to_f / getTotalReviewsAssigned().to_f) * 100).to_i
+
+		end
+
+	end
+
+	# getAverageScore()
+	# Returns the average of all responses for this assignment as an integer (0-100)
+	# Created by: Jason Vorenkamp
+	# Created on: November 1, 2010
+	# Project: CSC 517 - OSS Project - 320 Assessment
+
+	def getAverageScore()
+
+		sumOfScores = 0
+
+		self.response_maps.each do |response_map|
+
+			if !response_map.response.nil? then
+
+				sumOfScores = sumOfScores + response_map.response.getAverageScore
+
+			end
+
+		end
+
+		(sumOfScores / getTotalReviewsCompleted).to_i
+
+	end
+    
+    
 end
   

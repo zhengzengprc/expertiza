@@ -1,6 +1,15 @@
 class AssignmentTeam < Team
   belongs_to :assignment, :class_name => 'Assignment', :foreign_key => 'parent_id'
   has_many :review_mappings, :class_name => 'TeamReviewResponseMap', :foreign_key => 'reviewee_id'
+
+  def delete
+    if read_attribute(:type) == 'AssignmentTeam' # whose idea was it to use a ruby keyword for an attribute name?
+      signup = SignedUpUser.find_team_participants(parent_id.to_s).select{|p| p.creator_id == self.id}
+      signup.each &:destroy
+    end
+
+    super
+  end
  
   def get_hyperlinks
     links = Array.new
@@ -8,6 +17,17 @@ class AssignmentTeam < Team
      if team_member.submitted_hyperlink != nil and team_member.submitted_hyperlink.strip.length > 0      
       links << team_member.submitted_hyperlink      
      end
+    end
+    return links
+  end
+  
+  #used to get the files for the codereview
+  def get_codefiles
+    codefiles = Codefile.new
+    for team_member in self.get_participants 
+      for codefile in team_member.get_codefiles
+        codefiles << codefile
+      end
     end
     return links
   end
@@ -116,7 +136,11 @@ class AssignmentTeam < Team
  
   def add_participant(assignment_id, user)
    if AssignmentParticipant.find_by_parent_id_and_user_id(assignment_id, user.id) == nil
-     AssignmentParticipant.create(:parent_id => assignment_id, :user_id => user.id, :permission_granted => user.master_permission_granted)
+      if !user.master_permission_granted.nil?
+        p_permission_updated_at = user.permission_updated_at;
+        p_digital_signature = user.digital_signature;
+      end
+     AssignmentParticipant.create(:parent_id => assignment_id, :user_id => user.id, :permission_granted => user.master_permission_granted, :permission_updated_at => p_permission_updated_at, :digital_signature => p_digital_signature)
    end    
   end
  

@@ -23,6 +23,7 @@ Rails::Initializer.run do |config|
   config.gem 'RedCloth'
   config.gem 'rgl', :lib => 'rgl/adjacency'
   config.gem 'rubyzip', :lib => "zip/zip"
+  config.gem 'gchartrb', :lib => 'google_chart'
   #raise 'graphviz dependency is not installed - missing dot executable' unless RUBY_PLATFORM =~ /mswin/ or %x(which dot).to_s.any?
 
   # Only load the plugins named here, in the order given (default is alphabetical).
@@ -65,7 +66,7 @@ Rails::Initializer.run do |config|
 # creating a new user or instructor.
 # config.action_mailer.smtp_settings = {
 #  :enable_starttls_auto => true,
-#   :address        => "smtp.gmail.com",
+#  :address        => "smtp.gmail.com",
 #   :port           => 587,
 #   :domain         => "gmail.com",
 #   :authentication => :plain,

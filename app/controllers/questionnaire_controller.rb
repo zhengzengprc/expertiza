@@ -113,12 +113,7 @@ class QuestionnaireController < ApplicationController
       @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
     else
       @questionnaire.instructor_id = session[:user].id
-    end 
-    if params[:static] == "dynamic_review"
-      @questionnaire.is_static = 0
-      @questionnaire.review_granularity = params[:review]
-      @questionnaire.review_selection_type = params[:topic_review]
-    end
+    end       
     save_questionnaire    
     redirect_to :controller => 'tree_display', :action => 'list'
   end

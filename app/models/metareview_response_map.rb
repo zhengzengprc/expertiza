@@ -94,4 +94,24 @@ class MetareviewResponseMap < ResponseMap
       index += 1
     end 
   end  
+  
+  # E3 task list - determine if info has been reviewed but not metareviewed
+  #    Override of response_map version for metareviews
+  def ready_for_review()
+    rev_response = self.review_mapping.response
+    meta_response = self.response
+    if rev_response.nil?   
+      return false             # no review, so nothing to metareview
+    elsif meta_response.nil?
+      return true              # no metareview submitted, so ready
+    else
+      return rev_response.updated_at > meta_response.updated_at  # ready if a new review
+    end
+  end
+
+  # E3 task list - change displayed task name for metareviews
+  def task_name_override()
+    'metareview' 
+  end
+
 end

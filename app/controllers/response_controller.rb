@@ -1,6 +1,6 @@
 class ResponseController < ApplicationController
   helper :wiki
-  helper :SubmittedContent
+  helper :submitted_content
   helper :file
   
   def view
@@ -110,6 +110,8 @@ class ResponseController < ApplicationController
       ResponseHelper.compare_scores(@response, @questionnaire)
      ScoreCache.update_cache(@res)
       msg = "Your response was successfully saved."
+      @map.potential_response_deadline = nil
+      @map.save
     rescue
       @response.delete
       msg = "Your response was not saved. Cause: "+$!
@@ -138,15 +140,14 @@ class ResponseController < ApplicationController
   
   private
     
-def get_content    
+  def get_content    
     @title = @map.get_title 
-    @assignment = @map.assignment 
+    @assignment = @map.assignment
     @participant = @map.reviewer
-    @contributor = @map.contributor 
+    @contributor = @map.contributor
     @questionnaire = @map.questionnaire
-    #@questionnaire = Questionnaire.find_by_id(1)
     @questions = @questionnaire.questions
     @min = @questionnaire.min_question_score
-    @max = @questionnaire.max_question_score
-  end          
+    @max = @questionnaire.max_question_score     
+  end      
 end
