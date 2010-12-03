@@ -236,6 +236,7 @@ class QuestionnaireController < ApplicationController
       for question_key in params[:new_question].keys
         q = Question.new(params[:new_question][question_key])
         q.questionnaire_id = questionnaire_id
+        q.qtype = params[:new_question][question_key]['type']
         abc =   q.label['1'];
         q.save if !q.txt.strip.empty?
        
