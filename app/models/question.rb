@@ -31,11 +31,10 @@ class Question < ActiveRecord::Base
   # Class variables
   NUMERIC = 'Numeric' # Display string for NUMERIC questions
   TRUE_FALSE = 'True/False' # Display string for TRUE_FALSE questions
-  CHECKBOX = 'Checkbox'
-  
-  GRADING_TYPES = [[NUMERIC,false],[TRUE_FALSE,true],[CHECKBOX,1]]
+    
+  GRADING_TYPES = [[NUMERIC,false],[TRUE_FALSE,true]]
   WEIGHTS = [['1',1],['2',2],['3',3],['4',4],['5',5]]
-  QUESTION_TYPES = [['CHECKBOX',1],['RADIO',2],['DESCRIPTIVE',3]]
+  QUESTION_TYPES = [['Checkbox',1],['Radio',2],['Free text with numeric',3],['Free text',4]]
   
   attr_accessor :checked
   attr_accessor :type
