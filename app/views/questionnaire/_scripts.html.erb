@@ -190,6 +190,7 @@ function addQuestion(){
 		row.appendChild(column);
 		num_questions = num_questions + 1;
 	}
+	// code for free text
 	if (typeQuestion == 4)	{
 		table = document.getElementById("questions_table");
 		var row = table.insertRow(-1);
@@ -215,11 +216,11 @@ function addQuestion(){
 		
 		var labelRow = labelTable.insertRow(-1);
 		column = document.createElement("td");
-		column.innerHTML = "<input value="+id+"_1"+" class='label_text' id=new_question_" + id + "_label name=new_question[" + id + "][label][1] size=10 type=text style='visibility:hidden;'/>";
+		column.innerHTML = "<input style='visibility:hidden' value='nil' class='label_text' id=new_question_" + id + "_label name=new_question[" + id + "][label][1] size=10 type=text style='visibility:hidden;'/>";
 		labelRow.appendChild(column);
-	/*	
+		
 		column = document.createElement("td");
-		gradingTypes = "<select id=question_" + id + "_true_false name=new_question[" + id + "][true_false]>";
+		gradingTypes = "<select style='visibility:hidden' id=question_" + id + "_true_false name=new_question[" + id + "][true_false]>";
 		<% for type in Question::GRADING_TYPES %>
 			<%= "gradingTypes += '<option value=" + type[1].to_s + ">" + type[0].to_s + "</option>';"%>
 		<% end %>
@@ -228,13 +229,13 @@ function addQuestion(){
 		row.appendChild(column);
 		
 		column = document.createElement("td");
-		weights = "<select id=new_question_" + id + "_weight name=new_question[" + id + 		"][weight]>";
+		weights = "<select style='visibility:hidden' id=new_question_" + id + "_weight name=new_question[" + id + 		"][weight]>";
 		<% for weight in Question::WEIGHTS %>
 			<%= "weights += '<option value=" + weight[1].to_s + ">" + weight[0].to_s + "</option>';"%>
 		<% end %>
 		weights = weights + "</select>";
 		column.innerHTML = weights;
-		row.appendChild(column);*/
+		row.appendChild(column);
 		num_questions = num_questions + 1;
 	}
 }
