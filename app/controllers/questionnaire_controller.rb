@@ -238,6 +238,7 @@ class QuestionnaireController < ApplicationController
         q.questionnaire_id = questionnaire_id
         q.qtype = params[:new_question][question_key]['type']
         abc =   q.label['1'];
+        defgh = abc
         q.save if !q.txt.strip.empty?
        
       end
