@@ -35,6 +35,9 @@ class Question < ActiveRecord::Base
   GRADING_TYPES = [[NUMERIC,false],[TRUE_FALSE,true]]
   WEIGHTS = [['1',1],['2',2],['3',3],['4',4],['5',5]]
   QUESTION_TYPES = [['Checkbox',1],['Radio',2],['Free text with numeric',3],['Free text',4]]
+  QUESTION_TYPES_INV = [["1",'Checkbox'],["2",'Radio'],["3",'Free text with numeric'],["4",'Free text']]
+  # We just won an award for bad coding...
+
   
   attr_accessor :checked
   attr_accessor :type

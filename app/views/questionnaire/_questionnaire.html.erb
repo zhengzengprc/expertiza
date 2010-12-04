@@ -100,11 +100,11 @@
             <%= text_field "question[]", 'txt', :size=>70 %>
 			
             <table>
-                <!--the for loop below shows label for a question and saves bak to database-->
+                <!--the for loop below shows label for a question and saves back to database-->
                 <% for @labelT in @question.label %>
                 <tr>
                     <td>
-                        label: <input value='<%= @labelT[1] %>' class='label_text' id='new_question_label' name='question[<%= i%>][label][<%= @labelT[0] %>]' size=10 type=text/>
+	                        Enter text for <%= Question::QUESTION_TYPES_INV[@question.qtype.to_i].to_s + " option " + @labelT[0]%>  : <input value='<%= @labelT[1] %>' class='label_text' id='new_question_label' name='question[<%= i%>][label][<%= @labelT[0] %>]' size=10 type=text/>
                     </td>
                 </tr><% end %>
             </table>
