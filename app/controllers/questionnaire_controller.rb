@@ -113,7 +113,16 @@ class QuestionnaireController < ApplicationController
       @questionnaire.instructor_id = Ta.get_my_instructor((session[:user]).id)
     else
       @questionnaire.instructor_id = session[:user].id
-    end       
+    end     
+        #Extra data to be stored if dynamic review is enabled! Is_static is used to tell which of the two 
+    #types of review is enabled. Review granularity is used to tell if the student can select reviews 
+    #at topic level or submission level.
+    #review_selection_type is used to tell if the student can review submissions from his/her own topic.
+    if params[:static] == "dynamic_review"
+      @questionnaire.is_static = 0
+      @questionnaire.review_granularity = params[:review]
+      @questionnaire.review_selection_type = params[:topic_review]
+    end
     save_questionnaire    
     redirect_to :controller => 'tree_display', :action => 'list'
   end

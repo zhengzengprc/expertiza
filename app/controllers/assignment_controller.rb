@@ -83,7 +83,13 @@ if params[:switch_deadline][:due_at] == "" || params[:switch_deadline][:due_at].
   redirect_to :action => 'new', :private => params[:assignment][:private]
   return
 end
-    
+
+#ensure submit deadline is > switch deadline. Doesnt make sense to have it any other way!
+  if (params[:switch_deadline][:due_at] > params[:submit_deadline][:due_at]) 
+ flash[:error] = " Switch deadline has to be lesser than submit deadline" 
+ redirect_to :action => 'new', :private => params[:assignment][:private]
+ return
+end
   
     @assignment = Assignment.new(params[:assignment])    
     @user =  ApplicationHelper::get_user_role(session[:user])
@@ -300,7 +306,27 @@ end
   end
 
   
-def update      
+def update
+  
+      #added this bit of code to make sure that the submit deadline is greater than switch topic deadline 
+    #on editing the assignment
+    for due_date_key in params[:due_date].keys
+         due_date_temp = DueDate.find(due_date_key)
+         if due_date_temp.deadline_type_id == 6
+            switch_topic_deadline = params[:due_date][due_date_key][:due_at]
+         elsif due_date_temp.deadline_type_id == 1
+         submission_deadline = params[:due_date][due_date_key][:due_at]
+         end
+   end
+  
+   if (switch_topic_deadline > submission_deadline)
+     
+     flash[:error] = 'Switch Deadline has to be lesser than submission deadline.'
+     redirect_to :action => 'edit', :id => params[:id]
+     return 
+   end
+
+  
     if params[:assignment][:course_id]
       begin
         Course.find(params[:assignment][:course_id]).copy_participants(params[:id])

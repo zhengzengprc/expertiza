@@ -4,6 +4,44 @@ require 'uri'
 class SubmittedContentController < ApplicationController
   helper :wiki
   
+   #show method added as a part of dynamic and self selected reviewing. This method is used to show the list 
+  #submissions sorted by team or by submissions in case it is not a team assingment.
+ def show
+ 
+ #get all users signed up for the given topic id.
+ @team_names = SignedUpUser.find_all_by_topic_id(params[:topic_id])
+ @topic_id = params[:topic_id].to_i
+ @teamname = Array.new
+ #find all teams part of this assignemnt. If not a team assingmnet it doesnt matter. We will still display 
+ #the submissions. 
+ @team_names.each do |name|
+   @teamname << Team.find_by_id_and_parent_id(name.creator_id, params[:assignment])
+ end
+ 
+ #finding all participants of this assignment
+ @part =Array.new
+  @team_names.each do |name|
+   @part << AssignmentParticipant.find_by_user_id_and_parent_id(name.creator_id, params[:assignment] )
+ end
+ 
+ #either teamname or part will be nil. Because it can either be a team assignment or individual assigment.
+ #sorting them by number of reviews so that they can be displayed accordingly.
+  if (!(@teamname[0].nil?))
+  @teamname.sort!{|a,b| a.number_of_assigned_reviews <=> b.number_of_assigned_reviews}
+else
+  @part.sort! {|a,b| a.no_of_reviews <=> b.no_of_reviews}
+end
+ @assignment = Assignment.find(params[:assignment])
+ @participant_id = params[:parti_id]
+ #if nobody has signed up for topics, no need to show this page at all
+ if @team_names.size == 0
+   flash[:error] = "Sorry! Nobody has signed up for this topic. Please pick another one."
+   redirect_to :controller => 'student_review',:action => 'list', :id => @participant_id
+   return
+ end
+end
+
+  
   def edit
     @participant = AssignmentParticipant.find(params[:id])
     @assignment = @participant.assignment

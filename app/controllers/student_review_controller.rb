@@ -1,10 +1,38 @@
 class StudentReviewController < ApplicationController
+  
+  helper :SubmittedContent
+  
   def list
-    #  Clean up any stale review reservations first.
-    DynamicReviewAssignmentHelper::remove_all_expired_reservations
   
     @participant = AssignmentParticipant.find(params[:id])
+    
+     #The below statement might look meaningless. However, this needs to be copied because the partial 
+  # _responses modifies @participant but need to use this information after the partial is displayed as well.
+    @participant_id = @participant 
+    
     @assignment  = @participant.assignment
+    
+        #this code was added to take care of the condition where there are sign up topics but have no submissions.
+    #when sorting them by number of reviews, they will always have 0 reviews and hence will be shown at the topic 
+    #although they have no use. Here, we are setting number of reviews to a high number so that it may be at the
+    #bottom of the sorted list.
+    @assignment.sign_up_topics.each do |a|
+      @signed_up_user = SignedUpUser.find_by_topic_id(a.id)
+      if (@signed_up_user.nil?)
+        a.no_of_reviews = 10000
+        a.save
+      end
+    end
+    
+    #To sort the topics in order of number of assigned reviews. These instance variables are used to
+    #display the list of topics to the reviewer in sorted order in terms of number of reviews. It also
+    #handles the case if the assignment is a team assignment or not.
+    if @assignment.team_assignment
+      @teamname = Team.find_all_by_parent_id(@assignment.id, :order => "number_of_assigned_reviews")
+    else
+      @all_participants = Participant.find_all_by_parent_id(@assignment.id, :order => "no_of_reviews")  
+    end
+    
     
     # Find the current phase that the assignment is in.
     @review_phase = @assignment.get_current_stage(AssignmentParticipant.find(params[:id]).topic_id)
@@ -16,19 +44,7 @@ class StudentReviewController < ApplicationController
     end
     @metareview_mappings = MetareviewResponseMap.find_all_by_reviewer_id(@participant.id)  
 
-    # Calculate the number of reviews that the user has completed so far. Probably a more
-    # efficient way to do this.
-    @num_reviews_completed = 0
-    @review_mappings.each do |map|
-      @num_reviews_completed += 1 if map.potential_response_deadline.nil?
-    end
-
-    # Calculate the number of reviews that are in progress for the current user for
-    # this assignment.
-    @num_reviews_in_progress = 0
-    @review_mappings.each do |map|
-      @num_reviews_in_progress += 1 unless map.potential_response_deadline.nil?
-    end
+   
 
     if @assignment.staggered_deadline?
       @review_mappings.each { |review_mapping|

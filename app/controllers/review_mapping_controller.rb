@@ -17,6 +17,23 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:id])     
     @contributor = assignment.get_contributor(params[:contributor_id])
     session[:contributor] = @contributor
+    
+    #Find the review questionnaire for this assignment. This assumes that a questionnaire has been assigned!
+   assignment.questionnaires.each do |a|
+       if a.display_type == "Review"
+      @questionnaire = a
+        end
+  end
+  #if no review questionnaire is given, you will get a nil object error! 
+  #Add a review questionnaire!
+  @is_static = Questionnaire.find(@questionnaire.id)
+  
+  #if dynamic review, we are not allowign to add a reviewer statically! Would mess up a lot of things!
+    if(@is_static.is_static == 0)
+    flash[:error] = "This assignment has a dynamic review. Cannot add a reviewer statically... "
+    redirect_to :action => 'list_mappings', :id => params[:id]
+    return
+    end
   end
   
   def select_supervisor
@@ -75,48 +92,6 @@ class ReviewMappingController < ApplicationController
     redirect_to :action => 'list_mappings', :id => assignment.id, :msg => msg                                    
   end
 
-  def add_dynamic_reviewer
-    assignment = Assignment.find(params[:assignment_id])
-    reviewer   = AssignmentParticipant.find_by_user_id_and_parent_id(params[:reviewer_id], assignment.id)
-    requested_topic_id = params[:topic_id]
-    
-    submission = DynamicReviewAssignmentHelper::dynamic_review_assignment(assignment.id, reviewer.id, requested_topic_id)
-    
-    if submission.nil?
-        flash[:error] = "Could not find a submission to review for the specified topic, please choose another topic to continue."
-        redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
-    else
-      contributor = AssignmentParticipant.find_by_id_and_parent_id(submission.id, assignment.id)
-    
-      potentialResponseDeadline = (DateTime.now.to_time + assignment.dynamic_reviewer_response_time_limit_hours.hours).to_datetime
-    
-      begin
-        if assignment.team_assignment
-          if TeamReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?', contributor.id, reviewer.id]).nil?
-            TeamReviewResponseMap.create(:reviewee_id => contributor.id, 
-                                         :reviewer_id => reviewer.id,
-                                         :reviewed_object_id => assignment.id, 
-                                         :potential_response_deadline => potentialResponseDeadline)
-          else
-            raise "The reviewer is already assigned to this contributor. This shouldn't happen."
-          end
-        else
-          if ParticipantReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?',contributor.id,reviewer.id]).nil?
-            ParticipantReviewResponseMap.create(:reviewee_id => contributor.id, 
-                                                :reviewer_id => reviewer.id,
-                                                :reviewed_object_id => assignment.id, 
-                                                :potential_response_deadline => potentialResponseDeadline)
-          else
-            raise "The reviewer is already assigned to this contributor. This shouldn't happen."
-          end
-        end
-      rescue
-        flash[:error] = $!
-      end
-
-      redirect_to :controller => 'student_review', :action => 'list', :id => reviewer.id
-    end
-  end
  
   def add_metareviewer    
     mapping = ResponseMap.find(params[:id])  
@@ -159,6 +134,377 @@ class ReviewMappingController < ApplicationController
      return reviewer
   end  
   
+
+#This method checks if the option that a student may do all their reviews only from the same topic is enabled.
+  def allow_same_topic_enabled(assignment)
+      assignment.questionnaires.each do |a|
+      if a.display_type == "Review"
+      @questionnaire_topic = a
+      end
+      end
+  @is_allow_sametopic = Questionnaire.find(@questionnaire_topic.id)
+  if (@is_allow_sametopic.review_selection_type == "all_review_same_topic")
+      return true
+  else
+      return false
+  end
+end
+
+#This method is used to check if the option that a student may select submissions only from topics
+#he/she has not worked on.
+
+ def allow_different_topic_enabled(assignment)
+      assignment.questionnaires.each do |a|
+      if a.display_type == "Review"
+      @questionnaire_topic = a
+      end
+      end
+  @is_allow_sametopic = Questionnaire.find(@questionnaire_topic.id)
+  if (@is_allow_sametopic.review_selection_type == "not_review_same_topic")
+      return true
+  else
+      return false
+  end
+  end
+  
+  
+  ## Lets the reviewer choose only from topics that he has previously chosen a review from
+  def allow_same_topic(assignment, reviewer_id, topic_identifier)
+    
+    @is_first = ResponseMap.find_by_reviewed_object_id_and_reviewer_id(assignment.id,reviewer_id)
+    if (@is_first.nil?)##First review for that assignmet, so can select any topic
+      return true
+    else
+      if assignment.team_assignment ## If team assignment we have team id
+        
+        @team = Team.find(@is_first.reviewee_id)
+        @team_user = TeamsUser.find_by_team_id(@team.id).user_id
+        @participant_user = Participant.find_by_parent_id_and_user_id(assignment.id,@team_user)
+        @topic_id = @participant_user.topic_id
+        
+        if (@topic_id.to_i == topic_identifier.to_i)
+            return true
+        else
+            return false
+        end
+      else  ##Not team assignment we have participant id
+        
+       @participant_rev = Participant.find(@is_first.reviewee_id).topic_id
+       if (@participant_rev.to_i == topic_identifier.to_i)
+            return true
+        else
+            return false
+        end
+      end
+      
+    end
+  end
+  
+  ## Reviewers should not be able to review from topics that have worked on
+  
+  def review_different_topic(participant, topic_identifier)
+    
+    @rev_participant  = Participant.find(participant.to_i).topic_id
+  
+    if !(@rev_participant.nil?)
+     
+      if (@rev_participant.to_i == topic_identifier.to_i )
+       
+        return false
+      else
+       
+        return true
+      end
+    end
+    return true
+  end
+  
+  
+  # Author: Raghu Krishnamurthy and Shraddha Krishnamurthy
+  #this is the core of adding dynamic reviewers. This method adds response maps, keeps track of number 
+  #of reviews, assigns submission/ topic with least number of reviews etc.
+  
+  def add_dynamic_reviewer
+    
+
+    assignment = Assignment.find(params[:id]) 
+      #If there is no signup sheet we can skip this whole part
+    if(!params[:topic_id].nil?)###enter here only if there is a signup sheet. If not it should be nil
+    
+    #checking to see if the reviewer is picking the same topic as he picked before! OFcourse after checking 
+    #if the option is enabled.
+    if (allow_same_topic_enabled(assignment))
+      
+      flag = allow_same_topic(assignment,params[:participant_id],params[:topic_id])
+      
+          if (!flag)
+            flash[:error] = "Please select the topic you have already selected."
+            redirect_to :controller => 'student_review',:action => 'list', :id => params[:participant_id]
+            return
+        end
+      end
+    #checking to see if the reviewer is picking the same topic he/she has worked on! OFcourse after checking 
+    #if the option is enabled.
+    if(allow_different_topic_enabled(assignment))
+    
+    flag = review_different_topic(params[:participant_id], params[:topic_id])
+    
+    if (!flag)
+            flash[:error] = "You are not permitted to select your own topic to review ."
+            redirect_to :controller => 'student_review',:action => 'list', :id => params[:participant_id]
+            return
+        end
+    
+   end
+   
+      if(assignment.team_assignment)##handling team assingments.
+        @team_names = SignedUpUser.find_all_by_topic_id(params[:topic_id])
+        @teamname = Array.new
+        @team_names.each do |name|
+          @teamname << Team.find_by_id_and_parent_id(name.creator_id, assignment.id)
+        end##End do 
+        
+        if @team_names.size == 0
+           flash[:error] = "Sorry! Nobody has signed up for this topic Please pick another one."
+          redirect_to :controller => 'student_review',:action => 'list', :id => params[:participant_id]
+          return
+        end##end @team_names.size
+        #this is to find the submission with minumum number of reviews!
+        min = -1
+        id = -1
+        alternate_id = -1
+        alternate_array = Array.new               
+        @teamname.each do |t|
+         
+          @num_of_reviews = TeamReviewResponseMap.find_all_by_reviewed_object_id_and_reviewee_id(assignment.id,t.id)
+          
+          if min == -1
+            min = @num_of_reviews.size
+          elsif @num_of_reviews.size <= min
+            min = @num_of_reviews.size
+         end##end if elsif elsif
+         end##end @teamname.each do
+         
+         #Finding all the alternative submissions that can be assigned to this reviewer in case the minimum 
+# is his/her own review!  
+        @teamname.each do |t|
+        @num_of_reviews = TeamReviewResponseMap.find_all_by_reviewed_object_id_and_reviewee_id(assignment.id,t.id)
+        if @num_of_reviews.size == min
+          alternate_array << t.id
+        end
+      end
+
+          #finding the reviewers details! Finding his team id to ensure he/she is not give his/her own submission. 
+        @user_id = Participant.find_by_id_and_parent_id(params[:participant_id],assignment.id).user_id
+        
+        @teamnames_topic = Team.find_all_by_parent_id(assignment.id)
+        @teamnames_topic.each do |team|
+          
+           if(TeamsUser.find_by_team_id_and_user_id(team.id,@user_id))
+           @team_id_topic = TeamsUser.find_by_team_id_and_user_id(team.id,@user_id)
+           end #end if(TeamsUser...)
+               
+        end##end @teamnames_topic.each
+           #final assignemnt of submission to this reviewer!
+             alternate_array.each do |a|
+             @already_exists = TeamReviewResponseMap.find_by_reviewer_id_and_reviewee_id(params[:participant_id],a)
+             
+             if(@already_exists.nil? && @team_id_topic.team_id.to_i != a.to_i)
+                 alternate_id = a
+                 break
+             end
+         end
+         
+         
+        if(params[:contributor_id].nil?)
+           
+          if(alternate_id != -1)
+            params[:contributor_id]=alternate_id
+          else
+        
+            flash[:error] = "This topic has no more submissions to review..Please select another topic "
+            redirect_to :controller => 'student_review',:action => 'list', :id => params[:participant_id]
+            return
+            end
+               
+        end###if(id!= -1 && params[:contributor_id].nil?)
+
+      else###Handling Non team assignments. Do the same thign as was done for team assingments except that 
+        #for team assignments contributor is team id and non team assignments, it is participants.!
+      
+       @topic_participants = Participant.find_all_by_parent_id_and_topic_id(assignment.id,params[:topic_id])
+       min = -1
+       id = -1
+       alternate_id = -1
+       alternate_array = Array.new       
+       @topic_participants.each do |t|
+         @num_of_reviews = ParticipantReviewResponseMap.find_all_by_reviewed_object_id_and_reviewee_id(assignment.id,t.id)
+         
+         if min == -1
+           min = @num_of_reviews.size
+         elsif @num_of_reviews.size <= min
+           min = @num_of_reviews.size
+          end##end if elsif elsif
+       end ##end @topic_participant.each do
+  
+      @topic_participants.each do |t|
+        @num_of_reviews = ParticipantReviewResponseMap.find_all_by_reviewed_object_id_and_reviewee_id(assignment.id,t.id)
+        if @num_of_reviews.size == min
+          alternate_array << t.id
+        end
+      end
+  
+             alternate_array.each do |a|
+             @already_exists = ParticipantReviewResponseMap.find_by_reviewer_id_and_reviewee_id(params[:participant_id],a)
+             if(@already_exists.nil? && params[:participant_id].to_i != a.to_i)
+                 alternate_id = a
+                 break
+             end
+           end
+       
+
+       if(params[:contributor_id].nil?)
+          if(alternate_id != -1)
+            params[:contributor_id]=alternate_id
+          else
+            flash[:error] = "This topic has no more submissions to review..Please select another topic "
+            redirect_to :controller => 'student_review',:action => 'list', :id => params[:participant_id]
+            return
+            end               
+       end###if(id!= -1 && params[:contributor_id].nil?)  
+      end##End IF team_assignment
+    else
+#      flash[:error] = "Pick Some Topic"
+#      redirect_to :controller => 'student_review',:action => 'list', :id => params[:participant_id]
+#      return
+    end
+    
+    
+ ##########################################################################################
+###########################################################################################
+#Ensureing use has selected something!
+       if (params[:topic_id].nil? && params[:contributor_id].nil?)
+      flash[:error] = "Please select atleast one option"
+            redirect_to :controller => 'student_review',:action => 'list', :id => params[:participant_id]
+            return
+    end
+    
+    assignment = Assignment.find(params[:id])
+    
+    #Ensureing students can pick submissions only from the topic they have already selected if enabled.
+    if (assignment.sign_up_topics.size!=0 && params[:topic_id].nil? && !(params[:tid].nil?))
+    if (allow_same_topic_enabled(assignment))
+      
+      flag = allow_same_topic(assignment,params[:participant_id],params[:tid])
+      
+          if (!flag)
+            flash[:error] = "Please select a submission from the same topic you have already selected."
+            redirect_to :controller => 'student_review',:action => 'list', :id => params[:participant_id]
+            return
+        end
+      end
+    #Ensureing students cannot pick submissions only from their own topic if enabled.
+    if(allow_different_topic_enabled(assignment))
+    
+    flag = review_different_topic(params[:participant_id], params[:tid])
+    
+    if (!flag)
+            flash[:error] = "You are not permitted to select a submission to review from the same topic you have worked on."
+            redirect_to :controller => 'student_review',:action => 'list', :id => params[:participant_id]
+            return
+        end
+    
+   end
+   
+    end
+    msg = String.new
+    begin
+      
+      user = get_user(params)      
+      regurl = url_for :action => 'add_user_to_assignment', 
+          :id => assignment.id, 
+          :user_id => user.id, 
+          :contributor_id => params[:contributor_id]                     
+      reviewer = get_reviewer(user,assignment,regurl)
+       
+      
+      if assignment.team_assignment
+       
+        @user_id = Participant.find_by_id_and_parent_id(params[:participant_id],assignment.id).user_id
+        @teamnames = Team.find_all_by_parent_id(assignment.id)
+       
+        @teamnames.each do |team|
+           
+           if(TeamsUser.find_by_team_id_and_user_id(team.id,@user_id))
+           @team_id = TeamsUser.find_by_team_id_and_user_id(team.id,@user_id)
+           end
+               
+        end
+        #ensure they dont select their own submission!
+       if !(@team_id.nil?)      
+       if( params[:contributor_id].to_i == @team_id.team_id)
+       flash[:error] = "You have selected your own submission.Please select another submission"
+       redirect_to :controller => 'student_review',:action => 'list', :id => params[:participant_id]
+       return
+     end
+     end
+        if TeamReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?',params[:contributor_id],reviewer.id]).nil?
+          TeamReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id)
+          #increase review counts for topics or participants depending on case!
+          if(!params[:topic_id].nil?)
+            @topic=SignUpTopic.find(params[:topic_id])
+            @topic.no_of_reviews += 1
+            @topic.save
+          end
+          @team_review_count = Team.find(params[:contributor_id])
+          @team_review_count.number_of_assigned_reviews +=1
+          @team_review_count.save
+          
+        else
+          flash[:error] = "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
+        end
+      else
+       
+       #same checks but for non team assignment
+       if(params[:contributor_id]==params[:participant_id])
+       flash[:error] = "You have selected your own submission.Please select another submission"
+       redirect_to :controller => 'student_review',:action => 'list', :id => params[:participant_id]
+       return
+     end
+            
+        if ParticipantReviewResponseMap.find(:first, :conditions => ['reviewee_id = ? and reviewer_id = ?',params[:contributor_id],reviewer.id]).nil?
+           ParticipantReviewResponseMap.create(:reviewee_id => params[:contributor_id], :reviewer_id => reviewer.id, :reviewed_object_id => assignment.id)
+           #increasing counts for number of reviews everytime a response map is made!
+           if(!params[:topic_id].nil?)
+            @topic=SignUpTopic.find(params[:topic_id])
+            @topic.no_of_reviews += 1
+            @topic.save
+          end
+          @participant_review_count = Participant.find(params[:contributor_id])
+          @participant_review_count.no_of_reviews +=1
+          @participant_review_count.save
+          
+          
+        else
+          flash[:error] = "The reviewer, \""+reviewer.name+"\", is already assigned to this contributor."
+        end
+      end
+    rescue
+       msg = $!
+    end    
+    redirect_to :controller => 'student_review',:action => 'list', :id => params[:participant_id]  
+  end
+
+
+
+
+
+
+
+
+
+
+
   
   def add_user_to_assignment
     if params[:contributor_id]
@@ -199,6 +545,21 @@ class ReviewMappingController < ApplicationController
     assignment = Assignment.find(params[:id])
     contributor = assignment.get_contributor(params[:contributor_id])
     mappings = contributor.review_mappings
+    
+    #ensure you cannot statically delete reviewers if dynamic review is chosen.
+    assignment.questionnaires.each do |a|
+       if a.display_type == "Review"
+      @questionnaire = a
+        end
+  end
+  @is_static = Questionnaire.find(@questionnaire.id)
+  
+    if(@is_static.is_static == 0)
+    flash[:error] = "This assignment has a dynamic review. Cannot delete all the reviewers... "
+    redirect_to :action => 'list_mappings', :id => params[:id]
+    return
+    end
+
     
     failedCount = delete_mappings(mappings, params[:force])
     if failedCount > 0
@@ -244,6 +605,24 @@ class ReviewMappingController < ApplicationController
     contributor = AssignmentParticipant.find(params[:id])
     name = contributor.name
     assignment_id = contributor.assignment
+    
+        #ensure you cannot delete reviewer if dynamic review is chosen.
+    @assign = Assignment.find(assignment_id)
+   @assign.questionnaires.each do |a|
+       if a.display_type == "Review"
+      @questionnaire = a
+        end
+  end
+  @is_static = Questionnaire.find(@questionnaire.id)
+  
+    if(@is_static.is_static == 0)
+    flash[:error] = "This assignment has a dynamic review. Cannot delete the reviewer... "
+    redirect_to :action => 'list_mappings', :id => assignment_id
+    return
+    end
+
+    
+    
     begin
       contributor.destroy
       flash[:note] = "\"#{name}\" is no longer a participant in this assignment."      
