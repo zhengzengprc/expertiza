@@ -31,7 +31,7 @@ class Question < ActiveRecord::Base
   # Class variables
   NUMERIC = 'Numeric' # Display string for NUMERIC questions
   TRUE_FALSE = 'True/False' # Display string for TRUE_FALSE questions
-    
+  
   GRADING_TYPES = [[NUMERIC,false],[TRUE_FALSE,true]]
   WEIGHTS = [['1',1],['2',2],['3',3],['4',4],['5',5]]
   QUESTION_TYPES = [['Checkbox',1],['Radio',2],['Free text with numeric',3],['Free text',4]]
@@ -44,7 +44,7 @@ class Question < ActiveRecord::Base
     QuestionAdvice.find_all_by_question_id(self.id).each{|advice| advice.destroy}
     self.destroy
   end
-    
+  
   def parse
     q_and_a = txt.split(/\{|\}/).collect do |x| x.strip end
     answers = q_and_a[1]
@@ -72,35 +72,35 @@ class Question < ActiveRecord::Base
     end
     output
   end
-
-# These two functions are for saving the labels
-# generated for radio, checkbox, and dropdown question types.
-def before_save
-  if self.label.nil?      # if nothing, send a blank string
-    self.labels = ""
-  else    
-    q = self.label
-    labelT = ""
-    q.each { |key, value| labelT += (value.to_s)+"|" }
-    self.labels = labelT
-   end
-end
-
-def after_find
-  arr = Array.new()
-  index1 = Array.new()
   
-  if self.labels.nil?
-    self.label = nil
-  else
-    arr = self.labels.split('|')
-    index = (1..arr.length).to_a
-    for each in index
-      index1[each-1] = each.to_s
+  # These two functions are for saving the labels
+  # generated for radio, checkbox, and dropdown question types.
+  def before_save
+    if self.label.nil? or self.label['1'] == ''     # if nothing, or a blank string, set a blank string
+      self.labels = ""
+    else    
+        q = self.label
+        labelT = ""
+        q.each { |key, value| labelT += (value.to_s)+"|" }
+        self.labels = labelT
     end
-    #self.label = Hash.new()
-    self.label = arr.to_h(index1)
   end
-  return
-end
+  
+  def after_find
+    arr = Array.new()
+    index1 = Array.new()
+    
+    if self.labels.nil?
+      self.label = nil
+    else
+      arr = self.labels.split('|')
+      index = (1..arr.length).to_a
+      for each in index
+        index1[each-1] = each.to_s
+      end
+      #self.label = Hash.new()
+      self.label = arr.to_h(index1)
+    end
+    return
+  end
 end
