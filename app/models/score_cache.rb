@@ -76,6 +76,7 @@ class ScoreCache < ActiveRecord::Base
          @teammember.team_id = i.team_id
        end
      end
+     puts i.team_id
       puts "the team memmber "
       puts @teammember.team_id
     @tu = TeamsUser.find(:first,:conditions => ["user_id = ? and team_id = ?", @participant.user_id, @teammember.team_id])
@@ -126,23 +127,32 @@ class ScoreCache < ActiveRecord::Base
        puts sc3
        curvedscore= sc3*sc.score
        if(curvedscore < a)
+          puts "where am i?"
           sc.score = a
           sc.save
           puts sc.score
        elsif(curvedscore > b)
             if(curvedscore > 110)
+              puts "i should be here"
               sc.score = 110
               sc.save
               puts sc.score
             else
+              puts "am i here?"
               sc.score = b
               sc.save
               puts sc.score
             end
        else
+          if(curvedscore >110)
+          puts "in the curving else?"
+          sc.score = 110
+          sc.save
+          else
           sc.score = curvedscore
           sc.save
           puts sc.score
+          end
        end
     
      
@@ -182,18 +192,26 @@ class ScoreCache < ActiveRecord::Base
           puts sc.score
        elsif(curvedscore > b)
             if(curvedscore > 110)
+              puts "i should be here"
               sc.score = 110
               sc.save
               puts sc.score
             else
+              puts "am i here?"
               sc.score = b
               sc.save
               puts sc.score
             end
        else
+          if(curvedscore >110)
+          puts "in the curving else?"
+          sc.score = 110
+          sc.save
+          else
           sc.score = curvedscore
           sc.save
           puts sc.score
+          end
        end
      
       
