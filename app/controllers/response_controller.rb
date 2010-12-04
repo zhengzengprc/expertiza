@@ -130,8 +130,9 @@ class ResponseController < ApplicationController
     @map = ResponseMap.find(params[:id])
     @res = 0
     msg = ""
+    str = ""
     begin
-      if params[:save]=="Save Quiz"
+    if params[:save]=="Save Quiz"
         
         @response = Response.create(:map_id => @map.id)
         @questionnaire = @map.questionnaire
@@ -148,27 +149,34 @@ class ResponseController < ApplicationController
             if question.txt.split("{")[1].include?("="+answer)==false
               points = 0
             end
-          }
-          
-          
-          
-          
-          
+          }                                                  
           
           score = Score.create(:response_id => @response.id, :question_id => question.id, :score => points, :comments => "")
           totalscore += points
         }
         @response.additional_comment = totalscore.to_s + '/100'
         @response.save
-      else
+    else
         @response = Response.create(:map_id => @map.id, :additional_comment => params[:review][:comments])
         @questionnaire = @map.questionnaire
-
-        questions = @questionnaire.questions
-        params[:responses].each_pair{ |k,v|
-          score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => v[:comment])
-        }
-      end
+        questions = @questionnaire.questions      
+        
+        params[:responses].each_pair do |k,v|                     
+          if v.has_key? "objectives" and  v[:objectives].length>0
+              str = ""
+              v[:objectives].each_pair do |k1,v1|
+                  if questions[k.to_i].qtype == "1"          
+                      str += (k1 + "|")
+                  elsif questions[k.to_i].qtype == "2"              
+                      str += (v1 + "|")
+                  end            
+              end              
+          else
+              str = v[:comment]  
+          end
+         score = Score.create(:response_id => @response.id, :question_id => questions[k.to_i].id, :score => v[:score], :comments => str)
+        end                 
+    end
     rescue
       msg = "Your response was not saved. Cause: "+$!
     end

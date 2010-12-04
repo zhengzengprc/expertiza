@@ -61,7 +61,7 @@
 	      <% end %>
 	<% end %>
 	  
-	<% if (question['qtype'] == "1") %>		  	
+	<% if (question['qtype'] == "1") or (question['qtype'] == "2") %>		  	
 		<% if controller.action_name != 'new' and @review_scores[i].comments != nil %>
 			<% arr=Array.new() %>
            	<% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
@@ -69,29 +69,21 @@
 			<%	for each in question.label %>
 				<br><!--<input type="checkbox" name='responses[][Lanswer]' value=abc>-->
 				<%= each[1]  %>
-				<input type="checkbox" name=<%= "responses["+i.to_s+"][objectives]["+each[0].to_s+"]" %> <% if arr.include?(each[0].to_s) %>  checked="checked" <% end%>    >
-				
+				<% if question['qtype'] == "1" %>			
+					<input type="checkbox" name=<%= "responses["+i.to_s+"][objectives]["+each[0].to_s+"]" %> <% if arr.include?(each[0].to_s) %>  checked="checked" <% end%>    >
+				<% else %>
+					<input type="radio" name="responses[<%= i.to_s%>][objectives][1]" value=<%= each[0].to_s %> <% if arr.include?(each[0].to_s) %>  checked="checked" <% end%> >				
+				<% end %>
 			<% end %>
 		<% else %>
 			<% for each in question.label %>
 				<br><%= each[1]  %>
-				<input type="checkbox" name=<%= "responses["+i.to_s+"][objectives]["+each[0].to_s+"]" %> > 
+				<% if question['qtype'] == "1" %>
+					<input type="checkbox" name=<%= "responses["+i.to_s+"][objectives]["+each[0].to_s+"]" %> > 
+				<% else %>
+					<input type="radio" name="responses[<%= i.to_s%>][objectives][1]" value=<%= each[0].to_s %> >		
+				<% end %>
 			<% end %>
-		<% end %>
-	<% elsif (question['qtype'] == "2") %>
-		<% if controller.action_name != 'new' and @review_scores[i].comments != nil %>
-			<% arr=Array.new() %>
-			<% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
-			<%	arr = text.split('|')	%>   			
-			<%	for each in question.label %>	
-				<br><%= each[1] %>
-				<input type="radio" name="responses[<%= i.to_s%>][objectives][1]" value=<%= each[0].to_s %> <% if arr.include?(each[0].to_s) %>  checked="checked" <% end%> >
-			<% end %>
-		<% else %>
-			<% for each in question.label %>
-			<br><%= each[1] %>
-			<input type="radio" name="responses[<%= i.to_s%>][objectives][1]" value=<%= each[0].to_s %> >
-			<% end %>		
 		<% end %>
 	<% end %>
 				
