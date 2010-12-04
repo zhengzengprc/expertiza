@@ -58,28 +58,40 @@
           </select>
       <% end %>
 	  
-	  <% if (question['qtype'] == "1") %>	
-	  		<% arr=Array.new() %>	
-			<% if controller.action_name != 'new' and @review_scores[i].comments != nil %>
-            	<% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
-				<%	arr = text.split('|')	%>
-        	<% end %>
-		
+	<% if (question['qtype'] == "1") %>		  	
+		<% if controller.action_name != 'new' and @review_scores[i].comments != nil %>
+			<% arr=Array.new() %>
+           	<% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
+			<%	arr = text.split('|')	%>     			
 			<%	for each in question.label %>
 				<br><!--<input type="checkbox" name='responses[][Lanswer]' value=abc>-->
 				<input type="checkbox" name=<%= "responses["+i.to_s+"][objectives]["+each[0].to_s+"]" %> <% if arr.include?(each[0].to_s) %>  checked="checked" <% end%>    ><br> 
 				<%= each[1]  %>
 			<% end %>
-	<% elsif (question['qtype'] == "2") %>
-			
-			<%	for each in question.label %>
-				<br><!--<input type="checkbox" name='responses[][Lanswer]' value=abc>-->
-				<input type="radio" name="responses[<%= i.to_s%>][objectives][1]" value=<%= each[0].to_s %>  ><br> 
-				<%= each[1]  %>
+		<% else %>
+			<% for each in question.label %>
+				<br><input type="checkbox" name=<%= "responses["+i.to_s+"][objectives]["+each[0].to_s+"]" %> > 
+				<%= each[1]  %><br>
 			<% end %>
-	
+		<% end %>
+	<% elsif (question['qtype'] == "2") %>
+		<% if controller.action_name != 'new' and @review_scores[i].comments != nil %>
+			<% arr=Array.new() %>
+			<% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
+			<%	arr = text.split('|')	%>   			
+			<%	for each in question.label %>	
+				<br>
+				<input type="radio" name="responses[<%= i.to_s%>][objectives][1]" value=<%= each[0].to_s %> <% if arr.include?(each[0].to_s) %>  checked="checked" <% end%> >
+				<%= each[1] %>
+			<% end %>
+		<% else %>
+			<% for each in question.label %>
+			<br><input type="radio" name="responses[<%= i.to_s%>][objectives][1]" value=<%= each[0].to_s %> >
+			<%= each[1] %>
+			<% end %>		
+		<% end %>
 	<% end %>
-
+				
   <%if question.question_advices.size > 0%>
       <%= render :partial => 'advice', :locals => {:i => i, :advice_list => question.question_advices} %>
   <% else %>
