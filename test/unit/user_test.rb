@@ -1,58 +1,103 @@
 require File.dirname(__FILE__) + '/../test_helper'
 
-class UserTest < Test::Unit::TestCase
-  
-  # Test user retrieval by email
-  def test_find_by_login_email
-    user = User.find_by_login('student1@foo.edu')    
-    assert_equal 'student1', user.name
-  end
-  
-  # Test user retrieval by name
-  def test_find_by_login_name
-    user = User.find_by_login('student1')    
-    assert_equal 'student1', user.name
+class UserTest < ActiveSupport::TestCase
+  # Be sure to include AuthenticatedTestHelper in test/test_helper.rb instead.
+  # Then, you can remove it from this and the functional test.
+  include AuthenticatedTestHelper
+  fixtures :users
+
+  def test_should_create_user
+    assert_difference 'User.count' do
+      user = create_user
+      assert !user.new_record?, "#{user.errors.full_messages.to_sentence}"
+    end
   end
 
-  # 101 add a new user 
-  def test_add_user
-    user = User.new
-    user.name = "testStudent1"
-    user.fullname = "test_Student_1"
-    user.password = Digest::SHA1.hexdigest("testStudent1")
-    user.email = "testStudent1@foo.edu"
-    user.role_id = "1"
-    assert user.save
-  end 
-  
-  # 102 Add a user with existing name 
-  def test_add_user_with_exist_name
-    user = User.new
-    user.name = 'student1'
-    user.password = Digest::SHA1.hexdigest("student1")
-    user.fullname = "student1_fullname",
-    user.role_id = "3"
-    assert !user.save
-    assert_equal ActiveRecord::Errors.default_error_messages[:taken], user.errors.on(:name)
+  def test_should_require_login
+    assert_no_difference 'User.count' do
+      u = create_user(:login => nil)
+      assert u.errors.on(:login)
+    end
   end
-  
-  # 103 Check valid user name and password   
-  def test_add_user_with_invalid_name
-    user = User.new
-    assert !user.valid?
-    assert user.errors.invalid?(:name)
-    #assert user.errors.invalid?(:password)
+
+  def test_should_require_password
+    assert_no_difference 'User.count' do
+      u = create_user(:password => nil)
+      assert u.errors.on(:password)
+    end
   end
-  # 202 edit a user name to an invalid name (e.g. blank)
-  def test_update_user_with_invalid_name
-    user = User.find_by_login('student1')
-    user.name = "";
-    assert !user.valid?
+
+  def test_should_require_password_confirmation
+    assert_no_difference 'User.count' do
+      u = create_user(:password_confirmation => nil)
+      assert u.errors.on(:password_confirmation)
+    end
   end
-  # 203 Change a user name to an existing name.
-  def test_update_user_with_existing_name
-    user = User.find_by_login('student1')
-    user.name = "student2"
-    assert !user.valid?
-  end  
+
+  def test_should_require_email
+    assert_no_difference 'User.count' do
+      u = create_user(:email => nil)
+      assert u.errors.on(:email)
+    end
+  end
+
+  def test_should_reset_password
+    users(:quentin).update_attributes(:password => 'new password', :password_confirmation => 'new password')
+    assert_equal users(:quentin), User.authenticate('quentin', 'new password')
+  end
+
+  def test_should_not_rehash_password
+    users(:quentin).update_attributes(:login => 'quentin2')
+    assert_equal users(:quentin), User.authenticate('quentin2', 'monkey')
+  end
+
+  def test_should_authenticate_user
+    assert_equal users(:quentin), User.authenticate('quentin', 'monkey')
+  end
+
+  def test_should_set_remember_token
+    users(:quentin).remember_me
+    assert_not_nil users(:quentin).remember_token
+    assert_not_nil users(:quentin).remember_token_expires_at
+  end
+
+  def test_should_unset_remember_token
+    users(:quentin).remember_me
+    assert_not_nil users(:quentin).remember_token
+    users(:quentin).forget_me
+    assert_nil users(:quentin).remember_token
+  end
+
+  def test_should_remember_me_for_one_week
+    before = 1.week.from_now.utc
+    users(:quentin).remember_me_for 1.week
+    after = 1.week.from_now.utc
+    assert_not_nil users(:quentin).remember_token
+    assert_not_nil users(:quentin).remember_token_expires_at
+    assert users(:quentin).remember_token_expires_at.between?(before, after)
+  end
+
+  def test_should_remember_me_until_one_week
+    time = 1.week.from_now.utc
+    users(:quentin).remember_me_until time
+    assert_not_nil users(:quentin).remember_token
+    assert_not_nil users(:quentin).remember_token_expires_at
+    assert_equal users(:quentin).remember_token_expires_at, time
+  end
+
+  def test_should_remember_me_default_two_weeks
+    before = 2.weeks.from_now.utc
+    users(:quentin).remember_me
+    after = 2.weeks.from_now.utc
+    assert_not_nil users(:quentin).remember_token
+    assert_not_nil users(:quentin).remember_token_expires_at
+    assert users(:quentin).remember_token_expires_at.between?(before, after)
+  end
+
+protected
+  def create_user(options = {})
+    record = User.new({ :login => 'quire', :email => 'quire@example.com', :password => 'quire69', :password_confirmation => 'quire69' }.merge(options))
+    record.save
+    record
+  end
 end

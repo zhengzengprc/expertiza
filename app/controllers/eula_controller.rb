@@ -3,6 +3,7 @@ class EulaController < ApplicationController
   end
   
   def accept
+  session[:user] = current_user
     session[:user].update_attribute('is_new_user',0)
     redirect_to :controller => 'student_task', :action => 'list'
   end

@@ -1,7 +1,9 @@
 class AssignmentController < ApplicationController
   require 'ftools'
   auto_complete_for :user, :name
-  before_filter :authorize
+  #before_filter :authorize
+  
+  before_filter :login_or_oauth_required,:only=>[:show,:index]
   
   def copy
     Assignment.record_timestamps = false

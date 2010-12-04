@@ -1,7 +1,10 @@
 class StudentTaskController < ApplicationController
   helper :submitted_content
   
+  before_filter :login_or_oauth_required,:only=>[:list]
+  
   def list
+  	session[:user] = current_user
     if session[:user].is_new_user
       redirect_to :controller => 'eula', :action => 'display'
     end

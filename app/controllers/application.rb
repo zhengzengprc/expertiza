@@ -2,14 +2,24 @@
 # Likewise, all the methods added will be available for all controllers.
 class ApplicationController < ActionController::Base
 
+## inlcude this..has method login_required current_user etc
+include AuthenticatedSystem
+
 protect_from_forgery :secret => '66c71ad1e57f67bb64bf3ac9ca144f4e'
 
-  def authorize 
-    unless session[:user]
-      flash[:notice] = "Please log in."
-      redirect_to(:controller => 'auth', :action => 'login')
-    end
-  end
+#  def authorize 
+#    unless session[:user]
+#      flash[:notice] = "Please log in."
+#      redirect_to(:controller => 'sessions', :action => 'new')
+#    end
+#  end
+  
+#   def login_required 
+ #   unless session[:user]
+  #    flash[:notice] = "Please log in."
+   #   redirect_to(:controller => 'sessions', :action => 'new')
+    #end
+#  end
   
   protected
   def list(object_type)
@@ -41,4 +51,6 @@ protect_from_forgery :secret => '66c71ad1e57f67bb64bf3ac9ca144f4e'
     @display_option.name = 'list_mine'
     @display_option.name = params[:display_option][:name] if params[:display_option]
   end
+  
+ 
 end
