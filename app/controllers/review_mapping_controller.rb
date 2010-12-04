@@ -19,6 +19,12 @@ class ReviewMappingController < ApplicationController
     session[:contributor] = @contributor
   end
   
+  def select_supervisor
+    assignment = Assignment.find(params[:id])     
+    @contributor = assignment.get_contributor(params[:contributor_id])
+    session[:contributor] = @contributor
+  end
+  
   def select_metareviewer
     @mapping = ResponseMap.find(params[:id])    
   end  
@@ -51,6 +57,22 @@ class ReviewMappingController < ApplicationController
        msg = $!
     end    
     redirect_to :action => 'list_mappings', :id => assignment.id, :msg => msg    
+  end
+
+  def add_supervisor 
+    assignment = Assignment.find(params[:id])  
+    msg = String.new
+    begin
+      user = get_user(params)   
+      regurl = url_for :action => 'add_user_to_assignment', :id => assignment.id, :user_id => user.id               
+
+      SupervisorResponseMap.create(:reviewed_object_id => assignment.id,                        
+                                   :reviewer_id => AssignmentParticipant.find_by_user_id_and_parent_id(user.id, assignment.id).id,
+                                   :reviewee_id => params[:contributor_id])                         
+    rescue  
+      msg = $!
+    end
+    redirect_to :action => 'list_mappings', :id => assignment.id, :msg => msg                                    
   end
 
   def add_dynamic_reviewer
@@ -151,7 +173,7 @@ class ReviewMappingController < ApplicationController
       assignment.add_participant(user.name)
     rescue
       flash[:error] = $!
-    end    
+    end
     if params[:contributor_id]
       redirect_to :action => 'add_reviewer',     :id => params[:id], :user_id => user.id, :contributor_id => params[:contributor_id]
     else
@@ -234,6 +256,18 @@ class ReviewMappingController < ApplicationController
   def delete_reviewer
     mapping = ResponseMap.find(params[:id]) 
     assignment_id = mapping.assignment.id
+    begin
+      mapping.delete
+      flash[:note] = "The review mapping for \""+mapping.reviewee.name+"\" and \""+mapping.reviewer.name+"\" have been deleted."        
+    rescue      
+      flash[:error] = "A delete action failed:<br/>" + $! + "Delete this mapping anyway?&nbsp;<a href='/review_mapping/delete_review/"+mapping.id.to_s+"'>Yes</a>&nbsp;|&nbsp;<a href='/review_mapping/list_mappings/#{assignment_id}'>No</a>"     
+    end
+    redirect_to :action => 'list_mappings', :id => assignment_id
+  end
+  
+  def delete_supervisor
+    mapping = SupervisorResponseMap.find(params[:id]) 
+    assignment_id = mapping.reviewed_object_id
     begin
       mapping.delete
       flash[:note] = "The review mapping for \""+mapping.reviewee.name+"\" and \""+mapping.reviewer.name+"\" have been deleted."        
