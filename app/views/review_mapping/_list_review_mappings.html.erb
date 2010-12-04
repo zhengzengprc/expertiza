@@ -8,11 +8,13 @@
     <th width="30%">Contributor</th>
     <th width="30%">Reviewed By</th>
     <th width="30%">Metareviewed By</th>
+    <th width="25%">Supervisor By</th>
   </tr>
   
   <% index1 = 0 
      index2 = 0
      index3 = 0
+	 index4 = 0
 
      items.each{
        | contributor |
@@ -138,6 +140,7 @@
                 } %>
                </table>
              </td>
+             
            </tr>
            <%
          end
@@ -145,7 +148,70 @@
     %>       
     </table>
     </td>
-    </tr>    
+    
+    <td style="vertical-align:top;"> 
+    
+    	<table width="100%">
+
+		<% 
+		
+			rmappings = SupervisorResponseMap.find_all_by_reviewed_object_id_and_reviewee_id(26,contributor.id) 
+
+			rmappings.sort! {|a,b| a.reviewer.fullname <=> b.reviewer.fullname } %>
+
+			<% rmappings.each { 
+						
+				| rmap |
+
+				if rmap
+				
+				index3+=1 
+
+				if ((index3 % 2) == 0) then bgcolor3 = "inherit"
+
+				else bgcolor3 = "inherit"
+
+				end %>
+              
+				<tr style="background-color:<%=bgcolor3%>">
+
+					<td>
+					
+						<%= rmap.reviewer.name %> (<%= rmap.reviewer.fullname %>)
+
+						<% if !assignment.dynamic_reviewer_assignments_enabled %>
+
+							<div style="text-align:right">
+
+								<%= link_to 'delete', :action => 'delete_supervisor', :id => rmap.id %><br/>
+
+							</div>
+
+						<% end %>      
+
+					</td>
+
+				</tr>
+				
+			<% end } %>
+
+			</table>
+
+			<% if !assignment.dynamic_reviewer_assignments_enabled %>
+
+				<div style="text-align:right">
+
+					<%= link_to 'add supervisor', :action => 'select_supervisor', :id => assignment.id, :contributor_id => contributor.id %><br/>
+
+					<%= link_to 'delete all reviewers', :action => 'delete_all_reviewers', :id => assignment.id, :contributor_id => contributor.id %>
+
+				</div>
+
+			<% end %>
+
+		</td>
+
+	</tr>    
    <% } %>   
 </table>
 <% 
