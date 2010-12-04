@@ -76,7 +76,18 @@
 		for @question in @questionnaire.questions %>
 	<tr>
 		<td align=center><input type=checkbox id="question_chk<%= i %>"></td>
-		<td><%= text_field "question[]", 'txt', :size=>70 %></td>
+		<td><%= text_field "question[]", 'txt', :size=>70 %>
+		<table>
+			
+			<!--the for loop below shows label for a question and saves bak to database-->
+			<% 	for @labelT in @question.label %>
+			<tr><td>
+					label: <input value='<%= @labelT[1] %>' class='label_text' id='new_question_label' name='question[<%= i%>][label][<%= @labelT[0] %>]' size=10 type=text/>
+			</td></tr>
+			<% end %>
+			
+		</table>
+		</td>			
 		<% if @questionnaire.type != "QuizQuestionnaire" %>
 			<td><%= select("question[]", :true_false, Question::GRADING_TYPES)%></td>
 			<td><%= select("question[]", :weight, Question::WEIGHTS)%></td>
