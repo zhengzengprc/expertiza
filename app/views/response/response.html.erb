@@ -28,7 +28,38 @@
         <% } %>
     <% else %>		
 
-       <%= question.txt %><BR/>	
+       <%= question.txt %><BR/>
+<% if question.qtype == "4" %>
+	        <% if controller.action_name != 'new' and @review_scores[i].comments != nil %>
+	            <% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
+	            <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><%= text %></textarea>
+	        <% else %>
+	            <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ></textarea>
+	        <% end %>
+	
+					
+	       <% if question.true_false? %>
+	          <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
+	             <%if controller.action_name != 'new' %>
+	               <option value="<%=@min%>" <%if @min==@review_scores[i].score%>selected="selected"<%end%> ><%=@min%></option>
+	               <option value="<%=@max%>" <%if @max==@review_scores[i].score%>selected="selected"<%end%> ><%=@max%></option>
+	             <%else%>
+	               <option value="<%=@min%>"><%=@min%></option>
+	               <option value="<%=@max%>"><%=@max%></option>
+	             <%end%>
+	          </select>
+	      <% else %>
+	          <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
+	              <% for j in @min..@max %>
+	                 <%if controller.action_name != 'new' %>
+	                    <option value="<%=j%>"<% if j==@review_scores[i].score%> selected="selected"<%end%> ><%=j%></option>
+	                 <%else%>
+	                    <option value="<%=j%>" ><%=j%></option>
+	                <% end %>
+	              <% end %>
+	          </select>
+	      <% end %>
+	<% end %>
 	   <% if question.qtype == "3" %>
 	        <% if controller.action_name != 'new' and @review_scores[i].comments != nil %>
 	            <% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
@@ -76,15 +107,44 @@
 				<% end %>
 			<% end %>
 		<% else %>
+			<table>
 			<% for each in question.label %>
-				<br><%= each[1]  %>
+			<tr><td>
+				<%= each[1]  %></td>
+				<td>
 				<% if question['qtype'] == "1" %>
 					<input type="checkbox" name=<%= "responses["+i.to_s+"][objectives]["+each[0].to_s+"]" %> > 
 				<% else %>
 					<input type="radio" name="responses[<%= i.to_s%>][objectives][1]" value=<%= each[0].to_s %> >		
 				<% end %>
+				</td>
+			
 			<% end %>
 		<% end %>
+		<td>
+		 <% if question.true_false? %>
+	          <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
+	             <%if controller.action_name != 'new' %>
+	               <option value="<%=@min%>" <%if @min==@review_scores[i].score%>selected="selected"<%end%> ><%=@min%></option>
+	               <option value="<%=@max%>" <%if @max==@review_scores[i].score%>selected="selected"<%end%> ><%=@max%></option>
+	             <%else%>
+	               <option value="<%=@min%>"><%=@min%></option>
+	               <option value="<%=@max%>"><%=@max%></option>
+	             <%end%>
+	          </select>
+	      <% else %>
+	          <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
+	              <% for j in @min..@max %>
+	                 <%if controller.action_name != 'new' %>
+	                    <option value="<%=j%>"<% if j==@review_scores[i].score%> selected="selected"<%end%> ><%=j%></option>
+	                 <%else%>
+	                    <option value="<%=j%>" ><%=j%></option>
+	                <% end %>
+	              <% end %>
+	          </select>
+	      <% end %>
+		  </td></tr>
+		</table>
 	<% end %>
 				
   <%if question.question_advices.size > 0%>
