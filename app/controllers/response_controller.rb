@@ -48,24 +48,23 @@ class ResponseController < ApplicationController
       params[:responses].each_pair do |k,v|
         score = Score.find_by_response_id_and_question_id(@response.id, questions[k.to_i].id)
         score.update_attribute('score',v[:score])
-        
-        if v.has_key? "objectives" 
-          if v[:objectives].length>0
-            str = ""
-            v[:objectives].each_pair do |k1,v1|
-              str += (k1 + "|") 
-            end
-            score.update_attribute('comments',str)
+             
+    if v[:comment] != nil
+      if v.has_key? "objectives" and  v[:objectives].length>0
+          str = ""
+          v[:objectives].each_pair do |k1,v1|
+            if questions[k.to_i].qtype == "1"          
+              str += (k1 + "|")
+            elsif questions[k.to_i].qtype == "2"              
+              str += (v1 + "|")
+            end            
           end
+          score.update_attribute('comments',str)
         else
-          if questions[k.to_i].qtype == "1"
-            score.update_attribute('comments',"")
-          else
-            score.update_attribute('comments',v[:comment])  
-          end
-          
-        end
-      end    
+          score.update_attribute('comments',v[:comment])  
+      end
+    end
+  end       
       
     rescue
       msg = "Your response was not saved. Cause: "+ $!
@@ -133,12 +132,14 @@ class ResponseController < ApplicationController
     msg = ""
     begin
       if params[:save]=="Save Quiz"
+        
         @response = Response.create(:map_id => @map.id)
         @questionnaire = @map.questionnaire
 
         questions = @questionnaire.questions
         totalscore = 0
         pointsperquestion = 100/questions.length
+        
         #evaluate each question
         questions.each{ |question|
           #calculate the score for the question
@@ -148,6 +149,12 @@ class ResponseController < ApplicationController
               points = 0
             end
           }
+          
+          
+          
+          
+          
+          
           score = Score.create(:response_id => @response.id, :question_id => question.id, :score => points, :comments => "")
           totalscore += points
         }
