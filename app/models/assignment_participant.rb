@@ -77,6 +77,10 @@ class AssignmentParticipant < Participant
     MetareviewResponseMap.get_assessments_for(self)  
   end
   
+   def get_supervisors
+    SupervisorResponseMap.get_assessments_for(self)  
+  end
+  
   def get_teammate_reviews
     TeammateReviewResponseMap.get_assessments_for(self)
   end
