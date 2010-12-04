@@ -76,9 +76,9 @@ class Question < ActiveRecord::Base
 # These two functions are for saving the labels
 # generated for radio, checkbox, and dropdown question types.
 def before_save
-  if self.label.nil?
+  if self.label.nil?      # if nothing, send a blank string
     self.labels = ""
-  else
+  else    
     q = self.label
     labelT = ""
     q.each { |key, value| labelT += (value.to_s)+"|" }
