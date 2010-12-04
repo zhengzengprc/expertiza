@@ -29,34 +29,37 @@
     <% else %>		
 
        <%= question.txt %><BR/>	
-        <% if controller.action_name != 'new' and @review_scores[i].comments != nil %>
-            <% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
-            <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><%= text %></textarea>
-        <% else %>
-            <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ></textarea>
-        <% end %>
+	   <% if question.qtype == "3" %>
+	        <% if controller.action_name != 'new' and @review_scores[i].comments != nil %>
+	            <% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
+	            <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ><%= text %></textarea>
+	        <% else %>
+	            <textarea cols="70" rows="1" id="responses_<%=i%>_comments" name="responses[<%=i%>][comment]"  style="overflow:hidden;" onkeyup="checkRows(this)" ></textarea>
+	        <% end %>
+	
 					
-       <% if question.true_false? %>
-          <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
-             <%if controller.action_name != 'new' %>
-               <option value="<%=@min%>" <%if @min==@review_scores[i].score%>selected="selected"<%end%> ><%=@min%></option>
-               <option value="<%=@max%>" <%if @max==@review_scores[i].score%>selected="selected"<%end%> ><%=@max%></option>
-             <%else%>
-               <option value="<%=@min%>"><%=@min%></option>
-               <option value="<%=@max%>"><%=@max%></option>
-             <%end%>
-          </select>
-      <% else %>
-          <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
-              <% for j in @min..@max %>
-                 <%if controller.action_name != 'new' %>
-                    <option value="<%=j%>"<% if j==@review_scores[i].score%> selected="selected"<%end%> ><%=j%></option>
-                 <%else%>
-                    <option value="<%=j%>" ><%=j%></option>
-                <% end %>
-              <% end %>
-          </select>
-      <% end %>
+	       <% if question.true_false? %>
+	          <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
+	             <%if controller.action_name != 'new' %>
+	               <option value="<%=@min%>" <%if @min==@review_scores[i].score%>selected="selected"<%end%> ><%=@min%></option>
+	               <option value="<%=@max%>" <%if @max==@review_scores[i].score%>selected="selected"<%end%> ><%=@max%></option>
+	             <%else%>
+	               <option value="<%=@min%>"><%=@min%></option>
+	               <option value="<%=@max%>"><%=@max%></option>
+	             <%end%>
+	          </select>
+	      <% else %>
+	          <select id="responses_<%=i%>_score" name="responses[<%=i%>][score]">
+	              <% for j in @min..@max %>
+	                 <%if controller.action_name != 'new' %>
+	                    <option value="<%=j%>"<% if j==@review_scores[i].score%> selected="selected"<%end%> ><%=j%></option>
+	                 <%else%>
+	                    <option value="<%=j%>" ><%=j%></option>
+	                <% end %>
+	              <% end %>
+	          </select>
+	      <% end %>
+	<% end %>
 	  
 	<% if (question['qtype'] == "1") %>		  	
 		<% if controller.action_name != 'new' and @review_scores[i].comments != nil %>
@@ -65,13 +68,14 @@
 			<%	arr = text.split('|')	%>     			
 			<%	for each in question.label %>
 				<br><!--<input type="checkbox" name='responses[][Lanswer]' value=abc>-->
-				<input type="checkbox" name=<%= "responses["+i.to_s+"][objectives]["+each[0].to_s+"]" %> <% if arr.include?(each[0].to_s) %>  checked="checked" <% end%>    ><br> 
 				<%= each[1]  %>
+				<input type="checkbox" name=<%= "responses["+i.to_s+"][objectives]["+each[0].to_s+"]" %> <% if arr.include?(each[0].to_s) %>  checked="checked" <% end%>    >
+				
 			<% end %>
 		<% else %>
 			<% for each in question.label %>
-				<br><input type="checkbox" name=<%= "responses["+i.to_s+"][objectives]["+each[0].to_s+"]" %> > 
-				<%= each[1]  %><br>
+				<br><%= each[1]  %>
+				<input type="checkbox" name=<%= "responses["+i.to_s+"][objectives]["+each[0].to_s+"]" %> > 
 			<% end %>
 		<% end %>
 	<% elsif (question['qtype'] == "2") %>
@@ -80,14 +84,13 @@
 			<% text = @review_scores[i].comments.gsub(/\"/,'&quot;').lstrip %>
 			<%	arr = text.split('|')	%>   			
 			<%	for each in question.label %>	
-				<br>
+				<br><%= each[1] %>
 				<input type="radio" name="responses[<%= i.to_s%>][objectives][1]" value=<%= each[0].to_s %> <% if arr.include?(each[0].to_s) %>  checked="checked" <% end%> >
-				<%= each[1] %>
 			<% end %>
 		<% else %>
 			<% for each in question.label %>
-			<br><input type="radio" name="responses[<%= i.to_s%>][objectives][1]" value=<%= each[0].to_s %> >
-			<%= each[1] %>
+			<br><%= each[1] %>
+			<input type="radio" name="responses[<%= i.to_s%>][objectives][1]" value=<%= each[0].to_s %> >
 			<% end %>		
 		<% end %>
 	<% end %>
