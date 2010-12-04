@@ -32,7 +32,7 @@ function addQuestions(){
 			var myId = parseInt(labelTable.getElementsByClassName('my_id')[0].innerHTML);
 			var labelRow = labelTable.insertRow(-1);
 			column = document.createElement("td");
-			column.innerHTML = "label: <input value="+myId+"_"+(labelCount+1)+" class='label_text' id=new_question_" + myId + "_label name=new_question[" + myId + "][label][" + (labelCount+1) +"] size=10 type=text/>";
+			column.innerHTML = "label: <input value="+myId+"_"+(labelCount+1)+" class='label_text' id=new_question_" + myId + "_label name=new_question[" + myId + "][label][" + (labelCount+1) +"] size=50 type=text/>";
 			column.innerHTML += " <a href='javascript:;' onClick='deleteThisOption(this);'>remove option</a> ";
 			labelRow.appendChild(column);
 		
@@ -121,7 +121,7 @@ function addQuestion(){
 		
 		var labelRow = labelTable.insertRow(-1);
 		column = document.createElement("td");
-		column.innerHTML = "label: <input value="+id+"_1"+" class='label_text' id=new_question_" + id + "_label name=new_question[" + id + "][label][1] size=10 type=text/>";
+		column.innerHTML = "label: <input value="+id+"_1"+" class='label_text' id=new_question_" + id + "_label name=new_question[" + id + "][label][1] size=50 type=text/>";
 		labelRow.appendChild(column);
 		
 		column = document.createElement("td");
