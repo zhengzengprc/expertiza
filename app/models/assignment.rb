@@ -126,7 +126,11 @@ class Assignment < ActiveRecord::Base
     if self.course_id != nil && self.course_id > 0
        path = Course.find(self.course_id).get_path
     else
-       path = RAILS_ROOT + "/pg_data/" +  FileHelper.clean_path(User.find(self.instructor_id).name) + "/"
+      user = User.find(self.instructor_id)
+      if(user != nil)
+        user.decrypt()
+      end
+       path = RAILS_ROOT + "/pg_data/" +  FileHelper.clean_path(user.name) + "/"
     end         
     return path + FileHelper.clean_path(self.directory_path)      
   end 
@@ -304,11 +308,13 @@ class Assignment < ActiveRecord::Base
 #manual addition
 # user_name - the user account name of the participant to add
 def add_participant(user_name)
-  user_name.encrypt()
-  user = User.find_by_name(user_name)
-  user_name.decrypt()
+  encrypter = AES256Encrypter.new
+  encrypted_name = encrypter.encrypt_val(user_name, EncryptionHelper.get_key())
+  user = User.find_by_name(encrypted_name)
   if (user == nil) 
     raise "No user account exists with the name "+user_name+". Please <a href='"+url_for(:controller=>'users',:action=>'new')+"'>create</a> the user first."
+  else
+    user.decrypt()
   end
   participant = AssignmentParticipant.find_by_parent_id_and_user_id(self.id, user.id)   
   if !participant
