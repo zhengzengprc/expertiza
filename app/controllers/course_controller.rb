@@ -10,6 +10,12 @@ class CourseController < ApplicationController
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
     @users = User.find_by_sql("select * from users where role_id=6") unless search.blank?
+
+    # decrypt all users returned
+    for user in @users
+      user.decrypt()
+    end
+
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false 
   end 
   # Creates a new course
@@ -112,7 +118,11 @@ class CourseController < ApplicationController
   
   def add_ta
     @course = Course.find(params[:course_id])
-    @user = User.find_by_name(params[:user][:name])
+
+    encrypter = AES256Encrypter.new
+    encrypted_name = encrypter.encrypt_val(params[:user][:name], EncryptionHelper.get_key())
+
+    @user = User.find_by_name(encrypted_name)
     if(@user==nil)
       redirect_to :action => 'view_teaching_assistants', :id => @course.id 
     else

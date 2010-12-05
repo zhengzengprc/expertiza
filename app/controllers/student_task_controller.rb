@@ -78,6 +78,8 @@ class StudentTaskController < ApplicationController
   @teams = []
   @user = User.new(params[:userform])
   @res = User.find_by_name(@user.name)
+  @res.decrypt()
+
   if @user.name!=""
   @participant = Participant.find_all_by_user_id(@res.id)
   for participant in @participant do
@@ -143,10 +145,14 @@ def percentage
      @countteamreview=0
      @assignment=0
      @course=0
-     @user=User.find_by_name(params[:name])
+
+     encrypter = AES256Encrypter.new
+     encrypted_name = encrypter.encrypt_val(params[:name], EncryptionHelper.get_key())
+     @user=User.find_by_name(encrypted_name)
      if (@user.nil?)
         @msg = "USER NOT FOUND"
      else
+       @user.decrypt()
        @teamid= TeamsUser.find_all_by_user_id(@user.id)
      @participant = Participant.find_all_by_user_id(@user.id)
      @participant.each do |part|

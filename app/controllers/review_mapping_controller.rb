@@ -4,11 +4,21 @@ class ReviewMappingController < ApplicationController
   helper :dynamic_review_assignment
   
   def auto_complete_for_user_name
-    name = params[:user][:name]+"%"
+    name = params[:user][:name]
     assignment_id = session[:contributor].parent_id
-    @users = User.find(:all, :include => :participants, 
-      :conditions => ['participants.type = "AssignmentParticipant" and users.name like ? and participants.parent_id = ?',name,assignment_id], 
-      :order => 'name') 
+
+    results = User.find(:all, :include => :participants,
+      :conditions => ['participants.type = "AssignmentParticipant" and participants.parent_id = ?',assignment_id],
+      :order => 'name')
+
+    @users = Array.new
+    for user in results
+      user.decrypt()
+
+      if(user.name.include?(name))
+        @users << user
+      end
+    end
 
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
@@ -120,12 +130,15 @@ class ReviewMappingController < ApplicationController
       if params[:user_id]
         user = User.find(params[:user_id])
       else
-        user = User.find_by_name(params[:user][:name])
+        encrypter = AES256Encrypter.new
+        encrypted_name = encrypter.encrypt_val(params[:user][:name], EncryptionHelper.get_key())
+        user = User.find_by_name(encrypted_name)
       end    
       if user.nil?
          newuser = url_for :controller => 'users', :action => 'new' 
          raise "Please <a href='#{newuser}'>create an account</a> for this user to continue."
-      end 
+      end
+      user.decrypt()
       return user
   end
   
@@ -145,7 +158,8 @@ class ReviewMappingController < ApplicationController
       mapping = ResponseMap.find(params[:id])
       assignment = mapping.assignment
     end
-         
+
+    # Don't need to decrypt since only the ID is used
     user = User.find(params[:user_id])
     begin
       assignment.add_participant(user.name)
@@ -459,8 +473,18 @@ class ReviewMappingController < ApplicationController
     else
       @type = "ParticipantReviewResponseMap"
     end
-    
-    @us = User.find(:all, :select => "DISTINCT id", :conditions => ["fullname LIKE ?", '%'+params[:user][:fullname]+'%'])
+
+    temp_users = User.find(:all, :select => "DISTINCT id")
+
+    @us = Array.new
+    for user in temp_users
+      user.decrypt()
+
+      if(user.fullname.include?(params[:user][:fullname]))
+        @us << user
+      end
+    end
+
     @participants = Participant.find(:all, :select => "DISTINCT id", :conditions => ["user_id IN (?) and parent_id = ?", @us, @assignment.id] )
     @review_scores = compute_reviews_hash( @assignment.id)
     @reviewers = ResponseMap.find(:all,:select => "DISTINCT reviewer_id", :conditions => ["reviewed_object_id = ? and type = ? and reviewer_id IN (?) ", @id, @type, @participants] )

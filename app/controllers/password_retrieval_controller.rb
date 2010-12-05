@@ -7,8 +7,13 @@ class PasswordRetrievalController < ApplicationController
     if params[:user][:email].nil? or params[:user][:email].strip.length == 0
       flash[:pwerr] = "Please enter an e-mail address"     
     else
-      user = User.find_by_email(params[:user][:email])
+      encrypter = AES256Encrypter.new
+      encrypted_email = encrypter.encrypt_val(params[:user][:email], EncryptionHelper.get_key())
+
+      user = User.find_by_email(encrypted_email)
+
       if user != nil
+        user.decrypt()
         clear_password = ParticipantsHelper.assign_password(8)
         user.send_password(clear_password)    
         flash[:pwnote] = "A new password has been sent to your e-mail address."

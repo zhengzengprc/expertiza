@@ -84,7 +84,11 @@ class GradesController < ApplicationController
   def send_grading_conflict_email
     email_form = params[:mailer]
     assignment = Assignment.find(email_form[:assignment])
-    recipient = User.find(:first, :conditions => ["email = ?", email_form[:recipients]])
+
+    encrypter = AES256Encrypter.new
+    encrypted_email = encrypter.encrypt_val(email_form[:recipients], EncryptionHelper.get_key())
+    recipient = User.find(:first, :conditions => ["email = ?", encrypted_email])
+    recipient.decrypt()
     
     body_text = email_form[:body_text]
     body_text["##[recipient_name]"] = recipient.fullname

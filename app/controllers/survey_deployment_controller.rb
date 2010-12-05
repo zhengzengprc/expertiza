@@ -88,7 +88,12 @@ def reportgen
   @type = []
   @teams = []
   @user = User.new(params[:userform])
+  @user.encrypt()
   @res = User.find_by_name(@user.name)
+  @user.decrypt()
+  if(@res != nil)
+    @res.decrypt()
+  end
   if @user.name!=""
   @participant = Participant.find_all_by_user_id(@res.id)
   for participant in @participant do

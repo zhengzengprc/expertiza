@@ -29,6 +29,7 @@ class PgUsersController < UsersController
     if user_id then
       begin
         user = User.find(user_id)
+        user.decrypt()
         # Change user rights?
         user.destroy
         flash[:notice] = "The " + user_type + "<tt>#{user.login}</tt> has been removed."

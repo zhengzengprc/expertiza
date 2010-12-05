@@ -13,15 +13,29 @@ class UsersController < ApplicationController
     users = Array.new
     participants = AssignmentParticipant.find_by_parent_id(assignment_id)    
     participants.each{
-      |participant| 
-      users << User.find(participant.user_id)
+      |participant|
+      user = User.find(participant.user_id)
+      if(user != nil)
+        user.decrypt()
+      end
+      users << user
     }
   end
 
   def auto_complete_for_user_name
     user = session[:user]
     role = Role.find(user.role_id)   
-    @users = User.find(:all, :conditions => ['name LIKE ? and (role_id in (?) or id = ?)', "#{params[:user][:name]}%",role.get_available_roles, user.id])
+    results = User.find(:all, :conditions => ['(role_id in (?) or id = ?)', role.get_available_roles, user.id])
+
+    @users = Array.new
+    for user in results
+      user.decrypt()
+
+      if(user.name.include?(params[:user][:name]))
+        @users << user
+      end
+    end
+
     render :inline => "<%= auto_complete_result @users, 'name' %>", :layout => false
   end
     
@@ -29,27 +43,53 @@ class UsersController < ApplicationController
     user = session[:user]
     role = Role.find(user.role_id)
     all_users = User.find(:all, :order => 'name', :conditions => ['role_id in (?) or id = ?', role.get_available_roles, user.id])
-    
+
+    @letters = Array.new
+
+    for user in all_users
+      user.decrypt()
+
+      first = user.name[0,1].downcase
+      if not @letters.include?(first)
+        @letters << first
+      end
+    end
+
+    @letters.sort!
+
     letter = params[:letter]
     session[:letter] = letter
     if letter == nil
-      letter = all_users.first.name[0,1].downcase
+      letter = @letters.first
     end 
     logger.info "#{letter}"
-    @letters = Array.new
-    @users = User.paginate(:page => params[:page], :order => 'name', :per_page => 20, :conditions => ["(role_id in (?) or id = ?) and substring(name,1,1) = ?", role.get_available_roles, user.id, letter])
-    all_users.each {
-       | userObj |
-       first = userObj.name[0,1].downcase
-       if not @letters.include?(first)
-          @letters << first  
-       end
-    }
+
+    @users = Array.new
+
+    for user in all_users
+      first_letter = user.name[0,1].downcase
+      if(first_letter == letter)
+        @users << user
+      end
+    end
+
+    @users.sort!{|user1, user2|
+      user1.name.downcase <=> user2.name.downcase}
+    
+    #@users = User.paginate(:page => params[:page], :order => 'name', :per_page => 20, :conditions => ["(role_id in (?) or id = ?) and substring(name,1,1) = ?", role.get_available_roles, user.id, letter])
+    #@users = User.paginate(:page => params[:page], :order => 'name', :per_page => 20, :conditions => ["(role_id in (?) or id = ?)", role.get_available_roles, user.id])
+    #for user in @users
+    #  user.decrypt()
+    #end
   end
   
   def show_selection
-    @user = User.find_by_name(params[:user][:name])
+    encrypter = AES256Encrypter.new
+    encrypted_name = encrypter.encrypt_val(params[:user][:name], EncryptionHelper.get_key())
+
+    @user = User.find_by_name(encrypted_name)
     if @user != nil
+      @user.decrypt()
        getRole
        if @role.parent_id == nil || @role.parent_id < (session[:user]).role_id || @user.id == (session[:user]).id
           render :action => 'show'
@@ -65,6 +105,9 @@ class UsersController < ApplicationController
   
   def show
     @user = User.find(params[:id])
+    if(@user != nil)
+      @user.decrypt()
+    end
     getRole
   end
   
@@ -82,7 +125,10 @@ class UsersController < ApplicationController
   end
 
   def create
-    check = User.find_by_name(params[:user][:name])
+    encrypter = AES256Encrypter.new
+    encrypted_name = encrypter.encrypt_val(params[:user][:name], EncryptionHelper.get_key())
+
+    check = User.find_by_name(encrypted_name)
     if check != nil
       params[:user][:name] = params[:user][:email]
     end
@@ -115,6 +161,10 @@ class UsersController < ApplicationController
 
   def edit
     @user = User.find(params[:id])
+    if(@user != nil)
+      @user.decrypt()
+    end
+
     if @user.role_id
       @role = Role.find(@user.role_id)
     end
@@ -122,7 +172,11 @@ class UsersController < ApplicationController
   end
 
   def update
-    @user = User.find(params[:id])   
+    @user = User.find(params[:id])
+    if(@user != nil)
+      @user.decrypt()
+    end
+    
     if params[:user]['clear_password'] == ''
       params[:user].delete('clear_password')
     end
@@ -147,6 +201,10 @@ class UsersController < ApplicationController
   def destroy
     begin
        user = User.find(params[:id])
+       if(user != nil)
+         user.decrypt()
+       end
+
        AssignmentParticipant.find_all_by_user_id(user.id).each{|participant| participant.delete}
        TeamsUser.find_all_by_user_id(user.id).each{|teamuser| teamuser.delete}
        AssignmentQuestionnaires.find_all_by_user_id(user.id).each{|aq| aq.destroy}           
@@ -160,6 +218,10 @@ class UsersController < ApplicationController
 
   def keys
     @user = User.find(params[:id])
+    if(@user != nil)
+      @user.decrypt()
+    end
+
     @private_key = @user.generate_keys
   end
   

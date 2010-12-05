@@ -17,10 +17,14 @@ class TeamsUsersController < ApplicationController
   end
   
   def create    
-    user = User.find_by_name(params[:user][:name].strip)
+    encrypter = AES256Encrypter.new
+    encrypted_name = encrypter.encrypt_val(params[:user][:name].strip, EncryptionHelper.get_key())
+    user = User.find_by_name(encrypted_name)
     if !user
       urlCreate = url_for :controller => 'users', :action => 'new'      
-      flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."            
+      flash[:error] = "\"#{params[:user][:name].strip}\" is not defined. Please <a href=\"#{urlCreate}\">create</a> this user before continuing."
+    else
+      user.decrypt()
     end
     team = Team.find_by_id(params[:id])    
     

@@ -133,6 +133,9 @@ end
   def reviewer_details_popup
     @userid = Participant.find(params[:id]).user_id
     @user = User.find(@userid)
+    if(@user != nil)
+      @user.decrypt
+    end
     
   end
 

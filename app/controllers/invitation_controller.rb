@@ -3,8 +3,12 @@ class InvitationController < ApplicationController
     @invitation = Invitation.new
   end
   
-  def create    
-    user = User.find_by_name(params[:user][:name].strip)
+  def create
+    encrypter = AES256Encrypter.new
+    encrypted_name = encrypter.encrypt_val(params[:user][:name].strip, EncryptionHelper.get_key())
+    user = User.find_by_name(encrypted_name)
+    user.decrypt()
+
     team = AssignmentTeam.find_by_id(params[:team_id])
     student = AssignmentParticipant.find(params[:student_id])
     #check if the invited user is valid
@@ -40,7 +44,18 @@ class InvitationController < ApplicationController
   
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
-    @users = User.find_by_sql("select * from users where LOWER(name) LIKE '%"+search+"%'") unless search.blank?    
+    @results = User.find(:all) unless search.blank?
+
+    @users = Array.new
+    for user in @results
+      user.decrypt()
+
+      if(user.name.include?(search))
+        @users << user
+      end
+    end
+
+
   end
  
   def accept

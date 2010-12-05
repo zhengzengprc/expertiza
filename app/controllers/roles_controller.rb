@@ -77,6 +77,10 @@ class RolesController < ApplicationController
     @users = User.find(:all,
                        :conditions => ['role_id = ?', @role.id],
                        :order => 'name')
+
+    for user in @users
+      user.decrypt()
+    end
   end
     
 end

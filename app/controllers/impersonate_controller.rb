@@ -19,8 +19,13 @@ class ImpersonateController < ApplicationController
     begin
        # Initial impersonation
        if params[:impersonate].nil?
-          user = User.find_by_name(params[:user][:name])
+         encrypter = AES256Encrypter.new
+         encrypted_name = encrypter.encrypt_val(params[:user][:name], EncryptionHelper.get_key())
+
+          user = User.find_by_name(encrypted_name)
           if user
+            user.decrypt()
+
              if session[:super_user] == nil
                 session[:super_user] = session[:user]
              end          
@@ -33,8 +38,13 @@ class ImpersonateController < ApplicationController
        else
           # Impersonate a new account
           if params[:impersonate][:name].length > 0
-             user = User.find_by_name(params[:impersonate][:name])
+            encrypter = AES256Encrypter.new
+            encrypted_name = encrypter.encrypt_val(params[:impersonate][:name], EncryptionHelper.get_key())
+
+             user = User.find_by_name(encrypted_name)
              if user
+               user.decrypt()
+               
                AuthController.clear_user_info(session, nil)
                session[:user] = user          
              else    

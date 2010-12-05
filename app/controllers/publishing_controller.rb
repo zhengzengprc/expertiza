@@ -1,7 +1,10 @@
 class PublishingController < ApplicationController
   
   def view   
-    @user = User.find_by_id(session[:user].id) 
+    @user = User.find_by_id(session[:user].id)
+    if(@user != nil)
+      @user.decrypt()
+    end
     @participants = AssignmentParticipant.find_all_by_user_id(session[:user].id)
   end
   
@@ -34,7 +37,10 @@ class PublishingController < ApplicationController
     if (!params[:id].nil?) 
       @participant = AssignmentParticipant.find(params[:id])
     end
-    @user = User.find_by_id(session[:user].id) 
+    @user = User.find_by_id(session[:user].id)
+    if(@user != nil)
+      @user.decrypt()
+    end
   end
   
   # Grant publishing rights using the private key supplied by the student

@@ -144,7 +144,10 @@ class SuggestionController < ApplicationController
     # instructor or TA is logged in
     if @suggestion.unityID != session[:user].name
       if not @suggestion.unityID.nil? and not @suggestion.unityID.empty?
-        user = User.find_by_name(@suggestion.unityID)
+        encrypter = AES256Encrypter.new
+        encrypted_unityID = encrypter.encrypt_val(@suggestion.unityID, EncryptionHelper.get_key())
+        # Don't need to decrypt since only the ID is used
+        user = User.find_by_name(encrypted_unityID)
         @toemail = user.id
       else
         @toemail = nil
@@ -155,6 +158,7 @@ class SuggestionController < ApplicationController
     else
       assnt = Assignment.find(@suggestion.assignment_id)
       course = Course.find(assnt.course_id)
+      # Don't need to decrypt since only the ID is used
       instructor = User.find(course.instructor_id)
       @toemail = instructor.id
       @editor = session[:user].name

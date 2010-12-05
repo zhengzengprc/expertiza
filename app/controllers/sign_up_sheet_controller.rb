@@ -310,6 +310,9 @@ class SignUpSheetController < ApplicationController
         #if team is not yet created, create new team.
         team = create_team(params[:assignment_id])
         user = User.find(session[:user].id)
+        if(user != nil)
+          user.decrypt()
+        end
         teamuser = create_team_users(user, team.id)
         confirmationStatus = confirmTopic(team.id, params[:id], params[:assignment_id])
       else

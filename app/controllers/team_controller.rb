@@ -92,6 +92,9 @@ def randomize_teams
     for k in 1..parent.team_count
     #for k in 0..(parent.team_count -1)
     user = User.find_by_id(participants[j-k].user_id)
+    if(user != nil)
+      user.decrypt()
+    end
     team.add_member(user)    
     end    
   end
@@ -112,6 +115,9 @@ def randomize_teams
   
   for indx in 1..diff
     user = User.find_by_id(participants[participants.length-indx].user_id)
+    if(user != nil)
+      user.decrypt()
+    end
     team.add_member(user)
   end
     

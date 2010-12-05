@@ -82,7 +82,16 @@ class ParticipantChoicesController < ApplicationController
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
     signup = SignupSheet.find_by_id(session[:signup_sheet_id]).assignment_id.to_s
-    @users = User.find_by_sql("select * from users where id !="+session[:user].id.to_s+" and LOWER(name) LIKE '%"+search+"%' and id in (select user_id from participants where user_id not in (select user_id from teams_users where team_id in (select id from teams where assignment_id ="+signup+")) and assignment_id ="+signup+")") unless search.blank?
+    results = User.find_by_sql("select * from users where id !="+session[:user].id.to_s+" and id in (select user_id from participants where user_id not in (select user_id from teams_users where team_id in (select id from teams where assignment_id ="+signup+")) and assignment_id ="+signup+")") unless search.blank?
+
+    @users = Array.new
+    for user in results
+      user.decrypt()
+
+      if(user.name.include?(search))
+        @users << user
+      end
+    end
     render :partial => "members" 
   end
   
@@ -188,7 +197,12 @@ class ParticipantChoicesController < ApplicationController
     parsed = username.split(",")
     
     parsed.each do |userfromList|
-      user = User.find_by_name(userfromList.strip)
+      encrypter = AES256Encrypter.new
+      encrypted_name = encrypter.encrypt_val(userfromList.strip, EncryptionHelper.get_key())
+
+      # Don't need to decrypt the find result since we're only using the id
+      user = User.find_by_name(encrypted_name)
+
       if (team_id == "")
         #   find the newly created team details
         team = Team.find_by_id(getNewTeam)
