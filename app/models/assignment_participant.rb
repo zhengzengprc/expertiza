@@ -162,7 +162,9 @@ class AssignmentParticipant < Participant
     if row.length < 1
        raise ArgumentError, "No user id has been specified." 
     end
-    user = User.find_by_name(row[0])        
+    row[0].encrypt()
+    user = User.find_by_name(row[0])
+    row[0].decrypt()
     if (user == nil)
       if row.length < 4
         raise ArgumentError, "The record containing #{row[0]} does not have enough items."
@@ -184,6 +186,7 @@ class AssignmentParticipant < Participant
      find_all_by_parent_id(parent_id).each{
           |part|
           user = part.user
+          user.encrypt()
           csv << [
             user.name,
             user.fullname,          
@@ -195,6 +198,7 @@ class AssignmentParticipant < Participant
             user.email_on_review_of_review,
             part.handle
           ]
+          user.decrypt()
       } 
   end
   

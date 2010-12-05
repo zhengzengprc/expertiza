@@ -1,6 +1,8 @@
 require 'digest/sha1'
 
 class User < ActiveRecord::Base
+  include EncryptionHelper
+
   has_many :participants, :class_name => 'Participant', :foreign_key => 'user_id'
   has_many :assignments, :through => :participants
   
@@ -16,6 +18,11 @@ class User < ActiveRecord::Base
 
   attr_accessor :clear_password
   attr_accessor :confirm_password
+
+  before_save 'self.encrypt'
+  after_save 'self.decrypt'
+
+  @@encrypted_vars = ["name", "fullname", "email"]
   
   def list_mine(object_type, user_id)
     object_type.find(:all, :conditions => ["instructor_id = ?", user_id])
@@ -82,8 +89,10 @@ class User < ActiveRecord::Base
   def self.import(row,session,id = nil)
       if row.length != 4
        raise ArgumentError, "Not enough items" 
-      end    
-      user = User.find_by_name(row[0])    
+     end
+     row[0].encrypt()
+     user = User.find_by_name(row[0])
+     row[0].decrypt()
       
       if user == nil
         attributes = ImportFileHelper::define_attributes(row)
@@ -115,11 +124,15 @@ class User < ActiveRecord::Base
   # If user supplies e-mail or name, the
   # helper will try to find that User account.
   def self.find_by_login(login)
+      login.encrypt()
       user = User.find_by_email(login)
+      login.decrypt()
       if user == nil
          items = login.split("@")
          shortName = items[0]
+         shortName.encrypt()
          userList = User.find(:all, {:conditions=> ["name =?",shortName]})
+         shortName.decrypt()
          if userList != nil && userList.length == 1
             user = userList.first            
          end

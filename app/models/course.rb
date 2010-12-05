@@ -25,7 +25,9 @@ class Course < ActiveRecord::Base
   end
   
   def add_participant(user_name)
+    user_name.encrypt()
     user = User.find_by_name(user_name)
+    user_name.decrypt()
     if (user == nil) 
       raise "No user account exists with the name "+user_name+". Please <a href='"+url_for(:controller=>'users',:action=>'new')+"'>create</a> the user first."      
     end
