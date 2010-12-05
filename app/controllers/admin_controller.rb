@@ -5,11 +5,17 @@ class AdminController < ApplicationController
   def search_users (role)
     username = request.raw_post || request.query_string
     # show only instructors created by logged in admin
-    @users = User.find(:all, :conditions => ["name LIKE ? and role_id = #{role}", (username + "%")])
+
+    @users = User.find(:all, :conditions => ["role_id = #{role}"])
 
     @results = Array.new
     for user in @users
-      @results << [user.login, user.id]
+      user.decrypt()
+
+      # Ensure the decrypted name contains the search string
+      if(user.name.include?(username))
+        @results << [user.login, user.id]
+      end
     end
     render(:layout => false)
     @results
@@ -20,7 +26,10 @@ class AdminController < ApplicationController
   end
 
   def new_instructor
-    @user = User.find_by_name(params[:name])
+    encrypter = AES256Encrypter.new
+    encrypted_name = encrypter.encrypt_val(params[:name], EncryptionHelper.get_key())
+
+    @user = User.find_by_name(encrypted_name)
     if(@user==nil)
       @user = User.new
       
@@ -29,6 +38,7 @@ class AdminController < ApplicationController
       @user.email_on_submission = true
       @user.email_on_review_of_review = true  
     else
+      @user.decrypt()
       @found = true
     end
     @user.name = params[:name]
@@ -37,7 +47,12 @@ class AdminController < ApplicationController
 
   def create_instructor
     if params['save']
-      @user = User.find_by_name((params[:user])[:name])
+      encrypter = AES256Encrypter.new
+      encrypted_name = encrypter.encrypt_val((params[:user])[:name], EncryptionHelper.get_key())
+
+      @user = User.find_by_name(encrypted_name)
+      @user.decrypt()
+
       @user.role_id = Role::INSTRUCTOR
       @user.update_attributes(params[:user])
       redirect_to :action => 'list_instructors'
@@ -64,13 +79,21 @@ class AdminController < ApplicationController
   end
   
   def search_users
-    @user = User.find_by_name(params[:name])
+    encrypter = AES256Encrypter.new
+    encrypted_name = encrypter.encrypt_val(params[:name], EncryptionHelper.get_key())
+    @user = User.find_by_name(encrypted_name)
+    @user.decrypt()
     #render :action => 'new_instructor'
   end
   
   def list_instructors
-   user_id = session[:user].id
-   @users = User.paginate(:page => params[:page], :order => 'name',:conditions => ["parent_id = ? AND role_id = ?", user_id, Role::INSTRUCTOR], :per_page => 50)
+    user_id = session[:user].id
+    @users = User.paginate(:page => params[:page], :order => 'name',:conditions => ["parent_id = ? AND role_id = ?", user_id, Role::INSTRUCTOR], :per_page => 50)
+
+    # decrypt all users returned
+    for user in @users
+      user.decrypt()
+    end
   end
 
   def search_administrator
@@ -88,10 +111,20 @@ class AdminController < ApplicationController
   def list_administrators    
     user_id = session[:user].id    
     @users = User.paginate(:page => params[:page], :order => 'name',:conditions => ["parent_id = ? AND role_id = ?", user_id, Role::ADMINISTRATOR], :per_page => 50)
+
+    # decrypt all users returned
+    for user in @users
+      user.decrypt()
+    end
   end
    
   def list_users(conditions)
     @users = User.paginate(:page => params[:page], :order => 'name',:conditions => conditions, :per_page => 50)
+
+    # decrypt all users returned
+    for user in @users
+      user.decrypt()
+    end
   end
 
   def search_super_administrator
@@ -109,6 +142,8 @@ class AdminController < ApplicationController
     else
       @role = Role.new(:id => nil, :name => '(none)')
     end
+
+    @user.decrypt()
   end
 
   def remove_instructor
@@ -122,5 +157,10 @@ class AdminController < ApplicationController
 
   def list_super_administrators
     @users = User.find(:all, :conditions => ["role_id = ?", Role::SUPERADMINISTRATOR])
+
+    # decrypt all users returned
+    for user in @users
+      user.decrypt()
+    end
   end
 end
