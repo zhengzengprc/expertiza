@@ -39,7 +39,11 @@ class Team < ActiveRecord::Base
      query = query + " and participants.parent_id = #{self.parent_id}"
      query = query + " and users.name like '#{name}%'"
      query = query + " order by users.name"
-     User.find_by_sql(query) 
+    user_query = User.find_by_sql(query)
+    for user in user_query
+      user.decrypt()
+    end
+    return user_query
  end
  
  def has_user(user)

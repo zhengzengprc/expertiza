@@ -31,11 +31,13 @@ module TeamHelper
           currTeam.assignment_id = assignment_id
           currTeam.save
         end
-              
+
        logger.info "#{split_line.length}"
        logger.info "#{split_line}"
-       while(pos < split_line.length) 
-          user = User.find_by_name(split_line[pos].strip)
+       encrypter = AES256Encrypter.new
+       while(pos < split_line.length)
+         encrypted_name = encrypter.encrypt_val(split_line[pos].strip, EncryptionHelper.get_key())
+         user = User.find_by_name(encrypted_name)
           if user && !(options[:handle_dups] == "ignore" && teams.length > 0)            
             teamusers = TeamsUser.find(:all, :conditions => ["team_id =? and user_id =?", currTeam.id,user.id])
             currUser = teamusers.first

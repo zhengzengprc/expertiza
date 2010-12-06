@@ -162,15 +162,17 @@ class AssignmentParticipant < Participant
     if row.length < 1
        raise ArgumentError, "No user id has been specified." 
     end
-    row[0].encrypt()
-    user = User.find_by_name(row[0])
-    row[0].decrypt()
+    encrypter = AES256Encrypter.new
+    encrypted_name = encrypter.encrypt_val(row[0], EncryptionHelper.get_key())
+    user = User.find_by_name(encrypted_name)
     if (user == nil)
       if row.length < 4
         raise ArgumentError, "The record containing #{row[0]} does not have enough items."
       end
       attributes = ImportFileHelper::define_attributes(row)
       user = ImportFileHelper::create_new_user(attributes,session)
+    else
+      user.decrypt()
     end                  
     if Assignment.find(id) == nil
        raise ImportError, "The assignment with id \""+id.to_s+"\" was not found."
@@ -186,7 +188,6 @@ class AssignmentParticipant < Participant
      find_all_by_parent_id(parent_id).each{
           |part|
           user = part.user
-          user.encrypt()
           csv << [
             user.name,
             user.fullname,          
@@ -198,7 +199,6 @@ class AssignmentParticipant < Participant
             user.email_on_review_of_review,
             part.handle
           ]
-          user.decrypt()
       } 
   end
   

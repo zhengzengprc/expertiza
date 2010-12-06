@@ -74,11 +74,13 @@ class AssignmentTeam < Team
        TeamNode.create(:parent_id => parent.id, :node_object_id => currTeam.id)
     end
       
-    while(index < row.length) 
-        user = User.find_by_name(row[index].to_s.strip)
+    while(index < row.length)
+      encrypter = AES256Encrypter.new
+      encrypted_name = encrypter.encrypt_val(row[index].to_s.strip, EncryptionHelper.get_key())
+      user = User.find_by_name(encrypted_name)
         if user == nil
           raise ImportError, "The user \""+row[index].to_s.strip+"\" was not found. <a href='/users/new'>Create</a> this user?"                           
-        elsif currTeam != nil         
+        elsif currTeam != nil
           currUser = TeamsUser.find(:first, :conditions => ["team_id =? and user_id =?", currTeam.id,user.id])          
           if currUser == nil
             currTeam.add_member(user)            

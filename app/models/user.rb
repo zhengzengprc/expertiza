@@ -22,6 +22,10 @@ class User < ActiveRecord::Base
   before_save 'self.encrypt'
   after_save 'self.decrypt'
 
+  def after_find
+    encrypt()
+  end
+
   @@encrypted_vars = ["name", "fullname", "email"]
   
   def list_mine(object_type, user_id)
@@ -31,12 +35,14 @@ class User < ActiveRecord::Base
   def getAvailableUsers(name)    
     parents = Role.find(self.role_id).get_parents
     
-    allUsers = User.find(:all, :conditions => ['name LIKE ?',"#{name}%"],:limit => 10)
+    allUsers = User.find(:all)
     users = Array.new
-    allUsers.each { | user | 
-      role = Role.find(user.role_id)
-      if parents.index(role) 
-        users << user
+    allUsers.each { | user |
+      if(user.name.include?(name))
+        role = Role.find(user.role_id)
+        if parents.index(role)
+          users << user
+        end
       end
     }    
     return users 
@@ -89,10 +95,11 @@ class User < ActiveRecord::Base
   def self.import(row,session,id = nil)
       if row.length != 4
        raise ArgumentError, "Not enough items" 
-     end
-     row[0].encrypt()
-     user = User.find_by_name(row[0])
-     row[0].decrypt()
+      end
+
+    encrypter = AES256Encrypter.new
+    encrypted_name = encrypter.encrypt_val(row[0], EncryptionHelper.get_key())
+    user = User.find_by_name(encrypted_name)
       
       if user == nil
         attributes = ImportFileHelper::define_attributes(row)
@@ -124,15 +131,17 @@ class User < ActiveRecord::Base
   # If user supplies e-mail or name, the
   # helper will try to find that User account.
   def self.find_by_login(login)
-      login.encrypt()
-      user = User.find_by_email(login)
-      login.decrypt()
+    encrypter = AES256Encrypter.new
+    encrypted_name = encrypter.encrypt_val(login, EncryptionHelper.get_key())
+    user = User.find_by_email(encrypted_name)
+
       if user == nil
          items = login.split("@")
          shortName = items[0]
-         shortName.encrypt()
-         userList = User.find(:all, {:conditions=> ["name =?",shortName]})
-         shortName.decrypt()
+
+         encrypter = AES256Encrypter.new
+         encrypted_name = encrypter.encrypt_val(shortName, EncryptionHelper.get_key())
+         userList = User.find(:all, {:conditions=> ["name =?",encrypted_name]})
          if userList != nil && userList.length == 1
             user = userList.first            
          end

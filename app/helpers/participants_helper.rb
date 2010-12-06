@@ -27,7 +27,9 @@ module ParticipantsHelper
   end
   
   def self.define_user(attrs, session, params, home_page)
-      user = User.find_by_name(attrs["name"])        
+    encrypter = AES256Encrypter.new
+    encrypted_name = encrypter.encrypt_val(attrs["name"], EncryptionHelper.get_key())
+      user = User.find_by_name(encrypted_name)        
       if user == nil
         user = create_new_user(attrs, session)
       end        

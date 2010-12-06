@@ -16,9 +16,10 @@ class CourseParticipant < Participant
     if row.length != 4
        raise ArgumentError, "Not enough items" 
     end
-    row[0].encrypt()
-    user = User.find_by_name(row[0])
-    row[0].decrypt()
+
+    encrypter = AES256Encrypter.new
+    encrypted_name = encrypter.encrypt_val(row[0], EncryptionHelper.get_key())
+    user = User.find_by_name(encrypted_name)
     if (user == nil)
       attributes = ImportFileHelper::define_attributes(row)
       user = ImportFileHelper::create_new_user(attributes,session)

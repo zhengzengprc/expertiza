@@ -49,8 +49,12 @@ class ReviewResponseMap < ResponseMap
       raise ImportError, "The assignment with id \"#{id}\" was not found. <a href='/assignment/new'>Create</a> this assignment?"
     end
     index = 1
+
+    encrypter = AES256Encrypter.new
+
     while index < row.length
-      user = User.find_by_name(row[index].to_s.strip)      
+      encrypted_name = encrypter.encrypt_val(row[index].to_s.strip, EncryptionHelper.get_key())
+      user = User.find_by_name(encrypted_name)
       if user.nil?
         raise ImportError, "The user account for the reviewer \"#{row[index]}\" was not found. <a href='/users/new'>Create</a> this user?"
       end
@@ -68,7 +72,8 @@ class ReviewResponseMap < ResponseMap
            TeamReviewResponseMap.create(:reviewer_id => reviewer.id, :reviewee_id => reviewee.id, :reviewed_object_id => assignment.id)
          end
       else
-         puser = User.find_by_name(row[0].to_s.strip)
+        encrypted_name = encrypter.encrypt_val(row[0].to_s.strip, EncryptionHelper.get_key())
+        puser = User.find_by_name(encrypted_name)
          if user == nil
            raise ImportError, "The user account for the reviewee \"#{row[0]}\" was not found. <a href='/users/new'>Create</a> this user?"
          end

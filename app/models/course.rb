@@ -16,8 +16,12 @@ class Course < ActiveRecord::Base
   def get_path
     if self.instructor_id == nil
       raise "Path can not be created. The course must be associated with an instructor."
-    end    
-    return RAILS_ROOT + "/pg_data/" +  FileHelper.clean_path(User.find(self.instructor_id).name)+ "/" + FileHelper.clean_path(self.directory_path) + "/"      
+    end
+    user = User.find(self.instructor_id)
+    if(user != nil)
+      user.decrypt()
+    end
+    return RAILS_ROOT + "/pg_data/" +  FileHelper.clean_path(user.name)+ "/" + FileHelper.clean_path(self.directory_path) + "/"
   end
   
   def get_participants
@@ -25,11 +29,13 @@ class Course < ActiveRecord::Base
   end
   
   def add_participant(user_name)
-    user_name.encrypt()
-    user = User.find_by_name(user_name)
-    user_name.decrypt()
+    encrypter = AES256Encrypter.new
+    encrypted_name = encrypter.encrypt_val(user_name, EncryptionHelper.get_key())
+    user = User.find_by_name(encrypted_name)
     if (user == nil) 
-      raise "No user account exists with the name "+user_name+". Please <a href='"+url_for(:controller=>'users',:action=>'new')+"'>create</a> the user first."      
+      raise "No user account exists with the name "+user_name+". Please <a href='"+url_for(:controller=>'users',:action=>'new')+"'>create</a> the user first."
+    else
+      user.decrypt()
     end
     participant = CourseParticipant.find_by_parent_id_and_user_id(self.id, user.id)
     unless participant # If there is already a participant, it has already been added. done. Otherwise, create it
@@ -44,6 +50,9 @@ class Course < ActiveRecord::Base
     participants.each{
       |participant|
       user = User.find(participant.user_id)
+      if(user != nil)
+        user.decrypt()
+      end
       
       begin
         self.add_participant(user.name)

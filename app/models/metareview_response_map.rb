@@ -48,27 +48,32 @@ class MetareviewResponseMap < ResponseMap
     if row.length < 3
        raise ArgumentError.new("Not enough items. The string should contain: Author, Reviewer, ReviewOfReviewer1 <, ..., ReviewerOfReviewerN>") 
     end
-    
+
+    encrypter = AES256Encrypter.new
+
     index = 2
     while index < row.length
       if Assignment.find(id).team_assignment
         contributor = AssignmentTeam.find_by_name_and_parent_id(row[0].to_s.strip, id)        
       else
-        user = User.find_by_name(row[0].to_s.strip)
+        encrypted_name = encrypter.encrypt_val(row[0].to_s.strip, EncryptionHelper.get_key())
+        user = User.find_by_name(encrypted_name)
         contributor = AssignmentParticipant.find_by_user_id_and_parent_id(user.id, id)
       end
       
       if contributor == nil
         raise ImportError, "Contributor, "+row[0].to_s+", was not found."     
       end      
-      
-      ruser = User.find_by_name(row[1].to_s.strip)
+
+      encrypted_name = encrypter.encrypt_val(row[1].to_s.strip, EncryptionHelper.get_key())
+      ruser = User.find_by_name(encrypted_name)
       reviewee = AssignmentParticipant.find_by_user_id_and_parent_id(ruser.id, id)
       if reviewee.nil?
         raise ImportError, "Reviewee,  "+row[1].to_s+", for contributor, "+contributor.name+", was not found."   
       end
-      
-      muser = User.find_by_name(row[index].to_s.strip)
+
+      encrypted_name = encrypter.encrypt_val(row[index].to_s.strip, EncryptionHelper.get_key())
+      muser = User.find_by_name(encrypted_name)
       reviewer = AssignmentParticipant.find_by_user_id_and_parent_id(muser.id, id)
       if reviewer.nil?
         raise ImportError, "Metareviewer,  "+row[index].to_s+", for contributor, "+contributor.name+", and reviewee, "+row[1].to_s+", was not found."
