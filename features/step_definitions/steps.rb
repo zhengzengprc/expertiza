@@ -16,7 +16,7 @@ Given /^"([^"]*)":"([^"]*)" logs into the system/ do |user_name, user_pw|
   $ff.button(:value,"Login").click
 end
 
-Given /^user will create an assignment named "([^"]*)"$/ do |assignment_name|
+Given /^(user )?will create an assignment named "([^"]*)"$/ do |dummy, assignment_name|
   # make an arbitrary assignment object in the system
   # with non-important settings...
 
@@ -58,9 +58,9 @@ Given /^user will create an assignment named "([^"]*)"$/ do |assignment_name|
   $ff.text_field(:name,"limits[reader]").set("45")
  
   $ff.text_field(:name,"assignment[dynamic_reviewer_response_time_limit_hours]").set("48")
-  $ff.text_field(:name,"submit_deadline[due_at]").set("2010-12-18 01:59:32")
-  $ff.text_field(:name,"review_deadline[due_at]").set("2010-12-28 01:59:32")
-  $ff.text_field(:name,"switch_deadline[due_at]").set("2011-01-03 01:59:32")
+  $ff.text_field(:name,"submit_deadline[due_at]").set("#{Time.new.year + 1}-12-18 01:59:32")
+  $ff.text_field(:name,"review_deadline[due_at]").set("#{Time.new.year + 1}-12-28 01:59:32")
+  $ff.text_field(:name,"switch_deadline[due_at]").set("#{Time.new.year + 1}-01-03 01:59:32")
 
   $ff.select_list(:name,"submit_deadline[submission_allowed_id]").select("No")
   $ff.select_list(:name,"review_deadline[submission_allowed_id]").select("OK")

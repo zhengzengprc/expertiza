@@ -13,8 +13,8 @@
 development:
   adapter: mysql
   database: pg_development
-  username: root 
-  password: 
+  username: expertiza_user # Username of MySQL
+  password: 1expertia_pwddd@@
   host: localhost
 
 # Warning: The database defined as 'test' will be erased and
@@ -23,16 +23,16 @@ development:
 test: &test
   adapter: mysql
   database: pg_test
-  username: root
-  password: 
+  username: expertiza_user 
+  password: 1expertia_pwddd@@
   host: localhost
 
 production:
   adapter: mysql
   database: pg_production
-  username: root
-  password: 
+  username: expertiza_user 
+  password: 1expertia_pwddd@@
   host: localhost
- 
+
 cucumber:
   <<: *test
