@@ -48,6 +48,10 @@ class AES256Encrypter
       return nil
     end
 
+    if(value.empty?)
+      return value
+    end
+
     c = OpenSSL::Cipher::Cipher.new("aes-256-cbc")
     c.encrypt
     c.key = key
@@ -61,6 +65,10 @@ class AES256Encrypter
   def decrypt_val(value, key)
     if(value == nil)
       return nil
+    end
+
+    if(value.empty?)
+      return value
     end
 
     c = OpenSSL::Cipher::Cipher.new("aes-256-cbc")
@@ -123,6 +131,10 @@ module EncryptionHelper
 
   def decrypt_with_key(key)
     encrypter = AES256Encrypter.new
+
+    array_test = self.class.send(:class_variable_get, :@@encrypted_vars)
+    puts array_test.class
+    puts array_test.size
 
     for encrypted_var in self.class.send(:class_variable_get, :@@encrypted_vars)
       value = self.send(encrypted_var)

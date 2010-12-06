@@ -22,6 +22,9 @@ class CreateUsers < ActiveRecord::Migration
     add_index "users", ["role_id"], :name => "fk_user_role_id"
    
     execute "INSERT INTO `users` VALUES (2,'admin','d033e22ae348aeb5660fc2140aec35850c4da997',4,NULL,'','',2,0,NULL,1,1,1,0,0);"
+
+    # Empty out the encrypted vars array so the migrations pre-encryption don't get confused
+    User.send(:class_variable_set, :@@encrypted_vars, Array.new)
   end
   
   def self.down

@@ -23,7 +23,7 @@ class User < ActiveRecord::Base
   after_save 'self.decrypt'
 
   def after_find
-    encrypt()
+    decrypt()
   end
 
   @@encrypted_vars = ["name", "fullname", "email"]

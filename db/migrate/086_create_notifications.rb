@@ -8,8 +8,6 @@ class CreateNotifications < ActiveRecord::Migration
       t.column :limit, :integer, :null => false, :default => 15          
     end
     
-    
-    
     User.find_by_sql("select * from users where role_id in (select id from roles where not (parent_id is null))").each{
       |user|
       execute "INSERT INTO `notification_limits` (`user_id`, `limit`) VALUES
