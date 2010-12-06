@@ -13,7 +13,7 @@
 development:
   adapter: mysql
   database: pg_development
-  username: root # Username of MySQL
+  username: root 
   password: 
   host: localhost
 
@@ -33,3 +33,6 @@ production:
   username: root
   password: 
   host: localhost
+ 
+cucumber:
+  <<: *test

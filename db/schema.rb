@@ -9,7 +9,14 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101127000253) do
+ActiveRecord::Schema.define(:version => 20101130004843) do
+
+  create_table "assignment_jobs", :force => true do |t|
+    t.integer  "assignment_id"
+    t.string   "job"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "assignment_questionnaires", :force => true do |t|
     t.integer "assignment_id"
@@ -17,6 +24,8 @@ ActiveRecord::Schema.define(:version => 20101127000253) do
     t.integer "user_id"
     t.integer "notification_limit",   :default => 15, :null => false
     t.integer "questionnaire_weight", :default => 0,  :null => false
+    t.string  "questionnaire_type"
+    t.string  "questionnaire_job"
   end
 
   add_index "assignment_questionnaires", ["assignment_id"], :name => "fk_aq_assignments_id"
@@ -427,6 +436,7 @@ ActiveRecord::Schema.define(:version => 20101127000253) do
     t.text     "digital_signature"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "no_of_reviews",                        :default => 0
   end
 
   add_index "participants", ["user_id"], :name => "fk_participant_users"
@@ -454,16 +464,19 @@ ActiveRecord::Schema.define(:version => 20101127000253) do
   add_index "question_advices", ["question_id"], :name => "fk_question_question_advices"
 
   create_table "questionnaires", :force => true do |t|
-    t.string   "name",                :limit => 64
-    t.integer  "instructor_id",                     :default => 0,     :null => false
-    t.boolean  "private",                           :default => false, :null => false
-    t.integer  "min_question_score",                :default => 0,     :null => false
+    t.string   "name",                  :limit => 64
+    t.integer  "instructor_id",                       :default => 0,     :null => false
+    t.boolean  "private",                             :default => false, :null => false
+    t.integer  "min_question_score",                  :default => 0,     :null => false
     t.integer  "max_question_score"
     t.datetime "created_at"
-    t.datetime "updated_at",                                           :null => false
+    t.datetime "updated_at",                                             :null => false
     t.integer  "default_num_choices"
     t.string   "type"
     t.string   "display_type"
+    t.integer  "is_static",                           :default => 1
+    t.text     "review_granularity"
+    t.text     "review_selection_type"
   end
 
   create_table "questions", :force => true do |t|
@@ -566,12 +579,13 @@ ActiveRecord::Schema.define(:version => 20101127000253) do
   add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
 
   create_table "sign_up_topics", :force => true do |t|
-    t.text    "topic_name",                     :null => false
-    t.integer "assignment_id",                  :null => false
-    t.integer "max_choosers",                   :null => false
+    t.text    "topic_name",                                    :null => false
+    t.integer "assignment_id",                                 :null => false
+    t.integer "max_choosers",                                  :null => false
     t.text    "category"
     t.string  "topic_identifier", :limit => 10
-    t.text    "description",                    :null => false
+    t.text    "description",                                   :null => false
+    t.integer "no_of_reviews",                  :default => 0
   end
 
   add_index "sign_up_topics", ["assignment_id"], :name => "fk_sign_up_categories_sign_up_topics"
@@ -688,8 +702,9 @@ ActiveRecord::Schema.define(:version => 20101127000253) do
 
   create_table "teams", :force => true do |t|
     t.string  "name"
-    t.integer "parent_id", :default => 0, :null => false
+    t.integer "parent_id",                  :default => 0, :null => false
     t.string  "type"
+    t.integer "number_of_assigned_reviews", :default => 0
   end
 
   create_table "teams_users", :force => true do |t|
