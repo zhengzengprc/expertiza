@@ -31,14 +31,6 @@ module EncryptionMigrationHelper
           model.constantize.update_all({a => enc_a}, {:id => r.id.to_s})
         end
       end
-      
-      # update the class encrypted_vars array
-      model_encrypted_vars = model.constantize.send(:class_variable_get, :@@encrypted_vars)
-      for new_encrypted_var in aryAttributes
-        # add the encrypted elements
-        model_encrypted_vars << new_encrypted_var
-      end
-      model.constantize.send(:class_variable_set, :@@encrypted_vars, model_encrypted_vars)
     end
   end
 
@@ -63,14 +55,6 @@ module EncryptionMigrationHelper
           model.constantize.update_all({a => dec_a}, {:id => r.id.to_s})
         end
       end
-
-      # update the class encrypted_vars array
-      model_encrypted_vars = model.constantize.send(:class_variable_get, :@@encrypted_vars)
-      for new_encrypted_var in aryAttributes
-        #remove the specified elements
-        model_encrypted_vars.delete(new_encrypted_var)
-      end
-      model.constantize.send(:class_variable_set, :@@encrypted_vars, model_encrypted_vars)
     end
   end
 end
