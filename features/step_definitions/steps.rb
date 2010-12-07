@@ -16,6 +16,35 @@ Given /^"([^"]*)":"([^"]*)" logs into the system/ do |user_name, user_pw|
   $ff.button(:value,"Login").click
 end
 
+
+Given /^user has uploaded csv file "([^"]*)" containing "([^"]*)":"([^"]*)" for the assignment named "([^"]*)" $/ do |csv_file, user1, user2, assignment_name|
+  # click the "assign reviewers javascript link"
+  if(!$ff.contains_text "Manage...")
+    fail "I cannot find the \"Manage...\" link!"
+  end
+  
+  $ff.link(:text, "Manage...").click
+   assignment_xpath1 = "//td[contains(.,'#{assignment_name}')]/../td[9]/ul/li/ul/li[9]/a"
+  $ff.element_by_xpath(assignment_xpath1).click
+  
+  File.open(csv_file, 'w') {|f| f.write("#{user1},#{user2}") }
+  $ff.link(:text, "Import reviewer mappings").click
+  $ff.file_field(:name, 'file').set(csv_file)
+  $ff.button(:value, "Import").click
+  
+  #add username
+ # $ff.text_field(:name,"user[name]").set(user_name)  
+ # $ff.button(:value, "Add Participant").click
+
+end
+
+Then /^the assignment named "([^"]*)" will have "([^"]*)":"([^"]*)" as reviewers$/ do |assignment_name, reviewer1, reviewer2|
+    #TODO
+end
+
+
+
+
 Given /^(user )?will create an assignment named "([^"]*)"$/ do |dummy, assignment_name|
   # make an arbitrary assignment object in the system
   # with non-important settings...
