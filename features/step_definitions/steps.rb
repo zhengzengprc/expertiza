@@ -126,19 +126,21 @@ end
 
 When /^user adds "([^"]*)" to the assignment, "([^"]*)"/ do |user_name, assignment_name|
  #TODO
-   assignment_xpath = "//td[]text()=#{assingment_name}"
-   assignment_name_elem = element_by_xpath(assignment_xpath)
-   assign_add_participant_link = element_by_xpath(following-sibling::assignment_xpath/li[4]/a/@href)
-   $ff.link(:href, assign_add_participant_link).click
-   
-   #add username
-   $ff.text_field(:name,"user[name]").set(user_name)  
-   $ff.button(:value, "Add Participant").click
-   
+   #assignment_xpath = "//td[]text()=#{assingment_name}"
+   #assignment_name_elem = element_by_xpath(assignment_xpath)
+   #assign_add_participant_link = element_by_xpath(following-sibling::assignment_xpath/li[4]/a/@href)
+   #$ff.link(:href, assign_add_participant_link).click
+   #
+   ##add username
+   #$ff.text_field(:name,"user[name]").set(user_name)  
+   #$ff.button(:value, "Add Participant").click
+
 end
 
-Then /^"([^"]*)" will be a participant of "([^"]*)"$/ do |arg1, arg2|
- #TODO
+Then /^"([^"]*)" will be a participant of "([^"]*)"$/ do |username, assignment_name|
+  assignment_xpath = "//td[contains(.,'#{assignment_name}')]"
+  $ff.element_by_xpath("#{assignment_xpath}/../td[5]/ul/li/ul/li[5]/a").click
+  assert($ff.contains_text username)
 end
 
 #adding a course
