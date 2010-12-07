@@ -96,32 +96,23 @@ Given /^user "([^"]*)" is a participant of "([^"]*)"$/ do |arg1, arg2|
   $ff.link(:text, "Add/remove participants").click
 end
 
-Given /^user "([^"]*)" is a reviewer of "([^"]*)" for "([^"]*)"/ do |arg1, arg2, arg3|
+Given /^user "([^"]*)" is a reviewer of "([^"]*)" for "([^"]*)"/ do |reviewer, assignment, reviewee|
   pending # express the regexp above with the code you wish you had
 end
 
-Given /^user "([^"]*)" reviews "([^"]*)"/ do |arg1, arg2|
+Given /^user "([^"]*)" reviews "([^"]*)"/ do |reviewer, reviewee|
   pending # express the regexp above with the code you wish you had
 end
 
-When /^user deletes review of "([^"]*)" for "([^"]*)" by "([^"]*)"$/ do |arg1, arg2, arg3|
+When /^user deletes review of "([^"]*)" for "([^"]*)" by "([^"]*)"$/ do |assignment, reviewee, reviewer|
   pending # express the regexp above with the code you wish you had
 end
 
-Then /^review of "([^"]*)" for "([^"]*)" by "([^"]*)" will not exist$/ do |arg1, arg2, arg3|
+Then /^review of "([^"]*)" for "([^"]*)" by "([^"]*)" will not exist$/ do |assignment, reviewee, reviewer|
   pending # express the regexp above with the code you wish you had
 end
 
 #AddParticipant
-
-#Given /^the assignment named "([^"]*)" will exist$/ do |assignment_name|
-  #check if the assignment is created
- # $ff.link(:text, "Manage...").click
- # $ff.link(:name, '3_3Link').click
- # if(!$ff.contains_text assignment_name)
- #    Given user will create an assignment named  assignment_name
- # end
-# end
 
 When /^user adds "([^"]*)" to the assignment, "([^"]*)"/ do |user_name, assignment_name|
   if(!$ff.contains_text "Manage...")
@@ -172,7 +163,6 @@ Given /^will create a course named "([^"]*)"$/ do |course_name|
 end
 
 Then /^the course named "([^"]*)" will exists$/ do |course_name|
-
   if(!$ff.contains_text "Manage...")
     fail "I cannot find the \"Manage...\" link!"
   end
@@ -181,40 +171,39 @@ Then /^the course named "([^"]*)" will exists$/ do |course_name|
   assert($ff.contains_text course_name)
 end
 
-Given /^user "([^"]*)" scored (\d+) on assignment "([^"]*)"$/ do |arg1, arg2, arg3|
+Given /^user "([^"]*)" scored (\d+) on assignment "([^"]*)"$/ do |username, grade, assignment|
   pending # express the regexp above with the code you wish you had
 end
 
-When /^user views scores for assignment "([^"]*)"$/ do |arg1|
+When /^user views scores for assignment "([^"]*)"$/ do |assignment|
   pending # express the regexp above with the code you wish you had
 end
 
-Then /^user "([^"]*)" will have a score of (\d+) for assignment "([^"]*)"$/ do |arg1, arg2, arg3|
+Then /^user "([^"]*)" will have a score of (\d+) for assignment "([^"]*)"$/ do |username, grade, assignment|
   pending # express the regexp above with the code you wish you had
 end
 
-Given /^user "([^"]*)" is a reviewer of "([^"]*)"$/ do |arg1, arg2|
+Given /^user "([^"]*)" is a reviewer of "([^"]*)"$/ do |username, reviewee|
   # !!! I don't think someone can be an arbitrary reviewer?
   pending # express the regexp above with the code you wish you had
 end
 
-When /^user deletes "([^"]*)" as a reviewer of "([^"]*)"$/ do |arg1, arg2|
+When /^user deletes "([^"]*)" as a reviewer of "([^"]*)"$/ do |reviewer, reviewee|
   pending # express the regexp above with the code you wish you had
 end
 
-Then /^user "([^"]*)" will not be a reviewer of "([^"]*)"$/ do |arg1, arg2|
+Then /^user "([^"]*)" will not be a reviewer of "([^"]*)"$/ do |reviewer, reviewee|
   pending # express the regexp above with the code you wish you had
 end
 
-When /^the user deletes the assignment named "([^"]*)"$/ do |arg1|
+When /^the user deletes the assignment named "([^"]*)"$/ do |assignment|
   pending # express the regexp above with the code you wish you had
 end
 
-Then /^the assignment named "([^"]*)" will not exist$/ do |arg1|
+Then /^the assignment named "([^"]*)" will not exist$/ do |assignment|
   pending # express the regexp above with the code you wish you had
 end
 
 Then /^user has logged in$/ do
   assert($ff.button(:value, "Logout").exists?)
 end
-
