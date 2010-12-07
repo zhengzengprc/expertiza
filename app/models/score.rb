@@ -1,5 +1,16 @@
 class Score < ActiveRecord::Base
-  belongs_to :question  
+  include EncryptionHelper
+  
+  belongs_to :question
+
+  before_save 'self.encrypt'
+  after_save 'self.decrypt'
+
+  def after_find
+    decrypt()
+  end
+
+  @@encrypted_vars = ["comments"]
   
   # Computes the total score for a list of assessments
   # parameters

@@ -20,7 +20,10 @@ class CreateScores < ActiveRecord::Migration
     
     execute "alter table scores 
                add constraint fk_score_questionnaire_types
-               foreign key (questionnaire_type_id) references questionnaire_types(id)"               
+               foreign key (questionnaire_type_id) references questionnaire_types(id)"
+
+    # Empty out the encrypted vars array so the migrations pre-encryption don't get confused
+    Score.send(:class_variable_set, :@@encrypted_vars, Array.new)
   end
   def self.down
     execute 'ALTER TABLE scores DROP FOREIGN KEY fk_score_questions'

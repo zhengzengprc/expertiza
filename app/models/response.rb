@@ -1,6 +1,17 @@
 class Response < ActiveRecord::Base
+  include EncryptionHelper
+  
   belongs_to :map, :class_name => 'ResponseMap', :foreign_key => 'map_id'
   has_many :scores, :class_name => 'Score', :foreign_key => 'response_id'
+
+  before_save 'self.encrypt'
+  after_save 'self.decrypt'
+
+  def after_find
+    decrypt()
+  end
+
+  @@encrypted_vars = ["additional_comment"]
   
   def display_as_html(prefix = nil, count = nil)
     if prefix

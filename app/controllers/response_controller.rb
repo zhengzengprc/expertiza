@@ -2,7 +2,7 @@ class ResponseController < ApplicationController
   helper :wiki
   helper :submitted_content
   helper :file
-  
+
   def view
     @response = Response.find(params[:id])
     @map = @response.map

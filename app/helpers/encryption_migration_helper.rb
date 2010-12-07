@@ -1,4 +1,4 @@
-require 'encryption_migration_helper'
+require 'encryption_helper'
 require 'openssl'
 require 'digest/sha1'
 
@@ -6,24 +6,6 @@ module EncryptionMigrationHelper
   def EncryptionMigrationHelper.get_key()
     key = Digest::SHA1.hexdigest("expertiz")
     return key
-  end
-
-  def EncryptionMigrationHelper.encrypt_val(value, key)
-    cipher = OpenSSL::Cipher::Cipher.new("aes-256-cbc")
-    cipher.encrypt
-    cipher.key = EncryptionMigrationHelper.get_key()
-    cipher.iv = iv = "ßâd1l624NyËè©³9©" #iv is the initializaton vector
-    encrypted_string = cipher.update(value)
-    encrypted_string << cipher.final
-  end
-
-  def EncryptionMigrationHelper.decrypt_val(value, key)
-    cipher = OpenSSL::Cipher::Cipher.new("aes-256-cbc")
-    cipher.decrypt
-    cipher.key = EncryptionMigrationHelper.get_key()
-    cipher.iv = iv = "ßâd1l624NyËè©³9©" #iv is the initializaton vector
-    encrypted_string = cipher.update(value)
-    encrypted_string << cipher.final
   end
   
   def EncryptionMigrationHelper.migrate_up(model_parameters, encryption_parameters)
