@@ -17,17 +17,17 @@ Given /^"([^"]*)":"([^"]*)" logs into the system/ do |user_name, user_pw|
 end
 
 
-Given /^user has uploaded csv file "([^"]*)" containing "([^"]*)":"([^"]*)" for the assignment named "([^"]*)" $/ do |csv_file, user1, user2, assignment_name|
+Given /^user has uploaded csv file "([^"]*)" containing "([^"]*)":"([^"]*)" for the assignment named "([^"]*)" $/ do |csv_file, contributor, reviewer, assignment_name|
   # click the "assign reviewers javascript link"
   if(!$ff.contains_text "Manage...")
     fail "I cannot find the \"Manage...\" link!"
   end
   
   $ff.link(:text, "Manage...").click
-   assignment_xpath1 = "//td[contains(.,'#{assignment_name}')]/../td[9]/ul/li/ul/li[9]/a"
+   assignment_xpath1 = "//td[contains(.,'#{assignment_name}')]/../td[8]/ul/li/ul/li[8]/a"
   $ff.element_by_xpath(assignment_xpath1).click
   
-  File.open(csv_file, 'w') {|f| f.write("#{user1},#{user2}") }
+  File.open(csv_file, 'w') {|f| f.write("#{contributor},#{reviewer}") }
   $ff.link(:text, "Import reviewer mappings").click
   $ff.file_field(:name, 'file').set(csv_file)
   $ff.button(:value, "Import").click
@@ -38,8 +38,13 @@ Given /^user has uploaded csv file "([^"]*)" containing "([^"]*)":"([^"]*)" for 
 
 end
 
-Then /^the assignment named "([^"]*)" will have "([^"]*)":"([^"]*)" as reviewers$/ do |assignment_name, reviewer1, reviewer2|
-    #TODO
+Then /^the assignment named "([^"]*)" will have "([^"]*)":"([^"]*)" as reviewers$/ do |assignment_name, contributor, reviewer|
+  
+  $ff.link(:text, "Manage...").click
+  assignment_xpath1 = "//td[contains(.,'#{assignment_name}')]/../td[9]/ul/li/ul/li[9]/a"
+  $ff.element_by_xpath(assignment_xpath1).click
+  assert($ff.contains_text reviewer)
+  
 end
 
 
@@ -66,7 +71,6 @@ Given /^(user )?will create an assignment named "([^"]*)"$/ do |dummy, assignmen
  #$ff.text_field(:name,"assignment[codereview]").value = ("false")
  #$ff.text_field(:name,"assignment[team_assignment]").value = ("true")
  #$ff.text_field(:name,"assignment[staggered_deadline]").value = ("true")
-
 
   $ff.text_field(:name,"weights[selfassessment]").set("10")
   $ff.text_field(:name,"limits[selfassessment]").set("30")
@@ -95,7 +99,6 @@ Given /^(user )?will create an assignment named "([^"]*)"$/ do |dummy, assignmen
   $ff.select_list(:name,"review_deadline[submission_allowed_id]").select("OK")
   $ff.select_list(:name,"reviewofreview_deadline[submission_allowed_id]").select("Late")
   $ff.select_list(:name,"switch_deadline[submission_allowed_id]").select("OK")
-
 
   $ff.select_list(:name,"submit_deadline[threshold]").select("16")
   $ff.button(:name, "save").click #hit create
@@ -128,6 +131,23 @@ end
 Given /^user "([^"]*)" is a reviewer of "([^"]*)" for "([^"]*)"/ do |reviewer, assignment, reviewee|
   pending # express the regexp above with the code you wish you had
 end
+
+
+Given /^"([^"]*)" has been assigned "([^"]*)"$/ do |user_name, assignment_name|
+  if(!$ff.contains_text "Manage...")
+    fail "I cannot find the \"Manage...\" link!"
+  end
+  
+  $ff.link(:text, "Manage...").click
+   assignment_xpath1 = "//td[contains(.,'#{assignment_name}')]/../td[5]/ul/li/ul/li[5]/a"
+  $ff.element_by_xpath(assignment_xpath1).click
+   
+    if(!$ff.contains_text user_name)
+       $ff.text_field(:name,"user[name]").set(user_name)
+      $ff.button(:value, "Add Participant").click 
+    end
+end
+
 
 Given /^user "([^"]*)" reviews "([^"]*)"/ do |reviewer, reviewee|
   pending # express the regexp above with the code you wish you had

@@ -66,6 +66,7 @@ if(false)
       $ff.link(:text, 'New User').click
       $ff.select_list(:name,'user[role_id]').select('Instructor')
       $ff.text_field(:name,'user[name]').set('Gehringer')
+      $ff.text_field(:name,'user[fullname]').set('Gehringer')
       $ff.text_field(:name,'user[clear_password]').set('gehringer')
       $ff.text_field(:name,'user[confirm_password]').set('gehringer')
       $ff.button(:name, 'commit').click
@@ -79,6 +80,7 @@ if(false)
       $ff.link(:text, 'New User').click
       $ff.select_list(:name,'user[role_id]').select('Teaching Assistant')
       $ff.text_field(:name,'user[name]').set('Titus')
+      $ff.text_field(:name,'user[fullname]').set('Titus')
       $ff.text_field(:name,'user[clear_password]').set('titus')
       $ff.text_field(:name,'user[confirm_password]').set('titus')
       $ff.button(:name, 'commit').click
@@ -92,6 +94,7 @@ if(false)
       $ff.link(:text, 'New User').click
       $ff.select_list(:name,'user[role_id]').select('Student')
       $ff.text_field(:name,'user[name]').set('mtreece')
+      $ff.text_field(:name,'user[fullname]').set('mtreece')
       $ff.text_field(:name,'user[clear_password]').set('mtreece_pw')
       $ff.text_field(:name,'user[confirm_password]').set('mtreece_pw')
       $ff.button(:name, 'commit').click
@@ -106,6 +109,7 @@ if(false)
       $ff.link(:text, 'New User').click
       $ff.select_list(:name,'user[role_id]').select('Student')
       $ff.text_field(:name,'user[name]').set('sjain2')
+      $ff.text_field(:name,'user[fullname]').set('sjain2')
       $ff.text_field(:name,'user[clear_password]').set('sjain2_pw')
       $ff.text_field(:name,'user[confirm_password]').set('sjain2_pw')
       $ff.button(:name, 'commit').click
