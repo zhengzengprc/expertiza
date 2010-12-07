@@ -85,7 +85,6 @@ end
 
 
 Given /^user "([^"]*)" is a participant of "([^"]*)"$/ do |arg1, arg2|
- 
   if(!$ff.contains_text "Manage...")
     fail "I cannot find the \"Manage...\" link!"
   end
@@ -125,6 +124,12 @@ end
 # end
 
 When /^user adds "([^"]*)" to the assignment, "([^"]*)"/ do |user_name, assignment_name|
+  if(!$ff.contains_text "Manage...")
+    fail "I cannot find the \"Manage...\" link!"
+  end
+  
+  $ff.link(:text, "Manage...").click
+ 
   assignment_xpath1 = "//td[contains(.,'#{assignment_name}')]/../td[5]/ul/li/ul/li[5]/a"
   $ff.element_by_xpath(assignment_xpath1).click
    
@@ -134,6 +139,12 @@ When /^user adds "([^"]*)" to the assignment, "([^"]*)"/ do |user_name, assignme
 end
 
 Then /^"([^"]*)" will be a participant of "([^"]*)"$/ do |username, assignment_name|
+  if(!$ff.contains_text "Manage...")
+    fail "I cannot find the \"Manage...\" link!"
+  end
+  
+  $ff.link(:text, "Manage...").click
+ 
   assignment_xpath = "//td[contains(.,'#{assignment_name}')]"
   $ff.element_by_xpath("#{assignment_xpath}/../td[5]/ul/li/ul/li[5]/a").click
   assert($ff.contains_text username)
