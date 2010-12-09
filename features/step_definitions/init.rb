@@ -115,7 +115,6 @@ if(true)
       $ff.button(:name, 'commit').click
     end
   
-  
   # nobody
     if($ff.link(:text, 'n').exists?)
       $ff.link(:text, 'n').click

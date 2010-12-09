@@ -30,7 +30,7 @@ Given /^user has uploaded csv file "([^"]*)" containing "([^"]*)":"([^"]*)" for 
   
   File.open(csv_file, 'w') {|f| f.write("#{contributor},#{reviewer}") }
   $ff.link(:text, "Import reviewer mappings").click
-  $ff.file_field(:name, 'file').set(csv_file)
+  $ff.file_field(:name, 'file').set("#{Dir.pwd}/features/csvs/#{csv_file}")
   $ff.button(:value, "Import").click
   
   #add username
