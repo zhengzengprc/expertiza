@@ -243,12 +243,36 @@ Then /^user "([^"]*)" will not be a reviewer of "([^"]*)"$/ do |reviewer, review
   pending # express the regexp above with the code you wish you had
 end
 
-When /^the user deletes the assignment named "([^"]*)"$/ do |assignment|
-  pending # express the regexp above with the code you wish you had
+When /^the user deletes the assignment named "([^"]*)"$/ do |assignment_name|
+  
+  
+  if(!$ff.contains_text "Manage...")
+    fail "I cannot find the \"Manage...\" link!"
+  end
+  
+  $ff.link(:text, "Manage...").click
+  $ff.link(:name, '3_3Link').click
+  
+  assignment_xpath1 = "//td[contains(.,'#{assignment_name}')]/../td[5]/ul/li/ul/li[3]/a"
+  $ff.element_by_xpath(assignment_xpath1).click
+    
 end
 
-Then /^the assignment named "([^"]*)" will not exist$/ do |assignment|
-  pending # express the regexp above with the code you wish you had
+Then /^the assignment named "([^"]*)" will not exist$/ do |assignment_name|
+  
+  if(!$ff.contains_text "Manage...")
+    fail "I cannot find the \"Manage...\" link!"
+  end
+
+  $ff.link(:text, "Manage...").click
+  $ff.link(:name, '3_3Link').click
+  
+  if(!$ff.contains_text assignment_name)
+    assert true
+  else 
+    assert false
+  end
+  
 end
 
 Then /^user has logged in$/ do
@@ -262,7 +286,7 @@ Given /^user has uploaded csv file "([^"]*)" for the assignment named "([^"]*)"$
   end
   
   $ff.link(:text, "Manage...").click
-  assignment_xpath1 = "//td[contains(.,'#{assignment_name}')]/../td[9]/ul/li/ul/li[9]/a"
+  assignment_xpath1 = "//td[contains(.,'#{assignment_name}')]/../td[5]/ul/li/ul/li[9]/a"
   $ff.element_by_xpath(assignment_xpath1).click
    
   #add username
@@ -271,7 +295,7 @@ Given /^user has uploaded csv file "([^"]*)" for the assignment named "([^"]*)"$
 
 end
 
-Then /^the assignment named "([^"]*)" will have "([^"]*)":"([^"]*)" as reviewers$/ do |assignment_name, reviewer1, reviewer2|
-  #TODO
-  pending
-end
+#Then /^the assignment named "([^"]*)" will have "([^"]*)":"([^"]*)" as reviewers$/ do |assignment_name, reviewer1, reviewer2|
+#  #TODO
+#  pending
+#end
