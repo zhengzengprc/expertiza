@@ -254,3 +254,24 @@ end
 Then /^user has logged in$/ do
   assert($ff.button(:value, "Logout").exists?)
 end
+
+Given /^user has uploaded csv file "([^"]*)" for the assignment named "([^"]*)"$/ do |csv_file|
+  # click the "assign reviewers javascript link"
+  if(!$ff.contains_text "Manage...")
+    fail "I cannot find the \"Manage...\" link!"
+  end
+  
+  $ff.link(:text, "Manage...").click
+  assignment_xpath1 = "//td[contains(.,'#{assignment_name}')]/../td[9]/ul/li/ul/li[9]/a"
+  $ff.element_by_xpath(assignment_xpath1).click
+   
+  #add username
+ # $ff.text_field(:name,"user[name]").set(user_name)  
+ # $ff.button(:value, "Add Participant").click
+
+end
+
+Then /^the assignment named "([^"]*)" will have "([^"]*)":"([^"]*)" as reviewers$/ do |assignment_name, reviewer1, reviewer2|
+  #TODO
+  pending
+end
