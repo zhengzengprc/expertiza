@@ -34,7 +34,7 @@ module FireWatir
   $ff.goto("http://localhost:3000")
 
 # replace true=> false for quick testing
-if(false)
+if(true)
   # log in as admin
     # if already logged in, log us out
     if($ff.button(:value, "Logout").exists?)

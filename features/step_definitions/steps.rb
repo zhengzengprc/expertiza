@@ -17,14 +17,15 @@ Given /^"([^"]*)":"([^"]*)" logs into the system/ do |user_name, user_pw|
 end
 
 
-Given /^user has uploaded csv file "([^"]*)" containing "([^"]*)":"([^"]*)" for the assignment named "([^"]*)" $/ do |csv_file, contributor, reviewer, assignment_name|
+Given /^user has uploaded csv file "([^"]*)" containing "([^"]*)":"([^"]*)" for the assignment named "([^"]*)"$/ do |csv_file, contributor, reviewer, assignment_name|
   # click the "assign reviewers javascript link"
   if(!$ff.contains_text "Manage...")
     fail "I cannot find the \"Manage...\" link!"
   end
   
   $ff.link(:text, "Manage...").click
-   assignment_xpath1 = "//td[contains(.,'#{assignment_name}')]/../td[8]/ul/li/ul/li[8]/a"
+  $ff.link(:name, '3_3Link').click
+   assignment_xpath1 = "//td[contains(.,'#{assignment_name}')]/../td[5]/ul/li/ul/li[9]/a"
   $ff.element_by_xpath(assignment_xpath1).click
   
   File.open(csv_file, 'w') {|f| f.write("#{contributor},#{reviewer}") }
@@ -41,7 +42,7 @@ end
 Then /^the assignment named "([^"]*)" will have "([^"]*)":"([^"]*)" as reviewers$/ do |assignment_name, contributor, reviewer|
   
   $ff.link(:text, "Manage...").click
-  assignment_xpath1 = "//td[contains(.,'#{assignment_name}')]/../td[9]/ul/li/ul/li[9]/a"
+  assignment_xpath1 = "//td[contains(.,'#{assignment_name}')]/../td[5]/ul/li/ul/li[9]/a"
   $ff.element_by_xpath(assignment_xpath1).click
   assert($ff.contains_text reviewer)
   
@@ -68,9 +69,6 @@ Given /^(user )?will create an assignment named "([^"]*)"$/ do |dummy, assignmen
   $ff.select_list(:name,"assignment[wiki_type_id]").select("No")
   $ff.select_list(:name,"assignment[team_assignment]").select("Yes")
   $ff.select_list(:name,"assignment[staggered_deadline]").select("No")
- #$ff.text_field(:name,"assignment[codereview]").value = ("false")
- #$ff.text_field(:name,"assignment[team_assignment]").value = ("true")
- #$ff.text_field(:name,"assignment[staggered_deadline]").value = ("true")
 
   $ff.text_field(:name,"weights[selfassessment]").set("10")
   $ff.text_field(:name,"limits[selfassessment]").set("30")
