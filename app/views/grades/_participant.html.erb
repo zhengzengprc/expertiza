@@ -21,6 +21,22 @@
   	tr_min = pscore[:teammate][:scores][:min] 
   	tr_avg = pscore[:teammate][:scores][:avg]   
   end  	
+    
+	slf_max = 0
+  	slf_min = 0
+   	slf_avg=nil
+
+	role_max = 0
+  	role_min = 0
+   	role_avg=nil
+
+	mngr_max = 0
+  	mngr_min = 0
+   	mngr_avg=nil
+
+	rdr_max = 0
+  	rdr_min = 0
+   	rdr_avg=nil
 %>
 
 <TR class="row" <% if team %> id="<%= prefix %>" style="display:none" <% end %>>
@@ -69,6 +85,26 @@
     <TD ALIGN="CENTER">---</TD>
     <TD ALIGN="CENTER">---</TD>
     <% end %>
+
+<!--       -->
+
+   <% if slf_avg %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",slf_avg) %>%
+  <!--  deleted toggle    -->
+
+    </TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",slf_min) %>% - <%= sprintf("%.0f",slf_max) %>%
+    <% if controller.action_name != "view_my_scores" %>
+      <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'self_review' %></FONT>
+    <% end %>  	    
+    </TD>
+    <% else %>
+    <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
+    <% end %>
+<!--       -->
+
+<!-- only if team assignment       -->
     <% if @assignment.team_assignment %>
     <% if tr_avg %>
     <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",tr_avg) %>%
@@ -83,7 +119,55 @@
     <TD ALIGN="CENTER">---</TD>
     <TD ALIGN="CENTER">---</TD>
     <% end %>    
+
+   <% if role_avg %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",role_avg) %>%
+  <!--  deleted toggle    -->
+    </TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",role_min) %>% - <%= sprintf("%.0f",role_max) %>%
+    <% if controller.action_name != "view_my_scores" %>
+      <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'role_review' %></FONT>
+    <% end %>  	    
+    </TD>
+    <% else %>
+    <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
     <% end %>
+
+    <% end %>
+<!-- end of team_assignment      -->
+
+   <% if mngr_avg %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",mngr_avg) %>%
+  <!--  deleted toggle    -->
+
+    </TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",mngr_min) %>% - <%= sprintf("%.0f",mngr_max) %>%
+    <% if controller.action_name != "view_my_scores" %>
+      <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'manager_review' %></FONT>
+    <% end %>  	    
+    </TD>
+    <% else %>
+    <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
+    <% end %>
+
+   <% if rdr_avg %>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.2f",rdr_avg) %>%
+  <!--  deleted toggle    -->
+
+    </TD>
+    <TD ALIGN="CENTER" VALIGN="TOP"><%= sprintf("%.0f",rdr_min) %>% - <%= sprintf("%.0f",rdr_max) %>%
+    <% if controller.action_name != "view_my_scores" %>
+      <BR/><FONT SIZE="-1"><%= link_to 'email authors', :action => 'conflict_notification', :id => participant.id, :submission => 'reader_review' %></FONT>
+    <% end %>  	    
+    </TD>
+    <% else %>
+    <TD ALIGN="CENTER">---</TD>
+    <TD ALIGN="CENTER">---</TD>
+    <% end %>
+
+<!--       -->
     <% stage = participant.assignment.get_current_stage(participant.topic_id) %>
     <% if controller.action_name == 'view' or controller.action_name == "view_my_scores" %>
     	<TD ALIGN="CENTER">
@@ -111,6 +195,7 @@
    	    <% end %>   	        
    	<% end %>
 </TR>
+
 <TR  class="row" id="<%= prefix %>_files" style="display:none">
 	<TD COLSPAN="9"><%= render :partial=>'grades/submissions', :locals => {:participant => participant} %></TD>
 </TR>
@@ -127,3 +212,8 @@
 	<TD COLSPAN="9"><%= render :partial=>'grades/teammate_reviews', :locals => {:prefix => prefix, :participant => participant, :rscore => pscore[:teammate]} %></TD>
 </TR>
 <!-- END PARTICIPANT -->
+<TR  class="row" id="<%= prefix %>_feedback" style="display:none">
+	<TD COLSPAN="9"><%= render :partial=>'grades/author_feedbacks', :locals => {:prefix => 'user', :participant => participant, :rscore => pscore[:feedback]} %></TD>
+</TR>
+<TR  class="row" id="<%= prefix %>_teammate_reviews" style="display:none">
+	<TD COLSPAN="9"><%= render :partial=>'grades/teammate_revi

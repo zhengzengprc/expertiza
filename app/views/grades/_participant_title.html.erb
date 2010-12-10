@@ -6,8 +6,14 @@
 <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Submitted work</TH>
 <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Reviewing</TH>
 <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Author Feedback</TH>
+
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Self Review</TH>
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Manager/Supervisor Feedback</TH>
+<TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Reader Review</TH>
+
 <% if @assignment.team_assignment %>
   <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Teammate Review</TH>
+  <TH COLSPAN="2" WIDTH="<%= colwidth*2 %>%">Role based review</TH>
 <% end %>
 <TH WIDTH="<%= colwidth %>%">&nbsp;</TH></TR>           
 
@@ -19,9 +25,29 @@
 <TH WIDTH="<%= colwidth %>%">Range </TH>
 <TH WIDTH="<%= colwidth %>%">Average</TH>
 <TH WIDTH="<%= colwidth %>%">Range </TH> 
+
+<TH WIDTH="<%= colwidth %>%">Average</TH>
+<TH WIDTH="<%= colwidth %>%">Range </TH> 
+<TH WIDTH="<%= colwidth %>%">Average</TH>
+<TH WIDTH="<%= colwidth %>%">Range </TH> 
+<TH WIDTH="<%= colwidth %>%">Average</TH>
+<TH WIDTH="<%= colwidth %>%">Range </TH> 
+
 <% if @assignment.team_assignment %>
   <TH WIDTH="<%= colwidth %>%">Average</TH>
   <TH WIDTH="<%= colwidth %>%">Range </TH>
+
+  <TH WIDTH="<%= colwidth %>%">Average</TH>
+  <TH WIDTH="<%= colwidth %>%">Range </TH>
+
 <% end %>   
 <TH WIDTH="<%= colwidth %>%">Final Score</TH></TR>    
     
+TH WIDTH="<%= colwidth %>%">Range </TH> 
+<TH WIDTH="<%= colwidth %>%">Average</TH>
+<TH WIDTH="<%= colwidth %>%">Range </TH> 
+<TH WIDTH="<%= colwidth %>%">Average</TH>
+<TH WIDTH="<%= colwidth %>%">Range </TH> 
+
+<% if @assignment.team_assignment %>
+  <TH WIDTH="<%= colwidth %>%">Average</T
