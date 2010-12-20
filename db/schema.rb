@@ -28,32 +28,33 @@ ActiveRecord::Schema.define(:version => 201010180105450) do
     t.datetime "updated_at"
     t.string   "name"
     t.string   "directory_path"
-    t.integer  "submitter_count",                            :default => 0,     :null => false
-    t.integer  "course_id",                                  :default => 0
-    t.integer  "instructor_id",                              :default => 0
-    t.boolean  "private",                                    :default => false, :null => false
-    t.integer  "num_reviews",                                :default => 0,     :null => false
-    t.integer  "num_review_of_reviews",                      :default => 0,     :null => false
-    t.integer  "num_review_of_reviewers",                    :default => 0,     :null => false
-    t.integer  "review_strategy_id",                         :default => 0
-    t.integer  "mapping_strategy_id",                        :default => 0
+    t.integer  "submitter_count",                      :default => 0,     :null => false
+    t.integer  "course_id",                            :default => 0
+    t.integer  "instructor_id",                        :default => 0
+    t.boolean  "private",                              :default => false, :null => false
+    t.integer  "num_reviews",                          :default => 0,     :null => false
+    t.integer  "num_review_of_reviews",                :default => 0,     :null => false
+    t.integer  "num_review_of_reviewers",              :default => 0,     :null => false
+    t.integer  "review_strategy_id",                   :default => 0
+    t.integer  "mapping_strategy_id",                  :default => 0
     t.integer  "review_questionnaire_id"
     t.integer  "review_of_review_questionnaire_id"
     t.boolean  "reviews_visible_to_all"
     t.boolean  "team_assignment"
     t.integer  "wiki_type_id"
     t.boolean  "require_signup"
-    t.integer  "num_reviewers",                              :default => 0,     :null => false
+    t.integer  "num_reviewers",                        :default => 0,     :null => false
     t.text     "spec_location"
     t.integer  "author_feedback_questionnaire_id"
     t.integer  "teammate_review_questionnaire_id"
-    t.integer  "team_count",                                 :default => 0,     :null => false
+    t.integer  "team_count",                           :default => 0,     :null => false
     t.boolean  "staggered_deadline"
     t.boolean  "allow_suggestions"
     t.integer  "days_between_submissions"
-    t.boolean  "dynamic_reviewer_assignments_enabled",       :default => false
-    t.integer  "dynamic_reviewer_response_time_limit_hours"
+    t.boolean  "dynamic_reviewer_assignments_enabled", :default => false
     t.boolean  "allow_hosted_docs"
+    t.string   "review_assignment_strategy"
+    t.integer  "max_reviews_per_submission"
   end
 
   add_index "assignments", ["course_id"], :name => "fk_assignments_courses"
@@ -404,12 +405,11 @@ ActiveRecord::Schema.define(:version => 201010180105450) do
   add_index "questions", ["questionnaire_id"], :name => "fk_question_questionnaires"
 
   create_table "response_maps", :force => true do |t|
-    t.integer  "reviewed_object_id",                            :null => false
-    t.integer  "reviewer_id",                                   :null => false
-    t.integer  "reviewee_id",                                   :null => false
-    t.string   "type",                                          :null => false
-    t.datetime "potential_response_deadline"
-    t.boolean  "notification_not_sent",       :default => true
+    t.integer "reviewed_object_id",                      :null => false
+    t.integer "reviewer_id",                             :null => false
+    t.integer "reviewee_id",                             :null => false
+    t.string  "type",                                    :null => false
+    t.boolean "notification_not_sent", :default => true
   end
 
   add_index "response_maps", ["reviewer_id"], :name => "fk_response_map_reviewer"
