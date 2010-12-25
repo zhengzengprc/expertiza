@@ -5,7 +5,41 @@ class StudentTaskController < ApplicationController
     if session[:user].is_new_user
       redirect_to :controller => 'eula', :action => 'display'
     end
-    @participants = AssignmentParticipant.find_all_by_user_id(session[:user].id, :order => "parent_id DESC")    
+    sortBy=params[:sort_by]
+    if (session[:desc]==nil)
+      session[:desc]=true
+    end
+    desc=!session[:desc];
+    session[:desc]=desc;
+    @participants = AssignmentParticipant.find(:all, :order=>"parent_id DESC", :conditions=>"user_id=#{session[:user].id}")
+
+=begin
+    the following is the critical part of the code that enables the sorting functionality.
+    it uses rocket operator to initiate comparison, we use a case statement to do different sorting
+    according to the criterio  we GET from the URL parameter. After the sorting, we pass @participants to
+    the corresponding view page to display it.
+=end
+
+    case sortBy
+      when "assignment"
+        @participants.sort! { |a, b| a.assignment.name <=> b.assignment.name }
+      when "topic"
+        @participants.sort! { |a, b| a.get_topic_string <=> b.get_topic_string }
+      when "course"
+        @participants.sort! { |a, b| a.assignment.course.name <=> b.assignment.course.name }
+      when "current_stage"
+        @participants.sort! { |a, b| a.assignment.get_current_stage(a.topic_id) <=> b.assignment.get_current_stage(b.topic_id) }
+      when "stage_deadline"
+        @participants.sort! { |a, b| a.assignment.get_stage_deadline(a.topic_id) <=> b.assignment.get_stage_deadline(b.topic_id) }
+      when "publishing_rights"
+        @participants.sort! { |a, b| a.get_publishing_rights <=> b.get_publishing_rights }
+    end
+    if (desc)
+      @participants.reverse!
+    end
+
+
+#    .find_all_by_user_id(session[:user].id, :order => "assignment.name DESC",join=>:assignment)
   end
   
   def view

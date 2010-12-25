@@ -12,6 +12,13 @@ class AssignmentParticipant < Participant
   def name
     self.user.name
   end
+  def get_publishing_rights
+    if (permission_granted)
+      return "granted"
+    else
+      return "denied"
+    end
+  end
 
   def get_scores(questions)
       scores = Hash.new

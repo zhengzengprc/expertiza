@@ -351,6 +351,9 @@ def add_participant(user_name)
      end
 
     due_date = find_current_stage(topic_id)
+     if (due_date==nil)
+       return "Unknown"
+     end
     if due_date == nil or due_date == COMPLETE
       return due_date
     else
