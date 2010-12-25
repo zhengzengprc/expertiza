@@ -1,6 +1,9 @@
 # Filters added to this controller will be run for all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
+
+require '/var/lib/gems/1.8/gems/gdocs4ruby-0.1.2/lib/gdocs4ruby.rb'
 class ApplicationController < ActionController::Base
+  include GDocs4Ruby
 
 protect_from_forgery :secret => '66c71ad1e57f67bb64bf3ac9ca144f4e'
 
@@ -9,6 +12,17 @@ protect_from_forgery :secret => '66c71ad1e57f67bb64bf3ac9ca144f4e'
       flash[:notice] = "Please log in."
       redirect_to(:controller => 'auth', :action => 'login')
     end
+  end
+  
+    def setup
+    @account = Service.new()
+    @account.debug = true
+#    if  session[:gdoc_login] != 1
+#      flash[:notice] = "Please login your google account."
+#      redirect_to :controller => 'admins', :action => 'gdoc_login', :id => '1'
+#    end
+ #   @account.authenticate(session[:g_account],[:g_password] )
+    @account.authenticate('csc517fall2010@gmail.com', 'csc517lei' )
   end
   
   protected
@@ -41,4 +55,12 @@ protect_from_forgery :secret => '66c71ad1e57f67bb64bf3ac9ca144f4e'
     @display_option.name = 'list_mine'
     @display_option.name = params[:display_option][:name] if params[:display_option]
   end
+  
+  def gauthorize
+    unless Guser.find_by_name(session[:gname])
+      flash[:notice] = "Only for Google Users"
+      redirect_to :controller => 'gusers', :action => 'index'
+    end
+  end
+  
 end

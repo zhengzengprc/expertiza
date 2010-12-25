@@ -15,6 +15,7 @@ class AuthController < ApplicationController
       if user and user.check_password(params[:login][:password])
         logger.info "User #{params[:login][:name]} successfully logged in"
         session[:user] = user
+        session[:gname] = params[:login][:name]
         AuthController.set_current_role(user.role_id,session)
         
         respond_to do |wants|          

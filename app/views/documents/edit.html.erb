@@ -1,0 +1,15 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<title>Untitled Document</title>
+	</head>
+	<body>
+		
+		<% form_for '', :url => {:action => :save_content, :doc_id => @document.id} do %>
+        <p><%= text_area_tag 'content', @document.get_content('txt'), :size => '50x10' %></p>
+		<%= submit_tag 'Save Content' %>
+		<% end %>
+		
+	</body>
+</html>

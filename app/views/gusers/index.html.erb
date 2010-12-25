@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<title>Untitled Document</title>
+	</head>
+	<body>
+		<h1>Listing Google Accounts</h1>
+
+<table>
+  <tr>
+    <th>Name</th>
+  </tr>
+
+<% for user in @users %>
+  <tr>
+    <td><%=h user.name %></td>
+    <td><%= link_to 'Show', user %></td>
+    <td><%= link_to 'Edit', edit_guser_path(user) %></td>
+    <td><%= link_to 'Destroy', user, :confirm => 'Are you sure?',
+                                        :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New user', new_guser_path %>
+<br/>
+<%= link_to "Google Docs", documents_path %>
+
+	</body>
+</html>

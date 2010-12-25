@@ -1,0 +1,17 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<title>Untitled Document</title>
+	</head>
+	<body>
+		<p>
+  <b>Name:</b>
+  <%=h @user.name %>
+</p>
+
+
+<%= link_to 'Edit', edit_guser_path(@user) %> |
+<%= link_to 'Back', gusers_path %>
+	</body>
+</html>
