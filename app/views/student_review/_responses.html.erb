@@ -24,24 +24,28 @@
        <td><%= link_to "View",{:controller => 'response', :action => 'view', :id => map.response.id} %></td>
        <% if @assignment.get_current_stage(@participant.topic_id) != "Complete" %>
        <td><%= link_to "Edit",{:controller => 'response', :action => 'edit', :id => map.response.id} %></td>
+       <td><%= link_to "Show a Good Review",{:controller => 'response', :action => 'showGoodReview',:assignment=>@assignment} %></td>                  
        <% end %>
      <% elsif @assignment.get_current_stage(@participant.topic_id) != "Complete" %>
        <%if @assignment.staggered_deadline?%>
            <%if map.type.to_s == "MetareviewResponseMap"%>
                <%if @assignment.get_current_stage(@participant.topic_id) == 'metareview'%>
                    <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
+                   <td><%= link_to "Show a Good Review",{:controller => 'response', :action => 'showGoodReview',:assignment=>@assignment} %></td>
                <%else%>
                    <td>Begin</td><td> (Work has not yet been submitted)</td>
                <%end%>
            <%else%>
                 <%if @assignment.get_current_stage(@participant.topic_id) != 'submission'%>
                    <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
+                   <td><%= link_to "Show a Good Review",{:controller => 'response', :action => 'showGoodReview',:assignment=>@assignment} %></td>
                 <%else%>
                    <td>Begin</td><td> (Work has not yet been submitted)</td>
                 <%end%>
            <%end%>
        <%else%>
            <td><%= link_to "Begin",{:controller => 'response', :action => 'new', :id => map.id} %></td>
+               <td><%= link_to "Show a Good Review",{:controller => 'response', :action => 'showGoodReview',:assignment=>@assignment} %></td>
        <%end%>
   	 <% else %>
   	   <td>Begin</td><td> (Work has not yet been submitted)</td>

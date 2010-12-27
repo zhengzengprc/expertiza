@@ -22,7 +22,13 @@ class Assignment < ActiveRecord::Base
   validates_uniqueness_of :scope => [:directory_path, :instructor_id]
     
   COMPLETE = "Complete"
-  
+
+  def findSimilarAssignment
+    return self.name; 
+  end
+  def findGoodReview
+    return self.name;
+  end
   def review_mappings
     if team_assignment
       TeamReviewResponseMap.find_all_by_reviewed_object_id(self.id)
@@ -30,7 +36,8 @@ class Assignment < ActiveRecord::Base
       ParticipantReviewResponseMap.find_all_by_reviewed_object_id(self.id)
     end
   end
-  
+
+
   def metareview_mappings
      mappings = Array.new
      self.review_mappings.each{
