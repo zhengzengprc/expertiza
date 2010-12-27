@@ -112,6 +112,18 @@ class AssignmentController < ApplicationController
       #setting the Due Dates with a helper function written in DueDate.rb
       DueDate::set_duedate(params[:submit_deadline],@Submission_deadline, @assignment.id, max_round )
       DueDate::set_duedate(params[:review_deadline],@Review_deadline, @assignment.id, max_round )
+
+      assignment_same_late_policy = params[:assignment_same_late_policy].to_i
+      assignment_id = @assignment.id
+      all_dead_line = params[:all_deadline_p].to_i
+      if all_dead_line
+        set_late_policy_for_all(params[:submit_deadline_p_all],@assignment)
+      else
+        helper = params[:assignment_helper]
+        number_of_rounds = helper[:no_of_reviews].to_i
+        set_late_policy(@assignment)
+      end
+
       max_round = 2;
       
      
@@ -369,4 +381,116 @@ class AssignmentController < ApplicationController
     FileHelper.update_file_location(oldpath,newpath)
     redirect_to :controller => 'tree_display', :action => 'list'
   end  
+
+  def set_late_policy_for_all(policies,assignment)
+      # Create a new Late Policy object, assign params to it and save in database
+      late_policy = LatePolicy.new
+      period_in_days = policies[:s_penalty_period_all].to_i
+      expressed_as_percentage = policies[:expressed_as_percentage].to_s.to_i
+      max_penalty = policies[:max_penalty].to_i
+      penalty_per_unit = policies[:penalty_per_unit].to_i
+      late_policy.penalty_period_in_minutes = period_in_days * 1440
+      late_policy.penalty_per_unit = penalty_per_unit
+      late_policy.expressed_as_percentage = expressed_as_percentage
+      late_policy.max_penalty = max_penalty
+      late_policy.save
+
+      # From this assign the late_policy id to the assignments in DueDates
+      @duedates = DueDate.find_all_by_assignment_id(assignment.id)
+      for dues in @duedates
+        dues.late_policy_id = late_policy.id
+        dues.save
+      end
+  end
+  def set_late_policy(assignment)
+    # Get the list of DueDates concerned with this assignment
+    @duedates = DueDate.find_all_by_assignment_id(assignment.id)
+
+    #Get the late Policies for each of the 3 phases, submit,review and rerview
+    @policies_submit = params[:submit_deadline_p]
+    @policies_review = params[:review_deadline_p]
+    @policies_reviewofreview = params[:reviewofreview_deadline_p]
+
+    # Deadline types used in the deadline_types DB table
+    deadline = DeadlineType.find_by_name("submission")
+    subdeadline= deadline.id
+    deadline = DeadlineType.find_by_name("review")
+    revdeadline = deadline.id
+    deadline = DeadlineType.find_by_name("resubmission")
+    resubdeadline= deadline.id
+    deadline = DeadlineType.find_by_name("rereview")
+    rerevdeadline= deadline.id
+    deadline = DeadlineType.find_by_name("metareview")
+    revofrevdeadline = deadline.id
+
+    # Write the submisiion policy and set the late policy id in the relevant due dates
+        late_policy = LatePolicy.new
+        period_in_days = @policies_submit[:s_penalty_period].to_i
+        if @policies_submit[:expressed_as_percentage]== 1
+          expressed_as_percentage = 0
+        else
+          expressed_as_percentage = 1
+        end  
+        max_penalty = @policies_submit[:max_penalty].to_i
+        penalty_per_unit = @policies_submit[:penalty_per_unit].to_i
+        late_policy.penalty_period_in_minutes = period_in_days  * 1440
+        late_policy.penalty_per_unit = penalty_per_unit
+        late_policy.expressed_as_percentage = expressed_as_percentage
+        late_policy.max_penalty = max_penalty
+        late_policy.save
+        # Now check if Due - Dates has  a deadline type ID that matches with Submission
+        for dues in @duedates
+          if (dues.deadline_type_id) == subdeadline  ||  (dues.deadline_type_id) == resubdeadline
+            dues.late_policy_id = late_policy.id
+            dues.save  
+        end
+      end
+
+    # Write the Review policy and set the late policy id in the relevant due dates
+        late_policy = LatePolicy.new
+        period_in_days = @policies_review[:r_penalty_period].to_i
+        if @policies_review[:expressed_as_percentage] == 1
+          expressed_as_percentage = 0
+        else
+          expressed_as_percentage = 1
+        end
+        max_penalty = @policies_review[:max_penalty].to_i
+        penalty_per_unit = @policies_review[:penalty_per_unit].to_i
+        late_policy.penalty_period_in_minutes = period_in_days  * 1440
+        late_policy.penalty_per_unit = penalty_per_unit
+        late_policy.expressed_as_percentage = expressed_as_percentage
+        late_policy.max_penalty = max_penalty
+        late_policy.save
+        # Now check if Due - Dates has  a deadline type ID that matches with Submission
+        for dues in @duedates
+            if (dues.deadline_type_id) == revdeadline || (dues.deadline_type_id) == rerevdeadline
+              dues.late_policy_id = late_policy.id
+              dues.save
+            end
+        end
+
+    # Write the Review policy and set the late policy id in the relevant due dates
+    late_policy = LatePolicy.new
+    period_in_days = @policies_reviewofreview[:rr_penalty_period].to_i
+    if params[:expressed_as_percentage]== 1
+      expressed_as_percentage = 0
+    else
+       expressed_as_percentage = 1
+    end
+    max_penalty = @policies_reviewofreview[:max_penalty].to_i
+    penalty_per_unit = @policies_reviewofreview[:penalty_per_unit].to_i
+    late_policy.penalty_period_in_minutes = period_in_days  * 1440
+    late_policy.penalty_per_unit = penalty_per_unit
+    late_policy.expressed_as_percentage = expressed_as_percentage
+    late_policy.max_penalty = max_penalty
+    late_policy.save
+    # Now check if Due - Dates has  a deadline type ID that matches with Submission
+    for dues in @duedates
+      if dues.deadline_type_id.to_i == revofrevdeadline
+        dues.late_policy_id = late_policy.id
+        dues.save;
+      end
+    end
+
+  end
 end

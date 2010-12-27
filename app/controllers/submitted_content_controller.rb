@@ -24,6 +24,7 @@ class SubmittedContentController < ApplicationController
     begin
       Net::HTTP.start(url.host, url.port)
       participant.update_attribute('submitted_hyperlink',params['submission'].strip)
+      grad_calc(participant)
     rescue 
       flash[:error] = "The URL or URI is not valid. Reason: "+$!
     end    
@@ -61,7 +62,8 @@ class SubmittedContentController < ApplicationController
     if params['unzip']
       SubmittedContentHelper::unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"
     end
-    participant.update_resubmit_times       
+    participant.update_resubmit_times
+    grad_calc(participant)
     redirect_to :action => 'edit', :id => participant.id
   end
 
@@ -97,6 +99,7 @@ class SubmittedContentController < ApplicationController
         rescue
         end
     end
+    grad_calc(participant)
     redirect_to :action => 'edit', :id => participant.id
   end
 
@@ -223,6 +226,32 @@ private
       flash[:note] = "The directory #{params[:faction][:create]} was created."
     rescue
       flash[:error] = $!
+    end
+  end
+
+  def grad_calc(participant)
+    s_pen = participant.penalty_accumulated
+    pen_sub= 0
+    pen_rev=0
+    test1=0
+    test2=0
+    stage_now = participant.assignment.get_current_stage(participant.topic_id)
+
+    pen_sub_time = Date.parse((participant.submitted_at).to_s)
+    pen_rev_time = participant.submitted_at
+    assignment = participant.assignment
+    duedates = DueDate.find_by_assignment_id(assignment.id)
+    date = Date.parse((duedates.due_at).to_s)
+    no_of_days= (pen_sub_time - date).to_i
+    no_of_mins = (no_of_days)*24*60
+    policy = LatePolicy.find_by_id(duedates.late_policy_id)
+    if(policy.expressed_as_percentage)
+     penalty_points = ((no_of_mins)*(policy.penalty_per_unit))/(policy.penalty_period_in_minutes*100)
+    else
+     penalty_points = ((no_of_mins)*(policy.penalty_per_unit))/(policy.penalty_period_in_minutes)
+    end
+    if penalty_points > policy.max_penalty
+      penalty_points  = policy.max_penalty
     end
   end
 end

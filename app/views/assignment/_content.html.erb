@@ -32,6 +32,21 @@ function get_assignment_startdate() {
         days_between_chapters.style.display = "none";
 	}
 }
+
+  function get_assignment_late_policy()
+  {
+      var late_policy_label = document.getElementById("late_policy");
+      var dropdownIndex = document.getElementById('late_policy_check').selectedIndex;
+ var dropdownValue = document.getElementById('late_policy_check')[dropdownIndex].value;
+      if(dropdownValue == "true"){
+//start_date.style.display = "";
+       late_policy_label.style.display = "";
+    }else{
+//start_date.style.display = "none";
+        late_policy_label.style.display = "none";
+   }
+  }
+
 </script>
 
 <% if flash[:notice] != nil and flash[:notice].strip != "" %>
@@ -86,36 +101,47 @@ function get_assignment_startdate() {
 <tr>
   <td><label for="team_assignment">Team assignment:</label></td>
   <td>
-  		<select id="teamselect" name="assignment[team_assignment]" onchange="onChange();">
-  		 <option value=false style="width:75px">No</option>
-         <option value=true style="width:75px" <% if @assignment.team_assignment %>SELECTED<%end%>>Yes</option>      
+   <select id="teamselect" name="assignment[team_assignment]" onchange="onChange();">
+   <option value=false style="width:75px">No</option>
+         <option value=true style="width:75px" <% if @assignment.team_assignment %>SELECTED<%end%>>Yes</option>
         </select>
-  </td>  
+  </td>
 </tr>
 
  <tr><td><label for="staggered">Staggered deadline?</label></td>
 
  <td>
-  		<select id="staggered_deadline" name="assignment[staggered_deadline]" onchange="get_assignment_startdate();">
-  		 <option value=false style="width:75px">No</option>
+   <select id="staggered_deadline" name="assignment[staggered_deadline]" onchange="get_assignment_startdate();">
+   <option value=false style="width:75px">No</option>
          <option value=true style="width:75px" <% if @assignment.staggered_deadline %>SELECTED<%end%>>Yes</option>
         </select>
   </td>
+
+   <tr><td><label for="late_pol">Assign Late Policy?</label></td>
+
+ <td>
+   <select id="late_policy_check" name="assignment_late_policy" onchange="get_assignment_late_policy();">
+   <option value=false style="width:75px" SELECTED>No</option>
+         <option value=true style="width:75px"> Yes</option>
+            <!-- <%# if @assignment.late_policy_check %>SELECTED<%#end%>> -->
+        </select>
+  </td>
+
 
  </tr>
 <tr><!-- E12 -->
   <td><label for="assignment_allow_hosted_docs">Allow Hosted Documents:</label></td>
   <td><%= check_box_tag 'assignment[allow_hosted_docs]', '1', @assignment.allow_hosted_docs %></td>
 </tr>
-<tr id="team_count1" style="display:none">  
-  <td valign="top" width="250" height="50"><label for="team_count">Maximum number of participants per team:</label></td>   
-  <td valign="top"><%= text_field 'assignment', 'team_count', :size => 5%></td>  
-  </td> 
+<tr id="team_count1" style="display:none">
+  <td valign="top" width="250" height="50"><label for="team_count">Maximum number of participants per team:</label></td>
+  <td valign="top"><%= text_field 'assignment', 'team_count', :size => 5%></td>
+  </td>
 </tr>
 
 <tr id="team_count2">
   <td colspan="2" height="50">&nbsp;</td>
-</tr> 
+</tr>
 </table></td>
 </tr>
 </table>
@@ -123,5 +149,3 @@ function get_assignment_startdate() {
 <p>
 </p>
 <!--[eoform:assignment]-->
-
-

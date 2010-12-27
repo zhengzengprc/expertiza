@@ -1,0 +1,164 @@
+<script>
+  function assign_same_data()
+  {
+      var late_policy_label_all = document.getElementById("late_policy_all");
+      var late_policy_label_stage= document.getElementById("late_policy_stages");
+      var dropdownIndex = document.getElementById('same_late_policy_check').selectedIndex;
+      var dropdownValue = document.getElementById('same_late_policy_check')[dropdownIndex].value;
+      if(dropdownValue=="true")
+      {
+          late_policy_label_all.style.display="";
+          late_policy_label_stage.style.display="none";
+
+      }
+      else
+      {
+       late_policy_label_all.style.display="none";
+       late_policy_label_stage.style.display="";
+      }
+  }
+</script>
+
+
+
+
+<div id="late_policy" style="display:none">
+   <div style="font-size:large;"><b><label id="late_policies_label">Late Policies</label></b></div><br/>
+           <br/>
+
+  <table>
+    <tr>
+    <td><label>Assign same late policy for all deadlines? (if "Yes", enter values in first row alone")</label></td>
+  <td>
+    <select id="same_late_policy_check" name="assignment_same_late_policy"  onchange="assign_same_data();">
+  		 <option value=false style="width:75px">No</option>
+         <option value=true style="width:75px"> Yes</option>
+    </select>
+     </td>
+    </tr>
+   </table>
+            <!-- <%# if @assignment.late_policy_check %>SELECTED<%#end%>> onchange="get_same_late_policy(); -->
+        <div  id="late_policy_all" style="display:none">
+        <TABLE class = "exp" >
+          <TR>
+
+              <TH>Deadline</TH>
+              <!--  <TH>Date & time</TH>   -->
+               <TH>Penalty allowed</TH>
+               <TH>Penalty period (in Days)</TH>
+
+               <TH>Penalty per unit</TH>
+               <TH>Expressed as percentage</TH>
+               <TH>Max_Penalty</TH>
+          </TR>
+              <TR>
+               <TD ALIGN=LEFT WIDTH=20%>
+                   Submission deadline
+               </TD>
+               <TD ALIGN=CENTER WIDTH=10%>
+                   <%= select('submit_deadline', 'submit_deadline_p[submission_allowed_id]', [ ['No', 1],['Yes', 2]],:selected =>2 )%>
+               </TD>
+              <TD ALIGN="CENTER">
+                    <input type="text" id="submit_penalty_period_in_days_all" name ="submit_deadline_p_all[s_penalty_period_all], <%=@all_deadline_p%>"/>
+              </TD>
+              <TD ALIGN="CENTER">
+                    <input type="text" id="submit_penalty_per_unit_all" name ="submit_deadline_p_all[penalty_per_unit]" value = <%=@all_deadline_pen_per_unit%>/>
+              </TD>
+              <TD ALIGN=CENTER WIDTH=10%>
+                   <%= select('submit_deadline_penalty', 'submit_deadline_p_all[expressed_as_percentage]', [ ['No', 1],['Yes', 2]],:selected =>2 )%>
+              </TD>
+              <TD ALIGN="CENTER">
+                    <input type="text" id="submit_penalty_max_all" name ="submit_deadline_p_all[max_penalty]" value = <%=@all_deadline_pen_min%>/>
+              </TD>
+              </TR>
+      </TABLE>
+    </div>
+     <div id = "late_policy_stages">
+  <TABLE class = "exp">
+          <TR>
+
+              <TH>Deadline</TH>
+              <!--  <TH>Date & time</TH>   -->
+               <TH>Penalty allowed</TH>
+               <TH>Penalty period (in Days)</TH>
+
+               <TH>Penalty per unit</TH>
+               <TH>Expressed as percentage</TH>
+               <TH>Max_Penalty</TH>
+          </TR>
+              <TR>
+               <TD ALIGN=LEFT WIDTH=20%>
+                   Submission deadline
+               </TD>
+               <TD ALIGN=CENTER WIDTH=10%>
+                   <%= select('submit_deadline', 'submission_allowed_id', [ ['No', 1],['Yes', 2]],:selected =>2 )%>
+               </TD>
+              <TD ALIGN="CENTER">
+                    <input type="text" id="submit_penalty_period_in_days" name ="submit_deadline_p[s_penalty_period]"/>
+              </TD>
+              <TD ALIGN="CENTER">
+                    <input type="text" id="submit_penalty_per_unit" name ="submit_deadline_p[penalty_per_unit]"/>
+              </TD>
+              <TD ALIGN=CENTER WIDTH=10%>
+                   <%= select('submit_deadline_penalty', 'submit_deadline_p[expressed_as_percentage]', [ ['No', 1],['Yes', 2]])%>
+              </TD>
+              <TD ALIGN="CENTER">
+                    <input type="text" id="submit_penalty_period_in_minutes" name ="submit_deadline_p[max_penalty]"/>
+              </TD>
+              </TR>
+              <TR>
+
+               <TD ALIGN=LEFT WIDTH=20%>
+                   <input name="deadlineTitle0" size=10	maxlength=10 value="Submission deadline" type="hidden"/>Review deadline
+               </TD>
+
+               <!-- nithy -->
+
+
+               <TD ALIGN=CENTER WIDTH=10%>
+                   <%= select('review_deadline', 'submission_allowed_id', [ ['No', 1],['Yes', 2]],:selected =>2 )%>
+               </TD>
+              <TD ALIGN="CENTER">
+                    <input type="text" id="review_penalty_period_in_days" name ="review_deadline_p[r_penalty_period]"/>
+              </TD>
+              <TD ALIGN="CENTER">
+                    <input type="text" id="review_penalty_per_unit" name ="review_deadline_p[penalty_per_unit]"/>
+              </TD>
+              <TD ALIGN=CENTER WIDTH=10%>
+                   <%= select('review_deadline_penalty', 'review_deadline_p[expressed_as_percentage]', [ ['No', 1],['Yes', 2]] )%>
+              </TD>
+              <TD ALIGN="CENTER">
+                    <input type="text" id="review_penalty_period_in_minutes" name ="review_deadline_p[max_penalty]"/>
+              </TD>
+              </TR>
+    </TABLE>
+
+  <table class="exp" id=extra_deadlines_penalties></table>
+
+  <TABLE class="exp">
+
+               <TR>
+               <TD ALIGN=LEFT WIDTH=20%>
+                   Review-of-Review deadline
+               </TD>
+
+               <TD ALIGN=CENTER WIDTH=10%>
+                   <%= select('reviewofreview_deadline', 'submission_allowed_id', [ ['No', 1],['Yes', 2]],:selected =>2 )%>
+               </TD>
+              <TD ALIGN="CENTER">
+                    <input type="text" id="reviewofreview_penalty_period_in_days" name ="reviewofreview_deadline_p[rr_penalty_period]"/>
+              </TD>
+              <TD ALIGN="CENTER">
+                    <input type="text" id="reviewofreview_penalty_per_unit" name ="reviewofreview_deadline_p[penalty_per_unit]"/>
+              </TD>
+              <TD ALIGN=CENTER WIDTH=10%>
+                   <%= select('reviewofreview_deadline_penalty', 'reviewofreview_deadline_p[expressed_as_percentage]', [ ['No', 1],['Yes', 2]])%>
+              </TD>
+              <TD ALIGN="CENTER">
+                    <input type="text" id="reviewofreview_penalty_period_in_minutes" name ="reviewofreview_deadline_p[max_penalty]"/>
+              </TD>
+              </TR>
+  </TABLE>
+       </div>
+</div>
+<br>
