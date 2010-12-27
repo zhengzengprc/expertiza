@@ -1,0 +1,26 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<title>View and suggest bookmarks</title>
+		
+	</head>
+	<body>
+		<h2>View and suggest bookmarks</h2>
+<%= link_to "View bookmarks", :controller=>'bookmark', :action=> 'list_bookmarks', :id=>session[:topicid]%>
+<br>
+<h3>Suggest New Bookmarks</h3>
+	<% form_tag(:controller=>"bookmark", :action=>'add_bookmark', :method=>"post") do%>  
+		<%= label_tag(:bookmark_title, "Title:")%><br>
+		<%= text_field_tag(:bookmark_title, "", :size=>"35")%>
+		<br><br>
+		<%= label_tag(:url, "URL/ DOI for the bookmark:") %><br>  
+		<%= text_field_tag(:url, "", :size=>"60") %>  
+		<br>
+		<%= submit_tag("Submit") %> 
+	<%end %>
+	
+	<br>
+	<a href=<%=@backurl%>>Back</a>
+	</body>
+</html>

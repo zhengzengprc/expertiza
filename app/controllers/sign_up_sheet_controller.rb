@@ -622,6 +622,10 @@ class SignUpSheetController < ApplicationController
 
   end
 
+  def suggest_bookmark
+      session[:topicid]=params[:id] #setting the topic ID into the session
+      @backurl=session[:return_to]
+  end
 
 end
 

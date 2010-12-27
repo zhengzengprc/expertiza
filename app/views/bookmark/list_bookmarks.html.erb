@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+		<title>List of all suggested bookmarks</title>
+	</head>
+	<body>
+	<table class="general">
+  	<tr>
+    <th width="1%">Topic #</th>
+    <th width="10%">Topic name(s)</th>
+    <th width="2%">Bookmark Title</th>
+    <th width="2%">Bookmark</th>
+	<%if @flag1==1%>
+	<th width="2%">Rate bookmark</th>
+	<th width="2%">Current Rating</th> 
+	<%end%>
+  </tr>
+    <% for bookmark in @bookmarks_list %>
+      <tr>
+      	<td><%=bookmark.sign_up_topic_id%></td>
+		<td><%=bookmark.topic_name%></td>
+		<td><%=bookmark.title %></td>
+		<td><a href=<%=bookmark.bookmark_link%> target="_blank"><%=bookmark.bookmark_link%></a></td>
+		
+		<%if @flag1==1%>
+		<%form_tag(:controller=>"bookmark", :action=>'rate_bookmark', :method=>"post") do%>
+		<td align="center">
+		
+		<%= label_tag(:rating, "Rating(scale 1-5):")%><br>
+		<%= text_field_tag(:rating, "", :size=>"5")%>
+		<%= hidden_field_tag(:id, value=bookmark.id)%>
+	
+		<%= image_submit_tag('copy_icon.png') %> 
+		
+		
+		</td>
+		<% end %>
+		
+		<td align="center"><%= link_to "Current Rating", :controller=>'bookmark', :action=> 'existing_rating', :id => bookmark.id%></td> 
+		<%end%>
+	  </tr>
+	 <% end%>
+	 
+	 <br>
+	 <%prevPage="/sign_up_sheet/suggest_bookmark/"+bookmark.sign_up_topic_id.to_s%>
+	 <%session[:topicid]=bookmark.sign_up_topic_id.to_s%>
+	<a href=<%=prevPage%>>Back</a>
+	
+	<%if @flag2==1%>
+	<p>Rating saved successfully</p>
+	<%end%>
+	
+	</body>
+</html>

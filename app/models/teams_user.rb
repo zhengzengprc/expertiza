@@ -14,4 +14,8 @@ class TeamsUser < ActiveRecord::Base
       team.delete    
     end
   end
+  
+  def self.find_teamid_for_userid(user_id)
+    TeamsUser.find_by_sql("SELECT tu.team_id FROM teams_users tu WHERE tu.user_id ="+ user_id);   
+  end
 end

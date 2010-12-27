@@ -7,8 +7,9 @@
 	    <th width="5%">Available slots</th>
 	    <th width="5%">Waitlist</th>
 	    <%if @show_actions%>
-	    <th width="5%">Action</th>
+	      <th width="5%">Action</th>
 	    <%end%>
+		  <th>Bookmark Action</th>
 	  </tr>
 
   <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
@@ -52,6 +53,7 @@
         <% end %>
 
         <%= render :partial => 'waitlisted_choosers', :locals => {:topic=>topic} %>
+		
         <%if @show_actions%>
             <%action_symbol_added = false%>
             <% if !@selected_topics.nil? && @selected_topics.size != 0 %>
@@ -65,6 +67,11 @@
             <%if action_symbol_added == false %>
                 <td align="center"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'signup', :id => topic.id, :assignment_id => params[:id] %></td>
             <% end %>
+				<td align="center">
+				<!--Changes to E10..Adding a new column in the Sign Up Sheet to allow for adding/viewing bookmarks for a topic-->
+				<%= link_to image_tag('action_img.png', :border => 0, :title => 'View/Suggest Bookmarks', :align => 'middle'), :controller=>'sign_up_sheet', :action=> 'suggest_bookmark', :id => topic.id%>
+				
+				</td>
         <% end %>
       </tr>
       <% i=i+1 %>

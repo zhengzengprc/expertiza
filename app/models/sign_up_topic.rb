@@ -87,4 +87,8 @@ class SignUpTopic < ActiveRecord::Base
     }
   end  
 
+  def self.find_topic_name_by_topic_id
+    puts "topic_id="+6
+    SignUpTopic.find_by_sql("SELECT topic_name FROM sign_up_topics  WHERE id =" + 6)
+  end
 end

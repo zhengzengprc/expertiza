@@ -58,5 +58,8 @@ class SignedUpUser < ActiveRecord::Base
     TeamsUser.find_by_sql("SELECT t.id as t_id FROM teams_users u, teams t WHERE u.team_id = t.id and t.parent_id =" + assignment_id.to_s + " and user_id =" + user_id.to_s)
   end
 
+  def self.find_signed_up_user(topic_id)
+    TeamsUser.find_by_sql("SELECT s.creator_id FROM signed_up_users s WHERE s.topic_id = " + topic_id )
+  end
   
 end
