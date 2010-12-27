@@ -1,0 +1,71 @@
+<script type="text/javascript">
+function onChange(){
+	count = document.getElementById("team_count1");
+	hidden = document.getElementById("team_count2");
+	document.poppedLayer3 = eval('document.getElementById("teammate_review")');
+	var dropdownIndex = document.getElementById('teamselect').selectedIndex;
+	var dropdownValue = document.getElementById('teamselect')[dropdownIndex].value;
+	if(dropdownValue == "true"){
+		count.style.display = "";
+		hidden.style.display = "none";
+		document.poppedLayer3.style.display = "";
+	}else{
+		count.style.display = "none";
+		hidden.style.display  = "";
+		document.poppedLayer3.style.display = "none";
+	}
+}
+
+function get_assignment_startdate() {
+    //var start_date = document.getElementById("assignment_startdate");
+    var staggered_label = document.getElementById("staggered_label");
+    var days_between_chapters = document.getElementById("days_between_chapters");
+    var dropdownIndex = document.getElementById('staggered_deadline').selectedIndex;
+	var dropdownValue = document.getElementById('staggered_deadline')[dropdownIndex].value;
+	if(dropdownValue == "true"){
+		//start_date.style.display = "";
+        staggered_label.style.display = "";
+        days_between_chapters.style.display = "";
+	}else{
+		//start_date.style.display = "none";
+        staggered_label.style.display = "none";
+        days_between_chapters.style.display = "none";
+	}
+}
+</script>
+
+<% if flash[:notice] != nil and flash[:notice].strip != "" %>
+<div class="flash_error">
+	<%= flash[:notice] %>
+</div>
+<% end %>
+<%= error_messages_for 'microtask' %>
+
+<!--[form:assignment]-->
+
+
+<table>
+<tr>
+  <td><label for="microtask_name">Microtask name: </label></td>
+  <td><%= text_field 'microtask', 'name'  %></td>
+</tr>
+<tr>  
+
+<tr>
+  <td><label for="max_choosers" id="max_choosers">Max choosers: </label></td>
+  <td><%= text_field 'microtask', 'max_choosers'%></td>
+</tr>
+<tr>  
+
+</table></td>
+
+<td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
+
+
+</table></td>
+</tr>
+</table>
+
+<!--[eoform:assignment]-->
+
+

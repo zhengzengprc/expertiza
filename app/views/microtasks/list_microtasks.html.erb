@@ -1,0 +1,32 @@
+<h1>List of Microtasks <%=  %></h1>
+
+<h3>* Click on a microtask name to assign grades <%= %></h3>
+
+<table class="general">
+  <tr>
+    <th width="5%">Topic #</th>
+    <th width="50%">Topic name(s)</th>
+    <th width="5%">Max choosers</th>
+    <th width="5%">Available slots</th>
+    <!--<th width="5%">Subscribe</th>-->
+<th width="20%">Deadline</th>
+  </tr>
+
+   <%@count=0%>
+   <%for microtask in @microtasks%>
+   <%@count=@count + 1%>
+<tr>
+    <td width="5%"><%= @count  %></td>
+    <td width="50%"><%=link_to microtask.name, :controller => 'microtasks', :action => 'users_belonging_to_microtask', :id=> microtask.id%></td>
+    
+    <td width="5%"><%=microtask.max_choosers%></td>
+	<% @numofrows=MicrotaskParticipant.count(:conditions => ["microtaskid = ?",microtask.id]) %> 
+	<td width="5%"><%=microtask.max_choosers -  @numofrows %></td>
+	    
+    <!--<td width="5%"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle')  %> </td>-->
+<td width="20%"><%=microtask.submission_deadline%></td>
+  </tr>
+   <%end%>
+  </table>
+  <a href="javascript:history.back()">Back</a>
+<br/>

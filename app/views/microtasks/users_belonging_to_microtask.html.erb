@@ -1,0 +1,31 @@
+<h1>Assign Grades <%=  %></h1>
+
+<h1>Participants for this microtask <%= %></h1>
+
+<table class="general">
+  <tr>
+    <th width="30%">Name of the partipant #</th>
+    <th width="15%">link_to user's_work</th>
+    <th width="10%">Current Grade</th>
+	<th width="45%">Assign Grade</th>
+  </tr>
+  
+   <%@count=0%>
+   <%for participant in @participants%>
+   <%user = User.find(participant.userid)%>
+<tr>
+    <td width="30%"><%=user.name %></td>
+    <td width="15%"><%= link_to 'users_work', :controller => 'submitted_content', :action => 'display_microtask_submitted_files' ,:micro =>1 , :microtask_id =>participant.microtaskid ,:participant_id =>participant.id  %></td>
+    <td width="10%"><%=participant.grades %></td>
+	<!--><td width="20%"><%= link_to 'Change Grade', :controller => 'microtask_participants', :action => 'change_grade', :muid =>participant.id%></td>-->
+	<td width="45%"><% form_tag :controller => 'microtask_participants', :action=>'change_grade', :id => participant.id, :microtask_id =>participant.microtaskid  do %>
+        Update grade (optional): <input type="text" name="grade" size=10/>
+	   <input type="submit" name="upload_link" value="Submit"/>    
+        <% end %></b><BR/>
+<!--<%= hidden_field_tag(:parent_id, "5") %>-->
+
+ </tr>
+   <%end%>
+  </table>
+  <a href="javascript:history.back()">Back</a>  
+<br/>

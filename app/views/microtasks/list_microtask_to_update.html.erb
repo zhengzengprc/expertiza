@@ -1,0 +1,20 @@
+<h1>Edit Mirotask</h1>
+<% form_tag :action => 'update', :id => @microtask.id do %>
+
+  <p><label for="microtask_name">Microtask name: </label><br/>
+  <%= text_field 'microtask', 'name'  %></p>
+
+  <p><label for="max_choosers" id="max_choosers">Max choosers: </label><br/>
+  <%= text_field 'microtask', 'max_choosers'%></p>
+
+
+  <p><label for="submission_deadline" id="submission_deadline">Submission deadline: </label><br/>
+  <%= text_field 'microtask', 'submission_deadline' %>
+
+     <img src="/images/cal.gif" onClick="NewCal('microtask_submission_deadline','YYYYMMDD',true,24); return false;"/>
+
+   <%= submit_tag "Update" %>
+<% end %>
+
+<br/>
+<%= render :partial => '/shared_scripts/back' %>

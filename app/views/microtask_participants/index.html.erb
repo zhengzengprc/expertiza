@@ -1,0 +1,24 @@
+<h1>Listing microtask_participants</h1>
+
+<table>
+  <tr>
+    <th>Userid</th>
+    <th>Microtaskid</th>
+    <th>Grades</th>
+  </tr>
+
+<% for microtask_participants in @microtask_participants %>
+  <tr>
+    <td><%=h microtask_participants.userid %></td>
+    <td><%=h microtask_participants.microtaskid %></td>
+    <td><%=h microtask_participants.grades %></td>
+    <td><%= link_to 'Show', microtask_participants %></td>
+    <td><%= link_to 'Edit', edit_microtask_participants_path(microtask_participants) %></td>
+    <td><%= link_to 'Destroy', microtask_participants, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New microtask_participants', new_microtask_participants_path %>

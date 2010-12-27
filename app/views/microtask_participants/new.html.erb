@@ -1,0 +1,23 @@
+<h1>New microtask_participants</h1>
+
+<% form_for(@microtask_participants) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :userid %><br />
+    <%= f.text_field :userid %>
+  </p>
+  <p>
+    <%= f.label :microtaskid %><br />
+    <%= f.text_field :microtaskid %>
+  </p>
+  <p>
+    <%= f.label :grades %><br />
+    <%= f.text_field :grades %>
+  </p>
+  <p>
+    <%= f.submit "Create" %>
+  </p>
+<% end %>
+
+<%= link_to 'Back', microtask_participants_path %>

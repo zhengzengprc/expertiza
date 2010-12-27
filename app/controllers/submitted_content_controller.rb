@@ -154,7 +154,7 @@ class SubmittedContentController < ApplicationController
       end 
   end  
   
-private  
+#private  
   
   def get_file_type file_name
     base = File.basename(file_name)
@@ -225,4 +225,56 @@ private
       flash[:error] = $!
     end
   end
+  
+  def display_microtask_submitted_files
+
+    @user=session[:user]
+    @microtaskparticipant= MicrotaskParticipant.find_by_id(params[:participant_id])
+    
+  end
+  def submit_microtask_file
+    
+    file = params[:uploaded_file]
+    @current_folder = DisplayOption.new
+    @current_folder.name = "/"
+    if params[:current_folder]
+      @current_folder.name = FileHelper::sanitize_folder(params[:current_folder][:name])
+    end
+    #--------------SPECIFY PROPER PATH------------------
+    @user=session[:user]
+    microtaskinst=Microtask.find_by_id(params[:id])
+    puts 
+    curr_directory = "#{RAILS_ROOT}/pg_data/#{User.find(microtaskinst.instructor_id).name}/#{User.find(@user.id).name}/microtasks/"
+    if !File.exists? curr_directory
+       FileUtils.mkdir_p(curr_directory)
+    end
+   
+    #safe_filename = file.full_original_filename.gsub(/\\/,"/")
+    safe_filename = file.original_filename.gsub(/\\/,"/")
+    safe_filename = FileHelper::sanitize_filename(safe_filename) # new code to sanitize file path before upload*
+    full_filename =  curr_directory + File.split(safe_filename).last.gsub(" ",'_') #safe_filename #curr_directory +
+    File.open(full_filename, "wb") { |f| f.write(file.read) }
+           
+    redirect_to :controller =>'submitted_content',:action => 'submittedwork', :id => params[:id]
+  end
+  def submit_microtask_hyperlink
+    @user=session[:user]
+    participant=MicrotaskParticipant.find_by_userid_and_microtaskid(@user.id,params[:id])
+    url = URI.parse(params['submission'].strip)
+    begin
+      Net::HTTP.start(url.host, url.port)
+      participant.update_attribute('submitted_hyperlink',params['submission'].strip)
+    rescue 
+      flash[:error] = "The URL or URI is not valid. Reason: "+$!
+    end    
+    redirect_to :controller => 'submitted_content',:action => 'submittedwork', :id => params[:id]
+  end
+  def submittedwork
+    @microtask=Microtask.find_by_id(params[:id])
+    @user=session[:user]
+    @microtaskparticipant=MicrotaskParticipant.find_by_userid_and_microtaskid(@user.id,@microtask.id)
+  end
+  
+
+
 end

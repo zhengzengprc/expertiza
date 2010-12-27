@@ -1,0 +1,41 @@
+<h1>View and Subscribe <%=  %></h1>
+
+<h1>Microtask Topics for <%= %></h1>
+<% @user=session[:user]%>
+<table class="general">
+  <tr>
+    <th width="5%">Topic #</th>
+    <th width="50%">Topic name(s)</th>
+    <th width="5%">Max choosers</th>
+    <th width="5%">Available slots</th>
+    <th width="5%">Subscribe</th>
+	<th width="20%">Deadline</th>
+  </tr>
+   <%@count=0%>
+   <%for microtask in @microtasks%>
+   <%@count=@count + 1%>
+	<tr>
+	<%action_symbol_added=false %>
+	<% microtaskParticipant = MicrotaskParticipant.find_by_userid_and_microtaskid(@user.id,microtask.id)%>
+	<%if microtaskParticipant != nil%>
+		<%action_symbol_added=true %>
+	<%end%>
+    <td width="5%"><%= @count  %></td>
+    <td width="50%"><%=microtask.name%></td>
+    <td width="5%"><%=microtask.max_choosers%></td>
+	<% @numofrows=MicrotaskParticipant.count(:conditions => ["microtaskid = ?",microtask.id]) %> 
+	<td width="5%"><%=microtask.max_choosers -  @numofrows %></td>
+	<%if action_symbol_added == true %>
+	<td align="center"><%= link_to image_tag('delete_icon.png', :border => 0, :title => 'Leave Topic', :align => 'middle'), :controller => 'microtasks',:action => 'delete_microtask_participant', :id => microtask.id  %></td>
+	<%end%>
+	<%if action_symbol_added == false %>
+	<td align="center" width="5%"><%= link_to image_tag('Check-icon.png', :border => 0, :title => 'Signup', :align => 'middle'), :controller => 'microtasks',:action => 'subscribe', :id => microtask.id %> </td>
+	<%action_symbol_added=true %>
+	<%end%>
+	<%stage = Microtask.get_microtask_deadline(microtask.id)%>
+	<td width="20%"><%=stage%></td>
+	</tr>
+   <%end%>
+  </table>
+  <a href="javascript:history.back()">Back</a>  
+<br/>

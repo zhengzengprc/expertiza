@@ -1,0 +1,29 @@
+<H1>Choose Microtask to submit your work <%=  %></H1>
+<BR>
+<TABLE class="general" >
+	
+
+	<tr>
+	<th width="10%" ALIGN="CENTER"> Topic </TH>
+	<Th width="70%" ALIGN="CENTER">Topic Name</TH>
+	<Th width="20%" ALIGN="CENTER">Deadline</TH>
+	</TR>
+	
+	<%@count=0%>
+	 <%for microtask in @pmicrotasks%>
+   	<%@count=@count + 1%>
+	<TR>
+	<TD width="10%" ALIGN="CENTER"> <%= @count%></TH>
+	<%microtaskinst = Microtask.find_by_id(microtask.microtaskid)%>
+	<%stage = Microtask.get_microtask_deadline(microtask.microtaskid)%>
+	<%if stage != "COMPLETE"%>
+	<TD width="70%" ALIGN="center"><%= link_to microtaskinst.name ,:controller => 'submitted_content',:action => 'submittedwork', :id => microtask.microtaskid  %></TH>
+	<Td width="20%" ALIGN="CENTER"><%= stage%></Td>
+	<%else%>
+	<TD width="70%" ALIGN="center"><%=  microtaskinst.name %></TH>
+	<Td width="20%" ALIGN="CENTER"><%= stage%></Td>
+	<%end%>
+	</TR>
+	<%end%>
+	
+</TABLE>

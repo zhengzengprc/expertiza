@@ -1,0 +1,28 @@
+<H1>Score for <%=  %></H1>
+<TABLE class="general" >
+	
+
+	<tr>
+	<th width="10%" ALIGN="CENTER"> Topic </TH>
+	<Th width="80%" ALIGN="CENTER">Topic Name</TH>
+	<Th width="10%" ALIGN="CENTER">Final Score</TH>
+	</TR>
+	
+	<%@count=0%>
+	 <%for microtask in @pmicrotasks%>
+   	<%@count=@count + 1%>
+	<TR>
+	<TD width="10%" ALIGN="CENTER"> <%= @count%></TH>
+	<%microtaskinst = Microtask.find_by_id(microtask.microtaskid)%>
+	<TD width="80%" ALIGN="center"><%= microtaskinst.name %></TH>
+	<%if microtask.grades != nil%>
+	<TD width="10%" ALIGN="CENTER"><%= microtask.grades%></TH>
+	<%else%>
+	<TD width="10%" ALIGN="CENTER">In Review</TH>
+	<%end%>
+	</TR>
+	<%end%>
+	
+</TABLE>
+<BR/>
+<a href="javascript:window.history.back()">Back</a>   

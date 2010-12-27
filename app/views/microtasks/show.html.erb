@@ -1,0 +1,38 @@
+<p>
+  <b>Name:</b>
+  <%=h @microtasks.name %>
+</p>
+
+<p>
+  <b>Directory path:</b>
+  <%=h @microtasks.directory_path %>
+</p>
+
+<p>
+  <b>Course:</b>
+  <%=h @microtasks.course_id %>
+</p>
+
+<p>
+  <b>Instructor:</b>
+  <%=h @microtasks.instructor_id %>
+</p>
+
+<p>
+  <b>Require signup:</b>
+  <%=h @microtasks.require_signup %>
+</p>
+
+<p>
+  <b>Spec location:</b>
+  <%=h @microtasks.spec_location %>
+</p>
+
+<p>
+  <b>Max choosers:</b>
+  <%=h @microtasks.max_choosers %>
+</p>
+
+
+<%= link_to 'Edit', edit_microtasks_path(@microtasks) %> |
+<%= link_to 'Back', microtasks_path %>

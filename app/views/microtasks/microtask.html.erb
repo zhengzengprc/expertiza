@@ -1,0 +1,25 @@
+<%@user=session[:user]%>
+<%if @user == nil %>
+	<h1>Please Login</h1>
+<%else%>
+<h1>Submit or Review work for <%=  %></h1>
+<div class="flash_note">
+Next: Click the activity you wish to perform on the Microtask titled: <%=  %>
+</div>
+<ul>
+		
+		
+		<li> <%= link_to 'View and Subscribe' , :controller => 'microtasks' , :action => 'subscribe'%>
+		</li>
+			
+		<li>
+	     	<%= link_to 'Your work',:controller => 'microtasks' , :action => 'work' %>
+	    </li>
+		<li>
+			<%= link_to "Your scores" ,:controller => 'microtasks' , :action => 'viewscore' %>
+		</li>
+ 		
+</ul>
+<br>
+<a href="javascript:window.history.back()">Back</a>
+<%end%>

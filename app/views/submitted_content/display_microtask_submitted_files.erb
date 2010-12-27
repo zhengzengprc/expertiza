@@ -1,0 +1,26 @@
+<%
+   	files = @microtaskparticipant.get_files(@microtaskparticipant.get_path )
+%>
+
+<b><h2>Submitted Files</h2></b>
+<% if files.length > 0  %>
+	<tr><td>&nbsp;</td><td><div id="1_myDiv"><%= display_microtask_submitted_files(@microtaskparticipant, files, false) %> </div></td></tr>
+<% else %>
+No files have been submitted.
+<% end %>
+<br>
+<br>
+<!-- For Displaying the submitted hyperlinks -->
+<b><h2>Hyperlinks</h2></b>&nbsp;&nbsp;&nbsp;<a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
+<%  if (@microtaskparticipant.submitted_hyperlink != nil) %>
+<div id="url" style="">
+	<ul>	
+       <li><a href="<%=  @microtaskparticipant.submitted_hyperlink %>" target="new"><%= @microtaskparticipant.submitted_hyperlink %></a></li>
+        </ul>
+</div>   
+<% else %>
+No hyperlinks have been submitted
+<% end %>
+
+
+<BR/><BR/>

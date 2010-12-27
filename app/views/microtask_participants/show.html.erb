@@ -1,0 +1,18 @@
+<p>
+  <b>Userid:</b>
+  <%=h @microtask_participants.userid %>
+</p>
+
+<p>
+  <b>Microtaskid:</b>
+  <%=h @microtask_participants.microtaskid %>
+</p>
+
+<p>
+  <b>Grades:</b>
+  <%=h @microtask_participants.grades %>
+</p>
+
+
+<%= link_to 'Edit', edit_microtask_participants_path(@microtask_participants) %> |
+<%= link_to 'Back', microtask_participants_path %>

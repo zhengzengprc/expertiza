@@ -1,0 +1,36 @@
+<h1>Submit work for <%= @microtask.name %></h1>
+	<%@user=session[:user]%>
+	<% form_tag :controller => 'submitted_content',:action=>'submit_microtask_hyperlink', :id => @microtask.id do%> 
+	 Submit a Hyperlink (optional): <input type="text" name="submission" size=40/><input type="submit" name="upload_link" value="Upload link"/>     
+	<%end%>
+		 
+	<b>Hyperlinks</b>&nbsp;&nbsp;&nbsp;<a href="#" id="urlLink" name="urlLink" onClick="toggleElement('url','links');return false;">hide links</a><br/>
+	<div id="url" style="">
+		<ul>
+		<% participant=MicrotaskParticipant.find_by_userid_and_microtaskid(@user.id,@microtask.id)%>	
+        <li><a href="<%= participant.submitted_hyperlink %>" target="new"><%= participant.submitted_hyperlink %></a></li>
+        </ul>
+	</div>   
+	
+	
+	<br></br><br></br><br></br>
+ 	<% form_tag({:controller => 'submitted_content',:action=>'submit_microtask_file',:id => @microtask.id},{:method => 'post', :enctype => "multipart/form-data", :onSubmit => "return checkIfFileExists(uploaded_file.value,1);"}) do %>
+    	<br/><input type="file" id="uploaded_file" name="uploaded_file" size=40 />
+    	<%= submit_tag 'Upload file' %>
+    	<br><br>
+    <%end%>
+	<%files = @microtaskparticipant.get_files(@microtaskparticipant.get_path)%>
+	<b>Submitted Files</b><BR/><BR/>
+	<% if files.length > 0  %>
+	<BR/>
+	<tr><td>&nbsp;</td><td><div id="1_myDiv"><%= display_microtask_submitted_files(@microtaskparticipant, files, false) %> </div></td></tr>
+<% else %>
+No files have been submitted.
+<% end %>
+
+
+		<br></br><br></br><br></br>
+	
+	<a href="javascript:window.history.back()">Back</a>
+	
+	

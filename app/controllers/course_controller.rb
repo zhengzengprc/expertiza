@@ -87,6 +87,18 @@ class CourseController < ApplicationController
       | map |
       map.destroy
     }
+    #pds++ , destroying the course should delete all the microtasks and microtaskparitcipants.
+    @microtasks = Microtask.find(:all,:conditions => ["course_id=?",course.id])
+    @microtasks.each do |microtask|
+    #for each microtask, delete its microtask participants.
+      @microtask_participants = MicrotaskParticipants.find(:all,:conditions => ["microtaskid=?",microtask.id])
+      @microtask_participants.each do |participant|
+        participant.destroy
+      end
+      microtask.destroy
+    end
+    #pds--
+
     course.destroy    
     redirect_to :controller => 'tree_display', :action => 'list'   
   end
