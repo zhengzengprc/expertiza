@@ -6,6 +6,7 @@
 class CourseController < ApplicationController
   auto_complete_for :user, :name
   require 'fileutils'
+  require 'aquarium'
   
   def auto_complete_for_user_name
     search = params[:user][:name].to_s
@@ -126,5 +127,12 @@ class CourseController < ApplicationController
     @ta_mapping.destroy
     redirect_to :action => 'view_teaching_assistants', :id => @ta_mapping.course
   end
-  
+
+include Aquarium::DSL
+  around :methods => [:auto_complete_for_user_name, :new, :edit, :update, :copy, :create, :delete, :toggle_access, :view_teaching_assistants, :add_ta, :remove_ta] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
+  end  
 end

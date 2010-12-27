@@ -1,6 +1,6 @@
 
 class SurveyDeploymentController < ApplicationController
-
+require 'aquarium'
 
   def new 
     @surveys=Questionnaire.find_all_by_type_id(4).map{|u| [u.name, u.id] }
@@ -81,6 +81,12 @@ class SurveyDeploymentController < ApplicationController
    redirect_to :action=>'reminder_thread'
   end
    
-  
+ include Aquarium::DSL
+  around :methods => [:new, :create, :list, :delete, :add_participants, :remainder_thread, :toggle_reminder_thread] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
+  end 
 
 end

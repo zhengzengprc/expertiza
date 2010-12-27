@@ -1,4 +1,6 @@
 class ReportsController < ApplicationController
+  require 'aquarium'
+  
   def view
     @assignment_id=14;
     
@@ -21,4 +23,13 @@ class ReportsController < ApplicationController
     
     
   end
+  
+include Aquarium::DSL
+  around :methods => [:view ] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
+  end
+  
 end

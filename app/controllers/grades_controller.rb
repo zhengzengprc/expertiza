@@ -1,4 +1,6 @@
 class GradesController < ApplicationController
+  require 'aquarium'
+  
   helper :file   
   helper :submitted_content
   
@@ -195,4 +197,12 @@ You submitted a score of ##[recipients_grade] for assignment ##[assignment_name]
     
 The Expertiza system has brought this to my attention."
   end  
+
+include Aquarium::DSL
+  around :methods => [:view, :view_my_scores, :edit, :instructor_review, :open, :send_grading_conflict_email, :conflict_notification, :update, :process_response, :get_body_text] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
+  end
 end

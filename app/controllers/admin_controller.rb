@@ -1,5 +1,7 @@
 # This controller is used for the Admin functionality
 # Author: unknown
+require 'aquarium'
+
 class AdminController < ApplicationController
 
   def search_users (role)
@@ -123,4 +125,17 @@ class AdminController < ApplicationController
   def list_super_administrators
     @users = User.find(:all, :conditions => ["role_id = ?", Role::SUPERADMINISTRATOR])
   end
+ include Aquarium::DSL  
+ around :methods => [:search_users, :search_instructor, :new_instructor, :create_instructor, :search_users, :list_instructors, :search_administrator, :add_administrator, :save_administrator, :list_administrators, :list_users, :search_super_administrator, :add_super_administrator, :show_instructor, :remove_instructor, :save_super_administrator, :list_super_administrators] do |join_point, object, *args|
+
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+
+    result = join_point.proceed
+
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+
+    result  # block needs to return the result of the "proceed"!
+
+  end   
+  
 end

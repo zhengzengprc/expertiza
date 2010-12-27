@@ -1,4 +1,6 @@
 class UsersController < ApplicationController
+  require 'aquarium'
+  
   auto_complete_for :user, :name
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
@@ -165,4 +167,11 @@ class UsersController < ApplicationController
     @all_roles = Role.find(:all, :conditions => ['id in (?) or id = ?',role.get_available_roles,role.id])
   end
   
+  include Aquarium::DSL
+  around :methods => [:index, :self.participants_in, :auto_complete_for_user_name, :list, :show_selection, :show, :getRole, :new, :create, :edit, :update, :destroy, :foreign ] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
+  end
 end

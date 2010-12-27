@@ -1,3 +1,5 @@
+require 'aquarium'
+
 class AssignmentController < ApplicationController
   require 'ftools'
   auto_complete_for :user, :name
@@ -361,4 +363,13 @@ class AssignmentController < ApplicationController
     FileHelper.update_file_location(oldpath,newpath)
     redirect_to :controller => 'tree_display', :action => 'list'
   end  
+
+include Aquarium::DSL
+  around :methods => [:copy, :new, :toggle_access, :create, :edit, :define_instructor_notification_limit, :set_questionnaires, :get_limits_and_weights, :set_limits_and_weights, :update, :show, :delete, :list, :associate_assignment_to_course] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
+  end
+
 end

@@ -1,4 +1,6 @@
 class ResponseController < ApplicationController
+  require 'aquarium'
+  
   helper :wiki
   helper :submitted_content
   helper :file
@@ -148,4 +150,13 @@ class ResponseController < ApplicationController
     @min = @questionnaire.min_question_score
     @max = @questionnaire.max_question_score     
   end      
+  
+  include Aquarium::DSL
+  around :methods => [:view, :delete, :edit, :update, :new_feedback, :new, :create, :saving, :redirection, :get_content ] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
+  end
+  
 end

@@ -1,4 +1,5 @@
 class SurveyResponseController < ApplicationController
+require 'aquarium'
 
   def begin_survey
     unless session[:user] #redirect to homepage if user not logged in
@@ -200,5 +201,15 @@ class SurveyResponseController < ApplicationController
     @assignment.name="Course Evaluation"
    end
    
+ end
+ 
+ include Aquarium::DSL
+  around :methods => [:begin_survey, :create, :submit, :view_responses, :comments] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
   end
+ 
+ 
 end

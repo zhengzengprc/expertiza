@@ -1,4 +1,6 @@
 class TeamController < ApplicationController
+  require 'aquarium'
+  
  auto_complete_for :user, :name  
 
    ############## These methods created by mahesh############
@@ -232,5 +234,13 @@ def create_teams
     end
  end
 
+ include Aquarium::DSL
+  around :methods => [:And, :score, :min, :create_teams_view, :delete_all, :randomize_teams, :create_teams, :list, :new, :create, :update, :edit, :delete, :inherit, :bequeath, :check_for_existing_team_name] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
+  end
+ 
  
 end

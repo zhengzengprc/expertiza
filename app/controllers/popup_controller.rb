@@ -1,4 +1,6 @@
 class PopupController < ApplicationController
+  require 'aquarium'
+  
   layout 'standard'
   def team_users_popup
   @maxscore = 0
@@ -55,6 +57,7 @@ class PopupController < ApplicationController
 #    @review_questionnaire = Questionnaire.find(@assignment.review_questionnaire_id)
 #    @review_questions = @review_questionnaire.questions
     #@maxscore = @review_questionnaire.max_question_score
+    
     
   
 end
@@ -135,5 +138,12 @@ end
     @user = User.find(@userid)
     
   end
-
+include Aquarium::DSL
+  around :methods => [:team_users_popup, :participants_popup, :view_review_scores_popup, :reviewer_details_popup] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
+  end
+  
 end

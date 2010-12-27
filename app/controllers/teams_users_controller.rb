@@ -1,4 +1,5 @@
 class TeamsUsersController < ApplicationController  
+require 'aquarium'
 
   def auto_complete_for_user_name      
     team = Team.find(session[:team_id])    
@@ -46,6 +47,14 @@ class TeamsUsersController < ApplicationController
     }
     
     redirect_to :action => 'list', :id => params[:id]
+  end
+  
+  include Aquarium::DSL
+  around :methods => [:auto_complete_for_user_name, :list, :new, :create, :delete, :delete_selected] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
   end
   
 end

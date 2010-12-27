@@ -1,4 +1,6 @@
 class InvitationController < ApplicationController
+  require 'aquarium'
+  
   def new 
     @invitation = Invitation.new
   end
@@ -129,5 +131,15 @@ class InvitationController < ApplicationController
     Invitation.find(params[:inv_id]).destroy
     redirect_to :controller => 'student_team', :action => 'view', :id => params[:student_id]
   end
+
+
+include Aquarium::DSL
+  around :methods => [:new, :create, :auto_complete_for_user_name, :accept, :decline, :cancel] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
+  end
+
 
 end

@@ -1,5 +1,7 @@
 # Filters added to this controller will be run for all controllers in the application.
 # Likewise, all the methods added will be available for all controllers.
+require 'aquarium'
+
 class ApplicationController < ActionController::Base
 
 protect_from_forgery :secret => '66c71ad1e57f67bb64bf3ac9ca144f4e'
@@ -41,4 +43,6 @@ protect_from_forgery :secret => '66c71ad1e57f67bb64bf3ac9ca144f4e'
     @display_option.name = 'list_mine'
     @display_option.name = params[:display_option][:name] if params[:display_option]
   end
+  
+  
 end

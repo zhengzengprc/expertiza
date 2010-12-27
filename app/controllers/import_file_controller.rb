@@ -1,5 +1,5 @@
 class ImportFileController < ApplicationController
-  
+  require 'aquarium'
   def start
     @id = params[:id]
     @expected_fields = params[:expected_fields]
@@ -69,4 +69,14 @@ class ImportFileController < ApplicationController
       items.each { | value | row << value.sub("\"","").sub("\"","").strip }
       return row
   end   
+  
+  include Aquarium::DSL
+  around :methods => [:start, :import, :importFile, :get_delimiter, :parse_line] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
+  end
+  
+  
 end

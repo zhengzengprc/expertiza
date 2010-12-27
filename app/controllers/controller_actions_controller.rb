@@ -1,5 +1,5 @@
 class ControllerActionsController < ApplicationController
-
+require 'aquarium'
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
          :redirect_to => { :action => :list }
@@ -129,5 +129,14 @@ class ControllerActionsController < ApplicationController
 
     return action_collection
   end
+
+include Aquarium::DSL
+  around :methods => [:index, :list, :show, :new, :new_for, :create, :edit, :update, :destroy, :foreign, :class_actions] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
+  end
+    
     
 end

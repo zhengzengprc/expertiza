@@ -3,7 +3,7 @@ class SignUpSheetController < ApplicationController
   require 'rgl/dot'
   require 'graph/graphviz_dot'
   require 'rgl/topsort'
-
+  require 'aquarium'
 
   # GETs should be safe (see http://www.w3.org/2001/tag/doc/whenToUseGet.html)
   verify :method => :post, :only => [ :destroy, :create, :update ],
@@ -597,6 +597,13 @@ class SignUpSheetController < ApplicationController
 
   end
 
+include Aquarium::DSL
+  around :methods => [:add_signup_topics_staggered, :add_signup_topics, :load_add_signup_topics, :new,:create,:redirect_to_sign_up, :delete, :edit, :update, :signup_topics, :delete_signup, :delete_signup_for_topic, :signup, :otherConfirmedTopicforUser, :slotExist?, :otherConfirmedTopicforUser, :confirmTopic, :confirmTopic, :create_team, :generate_team_name, :create_team_users, :has_user, :save_topic_deadlines, :stringtodate, :build_dependency_graph, :create_common_start_time_topics, :create_topic_deadline, :set_start_due_date] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
+  end
 
 end
 

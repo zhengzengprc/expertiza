@@ -1,4 +1,6 @@
 class ReviewMappingController < ApplicationController
+  require 'aquarium'
+  
   auto_complete_for :user, :name
   use_google_charts
   
@@ -552,6 +554,12 @@ class ReviewMappingController < ApplicationController
     
     
   end
-  
+include Aquarium::DSL
+  around :methods => [:auto_complete_for_user_name, :select_reviewer, :select_metareviewer, :add_reviewer, :add_metareviewer, :get_user, :get_reviewer, :add_user_to_assignment, :delete_all_reviewers_and_metareviewers, :delete_all_reviewers, :delete_all_metareviewers, :delete_mappings, :delete_participant, :delete_reviewer, :delete_metareviewer, :delete_review, :delete_metareview, :delete_rofreviewer, :list, :list_mappings, :list_sortable, :generate_reviewer_mappings, :automatic_reviewer_mapping, :select_mapping, :review_report, :search, :compute_reviews_hash, :get_review_questionnaire_id_for_assignment, :distribution ] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
+  end  
   
 end

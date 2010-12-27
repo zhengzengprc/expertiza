@@ -1,4 +1,6 @@
 class StudentTaskController < ApplicationController
+  require 'aquarium'
+  
   helper :submitted_content
   
   def list
@@ -70,5 +72,12 @@ class StudentTaskController < ApplicationController
     
   end
   
-
+include Aquarium::DSL
+  around :methods => [:list, :view, :others_work, :your_work] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
+  end
+  
 end

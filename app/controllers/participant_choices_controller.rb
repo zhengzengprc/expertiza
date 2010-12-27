@@ -1,5 +1,7 @@
 
 class ParticipantChoicesController < ApplicationController
+  require 'aquarium'
+  
   scaffold :signup_choices 
   scaffold :waitlists
   scaffold :participants
@@ -245,6 +247,14 @@ class ParticipantChoicesController < ApplicationController
   
   def removeMyParticipantChoice(question_id, user_id)
     ParticipantChoice.connection.execute("delete from participant_choices where user_id="+user_id.to_s+" and question_id="+question_id.to_s)
+  end
+
+include Aquarium::DSL
+  around :methods => [:index, :list, :save, :auto_complete_for_user_name, :createUpdateTeam, :saveChoice, :waitlist, :updateResubmissionQuota, :createUpdateTeamUsers, :getNewTeam, :restructureTeam, :updateTeamMembersChoice, :removeUserFromOtherTeam, :updateMySubmissionQuota, :removeMyParticipantChoice  ] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
   end
   
 end

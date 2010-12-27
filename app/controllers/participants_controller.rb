@@ -1,5 +1,6 @@
 class ParticipantsController < ApplicationController
   auto_complete_for :user, :name
+  require 'aquarium'
   
   def list
     @root_node = Object.const_get(params[:model]+"Node").find_by_node_object_id(params[:id])     
@@ -114,4 +115,13 @@ end
       end            
     end
   end   
+  
+  include Aquarium::DSL
+  around :methods => [:list, :add, :delete, :delete_display, :delete_items, :inherit, :bequeath_all, :change_handle  ] do |join_point, object, *args|
+    logger.info "[info] Entering: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result = join_point.proceed
+    logger.info "[info] Leaving: #{join_point.target_type.name}##{join_point.method_name}: object = #{object}, args = #{args}" 
+    result  # block needs to return the result of the "proceed"!
+  end
+  
 end
