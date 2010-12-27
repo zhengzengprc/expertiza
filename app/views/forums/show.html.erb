@@ -1,0 +1,27 @@
+<%= @forum.name  %>
+
+<table>
+  <tr>
+    <th width="60%">Topic Title</th>
+	<th width="10%">Replies</th>
+    <th width="30%">Created By</th>
+	<th width="60%">Actions</th>
+	
+  </tr>
+  <% for topic in @forum.topics %>
+    <tr>
+      <td><%= link_to h(topic.name), :controller => 'topics', :action => :show, :id => topic.id %>
+      <td><%= topic.posts.count %></td>
+	  <td class="right"> <%= link_to h(topic.last_poster_name) %></td>
+      <% if session[:user].role.name == "Super-Administrator" %>
+	  <td><%= link_to "Destroy",:controller => 'topics', :confirm => 'Are you sure?', :action => :destroy, :id => topic.id %></td>
+    </tr>
+	  <%else%>
+	   <td></td>
+	   </tr>
+	  <%end%> 
+  <% end %>
+</table>
+
+<p><%= link_to "New Topic", "/topics/new?forum=#{@forum.id}" %></p>
+<p><%= link_to "Back to Forums", "/forums/index"%> </p>

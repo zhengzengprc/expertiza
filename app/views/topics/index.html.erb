@@ -1,0 +1,21 @@
+<h1>Topics</h1>
+
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Last Poster</th>
+    <th>Last Post At</th>
+  </tr>
+  <% for topic in @topics %>
+    <tr>
+      <td><%=h topic.name %></td>
+      <td><%=h topic.last_poster_id %></td>
+      <td><%=h topic.last_post_at %></td>
+      <td><%= link_to "Show", :controller => "topics", :action => :show, :topic => topic.id %></td>
+      <td><%= link_to "Edit", :controller => "topics", :action => :edit, :topic => topic.id %></td>
+      <td><%= link_to "Destroy", :controller => "topics", :confirm => 'Are you sure?', :action => :destroy, :topic => topic.id %></td>
+    </tr>
+  <% end %>
+</table>
+
+<p><%= link_to "New Topic", new_topic_path %></p>

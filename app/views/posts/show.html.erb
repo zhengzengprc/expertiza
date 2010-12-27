@@ -1,0 +1,12 @@
+<h1>Post</h1>
+
+<p>
+  <strong>Content:</strong>
+  <%=h @post.content %>
+</p>
+
+<p>
+  <%= link_to "Edit", :controller => 'posts', :action => :edit, :post => @post %> |
+  <%= link_to "Destroy", :controller => 'posts', :confirm => 'Are you sure?', :action => :destroy, :post => @post %> |
+  <%= link_to "View All", :controller => 'topics', :action => 'show' %>
+</p>

@@ -1,0 +1,7 @@
+<h1>New Forum </h1>
+
+<% form_tag :action => 'create' do %>
+ <%= render :partial => 'form'%>
+ <%= submit_tag "Create"%>
+<% end %>
+<p><%= link_to "Back to List", "/forums/index" %></p>

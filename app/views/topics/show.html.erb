@@ -1,0 +1,23 @@
+<b><i><%= @topic.name %></i></b>
+<% rating=0 %>
+<% for post in @topic.posts %>
+<% rating= rating+post.cheers%>
+<div class="post">
+  <span class="left">By <%= link_to post.last_poster_name, :controller => 'users',:action => :show, :user => post.user %><br />
+                     <% if session[:user].role.name == "Super-Administrator" %>
+					 <%= link_to "Delete", :controller => 'posts', :confirm => 'Are you sure?', :action => :destroy, :posto => post.id %></br>
+					 <% end %>
+					 </span>
+  <span class="right"><%= post.content %>
+  <p><%= link_to "Cheer ",:controller => "posts", :action => :cheerup, :postt => post %>  
+					 <%= link_to "Uncheer ",:controller => "posts", :action => :cheerdown, :postth => post %></p>
+					 <i> Cheers :</i> <%= post.cheers %>
+					 </span>
+  
+</div>
+<% end %> 
+<i>The Rating for this topic is : </i> <%= rating %>
+<p>
+  <%= link_to "Reply", "#{"/posts/new"}?topic=#{@topic.id}" %>
+  |<%= link_to "Back to list", :controller => 'forums', :action => :show, :forum => @topic.forum_id %>
+</p>
