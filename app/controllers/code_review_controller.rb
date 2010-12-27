@@ -155,7 +155,6 @@ class CodeReviewController < ApplicationController
     end
     
     if success 
-    
       @review_file = ReviewFile.new
       @review_file.file_comment = params[:comment][:txt]
       @review_file.file_path = path
@@ -164,15 +163,16 @@ class CodeReviewController < ApplicationController
       @review_file.accepted = false
       @review_file.code_review = @code_review
       if (@code_review.files_uploaded)
-      	@code_review.files_uploaded = @code_review.files_uploaded + 1
+        @code_review.files_uploaded = @code_review.files_uploaded + 1
       else 
-      	@code_review.files_uploaded = 1 
+        @code_review.files_uploaded = 1 
+      end
       
       @code_review.save
       @review_file.save
       @msg = "File Uploaded Successfully."
+      redirect_to :back
     end
-    redirect_to :back
   end
   
   private  
