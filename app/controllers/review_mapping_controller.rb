@@ -49,7 +49,8 @@ class ReviewMappingController < ApplicationController
       end
     rescue
        msg = $!
-    end    
+    end
+    log_an_event(session[:user], "review_mapping_controller/add", "reviewer added to an assignment")
     redirect_to :action => 'list_mappings', :id => assignment.id, :msg => msg    
   end
 

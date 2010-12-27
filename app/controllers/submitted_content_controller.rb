@@ -24,6 +24,7 @@ class SubmittedContentController < ApplicationController
     begin
       Net::HTTP.start(url.host, url.port)
       participant.update_attribute('submitted_hyperlink',params['submission'].strip)
+      log_an_event(session[:user], "submitted_content_controller/submit_hyperlink", "hyperlink submitted")
     rescue 
       flash[:error] = "The URL or URI is not valid. Reason: "+$!
     end    
@@ -61,7 +62,8 @@ class SubmittedContentController < ApplicationController
     if params['unzip']
       SubmittedContentHelper::unzip_file(full_filename, curr_directory, true) if get_file_type(safe_filename) == "zip"
     end
-    participant.update_resubmit_times       
+    participant.update_resubmit_times
+    log_an_event(session[:user], "submitted_content_controller/submit_file", "file submitted")
     redirect_to :action => 'edit', :id => participant.id
   end
 
@@ -97,6 +99,7 @@ class SubmittedContentController < ApplicationController
         rescue
         end
     end
+    log_an_event(session[:user], "submitted_content_controller/submit_hosted_document", "hosted document submitted")
     redirect_to :action => 'edit', :id => participant.id
   end
 
