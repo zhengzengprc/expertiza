@@ -100,7 +100,12 @@
       	  <BR/><FONT SIZE="-1"><%= link_to 'edit score', :action => 'edit', :id => participant.id %></FONT>
       	<% end %>
     	<% else %>
-      	<FONT SIZE="-1">(in <%= stage %>)</FONT>
+		<% if @assignment.microtaskCredit %>
+		<% participant.update_attribute('microtaskCreditEarned', sprintf("%.2f",s_avg*@assignment.microtaskCredit)) %>
+      		<FONT SIZE="-1"> <%= sprintf("%.2f",s_avg*@assignment.microtaskCredit) %> </FONT>
+		<% else %>
+			<FONT SIZE="-1"> n/a</FONT>	
+		<% end %>
     	<% end %>      
     	</TD>
    	<% else %>

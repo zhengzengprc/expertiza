@@ -36,7 +36,10 @@ class ResponseController < ApplicationController
   def update
     @response = Response.find(params[:id])
     @myid = @response.id
+
     msg = ""
+    totalPoints = 0
+    numberOfQuestions = 0
     begin 
       @myid = @response.id
       @map = @response.map
@@ -47,18 +50,27 @@ class ResponseController < ApplicationController
 
       params[:responses].each_pair do |k,v|
         score = Score.find_by_response_id_and_question_id(@response.id, questions[k.to_i].id)
+        totalPoints += score
+        numberOfQuestions++
         score.update_attribute('score',v[:score])
         score.update_attribute('comments',v[:comment])
       end    
     rescue
       msg = "Your response was not saved. Cause: "+ $!
     end
+  
+    #avgScore = totalPoints/numberOfQuestions
+    puts @map.assignment.microtaskCredit
+    puts "=-"
+    puts @response.id
+
 
     begin
        ResponseHelper.compare_scores(@response, @questionnaire)
        ScoreCache.update_cache(@response.id)
     
       msg = "Your response was successfully saved."
+      
     rescue
       msg = "An error occurred while saving the response: "+$!
     end

@@ -11,6 +11,7 @@
 	<th>Current Stage</th>
 	<th>Stage Deadline</th>
 	<th>Publishing Rights</th>
+	<th> Is Microtask?</th>
    </tr>
 	
   <% for participant in @participants %>
@@ -23,6 +24,7 @@
         <td><%= participant.assignment.get_current_stage(participant.topic_id) %></td>
 	    <td><%= participant.assignment.get_stage_deadline(participant.topic_id) %></td>
 	    <td align=center><%if participant.permission_granted %>granted<% else %>denied<% end %></td>
+		<td><% if participant.assignment.microtask %>true<% else %>false<% end %></td>
       </tr>
     <% end %>
   <% end %>

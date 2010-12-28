@@ -103,7 +103,18 @@ function get_assignment_startdate() {
   </td>
 
  </tr>
-
+ 
+ <tr>
+  <td><label for="microtask">Is this a Microtask?</label></td>
+  <td><%= check_box 'assignment', 'microtask', {}, true, false %></td>
+ </tr>
+ 
+ <tr>
+  <td><label for="microtaskCredit" id="assgt_directory">Microtask Credit: </label></td>
+  <td><%= text_field 'assignment', 'microtaskCredit'%></td>
+</tr>
+ 
+ 
 <tr id="team_count1" style="display:none">  
   <td valign="top" width="250" height="50"><label for="team_count">Maximum number of participants per team:</label></td>   
   <td valign="top"><%= text_field 'assignment', 'team_count', :size => 5%></td>  
@@ -115,6 +126,8 @@ function get_assignment_startdate() {
 </tr> 
 </table></td>
 </tr>
+
+
 </table>
 
 <p>

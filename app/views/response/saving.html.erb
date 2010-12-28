@@ -1,1 +1,12 @@
+
+<%= @map.assignment.microtaskCredit %>
+<%= @map.assignment.id %>
+<%= @map.assignment.name%>
+<%= @map.assignment.team_assignment%>
+
+
+
+
+<%= Participant.find(@map.contributor).topic_id %>
+
 <h3><%= @msg %> <%= link_to "Continue", :action => "redirection", :id => @map.id, :return => @return %>?</h3>
