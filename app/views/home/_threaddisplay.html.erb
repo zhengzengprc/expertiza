@@ -1,0 +1,64 @@
+
+<% @threads.each do |thread| %>
+<div id="renderthreads" style="width:60%;" class="<%= thread.parentpost==0 ? "outer-c" : "outer-a" %>">
+	<table><tr>
+		<td class="leftCol">
+		<div style="width:75px; float:left;" class="threadleftside">
+			<div style="width:25px;padding-top:8px; float:left;">
+				<% if (thread.parentpost != 0) then %>
+					<% if thread.get_best(thread.id) == 0 then check_icon = "tick_gray.jpg" else check_icon = "tick_green.jpg" end %>
+					<% if (@user==Post.find(thread.parentpost).name)  then %>
+						<%= if (session[:current_topic_id] != 0) then link_to(image_tag(check_icon,:size=>"20x30",:title=>"Best"),{:action=>:best,:id=>thread}) else image_tag(check_icon,:size=>"20x30",:title=>"Best") end %>
+					<% else %>
+						<%= if  (thread.parentpost != 0) and (check_icon == "tick_green.jpg") then image_tag(check_icon,:size=>"20x30",:title=>"Best") end %>
+					<% end %>
+				<% end %>
+				
+				<!-- <%= image_tag("checkbtn.png" ,:size => "20x20" ) %> -->
+			</div>
+			<div style="width:20px;padding-top:5px; float:left;"  >
+				<% if ((@user!=thread.name) and (session[:current_topic_id] != 0)) then %>
+					<%= link_to(image_tag("arrow_up_black.jpg",:size=>"20x20",:title=>"Cheer"),{:action=>:cheer,:id=>thread}) %>
+				<% else%>
+					<%= image_tag("arrow_up_gray.jpg" ,:size => "20x20" ) %>
+				<% end %>
+				<% if ((@user!=thread.name) and (session[:current_topic_id] != 0)) then %>
+					<%= link_to(image_tag("arrow_down_black.jpg",:size=>"20x20",:title=>"Uncheer"),{:action=>:uncheer,:id=>thread}) %>
+				<% else%>
+					<%= image_tag("arrow_down_gray.jpg" ,:size => "20x20" ) %>
+				<% end %>
+			</div>
+			<div style="width:20px;padding-top:5px; float:left;">
+				<div style="width:20px;padding-top:1px; padding-left:3px; float:left;"><%= thread.get_cheercount %></div>
+				<div style="width:20px;padding-top:5px; padding-left:3px; float:left;"><%= thread.get_uncheercount %></div>
+			</div>
+		</div>
+		</td>
+		<td class="<%= thread.parentpost==0 ? "table_outer-c" : "table_outer-a" %>">
+		<div style="float:left;" class="<%= thread.parentpost==0 ? "render-c" : "render-a" %>">
+			<%= thread.posttext %>	
+			<br/>
+
+			<div style="float:right; margin-right:10px; font-size:80%; "><i><%= thread.name %></i>
+			&nbsp;<%= if (session[:current_topic_id] != 0) and (thread.parentpost == 0) then link_to("Reply",{:action=>:reply,:id=>thread}) end %>
+			</div>
+
+		</div>
+		</td>
+		<% if (@mode==4) and (session[:current_topic_id] != 0) then %>
+		<td style="background-color:#f7c4c4; ">
+		<div style="width:60px; float:left; background-color:#f7c4c4; padding-left:2px; ">
+	
+			
+			<%= link_to(image_tag("trashcan.png",:size=>"15x15",:title=>"Delete"),{:action=>:delete,:id=>thread}) %>
+			<%= check_box 'activated',thread.id %>
+			
+
+		</div>
+		</td>
+		<% end %>
+		
+	</tr></table>
+		<div style="clear:both;"></div>
+	</div>
+	<% end %>

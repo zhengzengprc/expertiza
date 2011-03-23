@@ -1,0 +1,59 @@
+<h1>Allthreads</h1>
+
+<table>
+  <tr>
+    <th>ID</th>
+    <th>Post/Reply</th>
+    <th>Creator</th>
+	<th>Cheers</th>
+	<th>Uncheers</th>
+  </tr> 
+  
+<!-- may want to simplify this code by rendering with partials: see Rendering Collections -> http://guides.rubyonrails.org/layouts_and_rendering.html -->
+<% @threads.each do |thread| %>
+  	<tr>
+  		<% if thread.parentpost == 0 %>
+			<td><%=h thread.id %></td>
+    		<td><b><%=h thread.posttext %></b></td>
+    		<td><%=h thread.name %></td>
+			<td><%=h thread.get_cheercount %></td>
+			<td><%=h thread.get_uncheercount %></td>
+			<td><%= link_to "Cheer" , :action => :cheer_post, :id => thread %></td>
+			<td><%= link_to "UnCheer" , :action => :uncheer_post, :id => thread %></td>
+			<td><%= link_to "Reply", :action => :reply, :id => thread %></td>
+			<!-- add a reply button to this -->
+		<% else %>
+			<td><%=h thread.id %></td>
+			<td>&nbsp;&nbsp;&nbsp;&nbsp;<%=h thread.posttext %></td>
+    		<td><%=h thread.name %></td>
+			<td><%=h thread.get_cheercount %></td>
+			<td><%=h thread.get_uncheercount %></td>
+			<td><%= link_to "Cheer" , :action => :cheer_post, :id => thread %></td>
+			<td><%= link_to "UnCheer" , :action => :uncheer_post, :id => thread %></td>
+			<!-- add in the css stylesheet stuff from p.102 to make this pretty -->
+		<% end %>
+	</tr>
+<% end %>
+</table>
+
+<p></p>
+<% form_tag :controller => 'allthreads', :action => 'index', :method => 'get' do %>
+	<%= text_field_tag :search, params[:search] %>
+	<%= submit_tag "Search", :name => nil %>
+	<%= link_to "Clear search", :action => :index %>
+<% end %>
+
+<p></p>
+
+<p></p>
+<% form_tag :controller => 'allthreads', :action => 'index', :method => 'get' do %>
+	<%= text_field_tag :new_post, params[:new_post] %>
+	<%= submit_tag "Post", :name => nil %>
+<% end %>
+
+
+
+
+
+
+

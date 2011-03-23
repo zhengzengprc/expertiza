@@ -1,0 +1,20 @@
+<h1>Editing follower</h1>
+
+<% form_for(@follower) do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= f.label :name %><br />
+    <%= f.text_field :name %>
+  </p>
+  <p>
+    <%= f.label :followeruserid %><br />
+    <%= f.text_field :followeruserid %>
+  </p>
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @follower %> |
+<%= link_to 'Back', followers_path %>

@@ -1,0 +1,60 @@
+<%= link_to "All Topics" , :action => 'topic' %> > User Ratings 
+<div id="main" style="float:none;">
+	
+	
+    <h1><%= @rating_name%></h1>
+	The first table below shows how many 'best' replies each user contributed.
+	<br>
+	The second table shows, for each user, the tally of the 'cheers' and 'uncheers' their peers gave them.
+	<p></p>
+	
+	
+    <table>
+        <tr>
+            <th>
+                Username
+            </th>
+            <th>
+                Total 'Best' Replies
+            </th>
+        </tr>
+        <% @best_ratings.each do |rate| %>
+        <tr class="<%= cycle('row-a', 'row-b')%>">
+            <td class="first">
+                <%= rate.name %>
+            </td>
+            <td class="first">
+                <%= rate.best_sum %>
+            </td>
+        </tr>
+        <% end %>
+    </table>
+	<br>
+    <table>
+        <tr>
+            <th>
+                Username
+            </th>
+            <th>
+                Total Cheers
+            </th>
+            <th>
+                Total UnCheers
+            </th>
+        </tr>
+        <% @cheer_ratings.each do |rate| %>
+        <tr class="<%= cycle('row-a', 'row-b')%>">
+            <td class="first">
+                <%= rate.name %>
+            </td>
+            <td class="first">
+                <%= rate.cheer_sum %>
+            </td>
+            <td class="first">
+                <%= rate.uncheer_sum %>
+            </td>
+        </tr>
+        <% end %>
+    </table>
+	<br>
+</div>

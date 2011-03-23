@@ -1,0 +1,49 @@
+ <div id="wrap">
+	<div id="header">
+		<h1 id="logo-text">NCSU TWITTER</h1>
+		<h2 id="slogan">Sam and Anup's Brilliant Answer to Twitter</h2>
+		<div id="header-links">
+			<p> <% if @mode == -1 %>
+				<%= link_to "Log In", :controller => 'admin', :action => "login" %>
+				<%= link_to "Sign Up" , :controller => 'users', :action => 'new' %>
+				<% else %>
+				
+				<%= "Welcome #{@user.name}!" %>
+				<%= link_to "Log out?", :controller => 'home', :action => 'logout' %>
+				<% end %>
+			</p>
+		</div>
+	</div>
+
+		
+	<div id="content-wrap">
+	</div>
+	
+	<div id ="main">
+  <h1>Reply to this post:</h1> 
+  <table>
+  	<% form_tag do %>
+  	<tr ><td class="first">
+   <%= @post.posttext %>
+   </td>
+    </tr>
+	<tr><td class="first">
+	<%= text_area_tag :posttext, params[:posttext] %>
+	</td></tr>
+	<tr><td class="first">
+	<%= submit_tag "Reply", :action => 'reply' %>
+	<%= submit_tag "Cancel reply", :action => 'index' %>
+   
+   </td>
+   </tr>
+   <%end%>
+  </table>
+
+<p>
+	<%= link_to "Back" , :action=> 'index' %>
+</p>
+</div>
+<div id="footer">
+    <p> &copy; 2010 <strong>NCSU Twitter Backchannel Application</strong> | Design by: Sam and Anup</p>
+</div>
+</div>

@@ -1,0 +1,26 @@
+<h1>Editing cheer</h1>
+
+<% form_for(@cheer) do |f| %>
+  <%= f.error_messages %>
+ 
+ <p>
+    <%= f.label :post_id %><br />
+    <%= f.text_field :post_id %>
+	
+  </p>
+  <p>
+    <%= f.label :cheercount %><br />
+    <%= f.text_field :cheercount %>
+  </p>
+  <p>
+    <%= f.label :uncheercount %><br />
+    <%= f.text_field :uncheercount %>
+  </p>
+  
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @cheer %> |
+<%= link_to 'Back', cheers_path %>

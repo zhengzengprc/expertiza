@@ -1,4 +1,12 @@
 ActionController::Routing::Routes.draw do |map|
+  map.resources :code_review
+
+  # Special routes for message board
+  map.resources :followers
+  map.resources :cheers
+  map.resources :posts
+  map.resource  :homes
+  
   # The priority is based upon order of creation: first created -> highest priority.
   
   # Sample of regular route:

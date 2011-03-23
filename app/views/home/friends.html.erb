@@ -1,0 +1,63 @@
+<div id="wrap">
+	<div id="header">
+		<h1 id="logo-text">NCSU TWITTER</h1>
+		<h2 id="slogan">Sam and Anup's Brilliant Answer to Twitter</h2>
+		<!-- <div id="header-links">
+			<p> <% if @mode == -1 %>
+				<%= link_to "Log In", :controller => 'admin', :action => "login" %>
+				<%= link_to "Sign Up" , :controller => 'users', :action => 'new' %>
+				<% else %>
+				
+				<%= "Welcome #{@user.name}!" %>
+				<%= link_to "Log out?", :controller => 'home', :action => 'logout' %>
+				<% end %>
+			</p>
+		</div> -->
+	</div>
+	
+	<div id="sidebar">
+		<% if @mode != -1%>
+		<p></p>
+		<p></p>
+		<h1><%= link_to "View Posts By Friends" , :action => 'viewfriends' %></h1>
+		<h1><%= link_to "View All Post" , :action => 'index' %></h1>
+		<% end %>
+	</div>
+
+<div id="main">
+<h1><%= if @friends.empty? then "" else "#{@user.name}, your current friends are:" end %></h1>
+
+<table>
+ <% @friends.each do |f| %>
+	<tr bgcolor="#dddddd">
+		<td ><%=  User.find(f.followeruserid).name %></td>
+		<td><%= link_to 'Reject', f, :controller => 'followers', :method => 'delete' %></td>
+				
+<%end%>
+</table>
+
+<p></p>
+
+<h1>You may want to add these people:</h1>
+<table>
+	 <% @all_users.each do |f| %>
+	 <%@follower = Follower.find_by_name_and_followeruserid(@user.name,f.id)%>
+		<%if f.name != @user.name && @follower == nil%>
+	  				<tr bgcolor="#dddddd">
+    					<td ><%=  f.name %></td>
+							<td ><%= link_to 'Accept', :controller => 'followers' ,:action => 'acceptFriend',:id => f %></td>
+					<%end%>
+				<%end%>
+			</table>	
+<p></p>
+
+	
+			
+<p>
+	<%= link_to "Back" , :controller => 'home', :action => 'index' %>
+</p>
+</div>
+<div id="footer">
+    <p> &copy; 2010 <strong>NCSU Twitter Backchannel Application</strong> | Design by: Sam and Anup</p>
+  </div>
+</div>	

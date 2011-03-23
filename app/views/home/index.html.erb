@@ -1,0 +1,114 @@
+
+
+	
+<div>
+<!-- <% form_tag :action => 'change_topic' do %> -->
+<div class="pagediv" >		
+	<!-- put stuff on the sidebar -->
+	<div ><div style="float:left">
+		<%= link_to "All Topics" , :action => 'topic' %> <%= PostTopic.find(session[:current_topic_id]).topicname rescue '' %>
+		</div>
+		<br>
+		<div style="float:left;">
+		
+		<br>	<br>
+			<table>
+			<tr class="row-a">
+				<td class="first">
+					<% form_tag do %>
+						<%= text_field_tag :search, params[:search] %>
+						
+					</td>	
+					
+			</tr>
+			
+			<tr>
+				<td>
+					<%= submit_tag "Search", :name => nil%>
+					<% end %> &nbsp;&nbsp;&nbsp;&nbsp;
+					<%= link_to "Clear search", :action => :index %>
+				</td>
+			</tr>
+			<tr></tr>
+			<tr><td>
+				<% form_tag :action => 'post' do %>
+							<%= text_area_tag :new_post_text, params[:new_post_text] %></td></tr><tr><td>
+							<%= hidden_field_tag :topic_id, params[:topic_id] %>
+							<%= submit_tag "Create New Post"%>
+						<% end %>
+						</td>
+			</tr>
+			<% if (@mode==4) then %>
+			<tr></tr>
+			<tr ><td style="margin-top:10px;">
+					<b>Admin Tools<b/>
+					<br/>
+					<%= link_to "Peer Grades (This Topic)" , :controller => 'home', :action => 'ratings_per_topic' %>
+				</td>
+			</tr>
+			<% end %>	
+		</table>
+		<br/>
+		</div>
+	
+	
+						
+		
+	</div>
+
+	<div id="main" style="width:75%;">
+
+	
+	
+	<h1>Topic: <%= PostTopic.find(session[:current_topic_id]).topicname rescue '(none)'%></h1>
+	
+<% @posts1 = PostTopic.find(:all).collect{ |c| [c.topicname, c.id] }%>
+  
+<% form_tag :action => 'change_topic' do %>
+<% if (@mode==4) then %>
+	<div style="background-color:#f7c4c4; padding: 5px 5px 5px 10px; margin-left:85px;">
+		<div >
+		The items in the red are extra admin functionality. You can move selected posts/threads to
+		a different topic (replies move with parents), or turn replies into their own posts.
+		Deletes are permanent.
+				
+				
+			
+			<br/><br/>For Selected Threads:	
+		</div>
+		<div>
+			<div style="width:200px;overflow:hidden; float:left;">
+				<%= select_tag 'topic',options_for_select(@posts1)%>
+			</div>
+				&nbsp;&nbsp;<%= submit_tag "Move Selected Threads to New Topic", :name => 'a[1]'%>
+		</div>
+		<div style="padding-left:210px;"><br/>
+			<%= submit_tag "Turn Selected Replies into Posts", :name => 'a[2]'%>
+		</div>
+	</div>
+
+<% end %>
+<%= render :partial => 'threaddisplay' %>
+
+
+<% end %>	
+	
+	<br><br>
+ 
+ <table style="width:100%; ">
+	<tr >
+		<td style="text-align: center; background-color:#ffffff">	
+		<%= will_paginate @threads %>
+		</td>
+	</tr>
+</table>
+
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+<p></p>
+
+<!-- <% end %> -->
+</div>
+</div>

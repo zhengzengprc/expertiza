@@ -63,6 +63,15 @@ ActiveRecord::Schema.define(:version => 20110304054311) do
   add_index "assignments", ["review_strategy_id"], :name => "fk_assignments_review_strategies"
   add_index "assignments", ["wiki_type_id"], :name => "fk_assignments_wiki_types"
 
+  create_table "cheers", :force => true do |t|
+    t.integer  "post_id"
+    t.integer  "cheercount"
+    t.integer  "uncheercount"
+    t.string   "name"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "comments", :force => true do |t|
     t.integer "participant_id", :default => 0,     :null => false
     t.boolean "private",        :default => false, :null => false
@@ -136,6 +145,13 @@ ActiveRecord::Schema.define(:version => 20110304054311) do
   add_index "due_dates", ["review_allowed_id"], :name => "fk_due_date_review_allowed"
   add_index "due_dates", ["review_of_review_allowed_id"], :name => "fk_due_date_review_of_review_allowed"
   add_index "due_dates", ["submission_allowed_id"], :name => "fk_due_date_submission_allowed"
+
+  create_table "followers", :force => true do |t|
+    t.string   "name"
+    t.integer  "followeruserid"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
 
   create_table "goldberg_content_pages", :force => true do |t|
     t.string   "title"
@@ -344,6 +360,22 @@ ActiveRecord::Schema.define(:version => 20110304054311) do
   create_table "plugin_schema_info", :id => false, :force => true do |t|
     t.string  "plugin_name"
     t.integer "version"
+  end
+
+  create_table "post_topics", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "topicname"
+  end
+
+  create_table "posts", :force => true do |t|
+    t.string   "name"
+    t.text     "posttext"
+    t.integer  "parentpost"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "topic_id"
+    t.integer  "best_post",  :default => 0
   end
 
   create_table "question_advices", :force => true do |t|

@@ -1,0 +1,96 @@
+    <div>
+        <p>
+        </p>
+        
+    </div>
+
+
+<div class="pagediv" style="float:left;">
+    <table>
+        <tr>
+            <td>
+                <% form_tag do %>
+                <%= text_field_tag :search, params[:search] %>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <%= submit_tag "Search", :name => nil %>
+                <% end %>&nbsp;&nbsp;&nbsp;<%= link_to "Clear search", :action => :topic %>
+            </td>
+        </tr>
+		<tr></tr>
+
+        <tr class="row-a">
+            <td class="first">
+                <% form_tag :action => 'add_topic' do %>
+                <%= text_area_tag :new_topic_text, params[:new_topic_text] %></td></tr><tr><td>
+                <%= submit_tag "Add New Topic", :name => nil %>
+                <% end %>
+            </td>
+        </tr>
+		<% if @mode == 4 %>
+			<tr></tr>
+			<tr ><td style="margin-top:10px;">
+					<b>Admin Tools<b/>
+					<br/>
+					<%= link_to "Peer Grades (All Topics)" , :controller => 'home', :action => 'ratings' %>
+					
+        		</td>
+			</tr>
+		<% end %>
+    </table>
+	<br/>
+
+</div>
+<div id="main">
+    <!-- when no search is being done -->
+	<% if params[:search].nil? %>
+	<h1>Topics</h1>
+    <table style="width:500px;">
+        <% @topics.each do |topic| %>
+        <tr class ="row-c">
+            <td class="first">
+                <%= link_to(topic.topicname,{:action=>:index,:topic_id=>topic}) %>
+            </td>
+            <td class="first" style="width:25px;">
+                <%= if (@mode==4) and (topic.id != 1) then link_to(image_tag("trashcan.png",:size=>"15x15",:title=>"Delete"),{:action=>:delete_topic,:topic_id=>topic.id}) end %>
+            </td>
+        </tr>
+        <% end %>
+    </table>
+    <table>
+        <tr>
+            <td>
+                <%= will_paginate @topics %>
+            </td>
+        </tr>
+    </table>
+    
+	<% else %><!-- when a search is being done -->
+	
+	<!-- show search results from the _names_ of the topics -->
+	<h1><%= if @match_topic.length != 0 then "Topic names containing search terms..." end %></h1>
+    <table style="width:500px;">
+        <% @match_topic.each do |topic| %>
+        <tr class ="row-c">
+            <td class="first">
+                <%= link_to(topic.topicname,{:action=>:index,:topic_id=>topic}) %>
+            </td>
+            <td class="first">
+                <%= if (@mode==4) then link_to(image_tag("trashcan.png",:size=>"10x10",:title=>"Delete"),{:action=>:delete_topic,:topic_id=>topic.id}) end %>
+            </td>
+        </tr>
+        <% end %>
+    </table>
+    <!-- show search results from the posts in each of the topics, paginating as we go -->
+	<% @topics.each do |topic| %>
+    <% @threads = Post.find_some_threads(params[:search],topic.id) %>
+    <h1><%= if @threads.length != 0 then "From #{topic.topicname}..." end %></h1>
+    <%= if @threads.length != 0 then render :partial => 'threaddisplay' end %>
+    <% end %>
+    <% end %>
+</div>
+</div>
+<div style="float:right;">
+</div>
