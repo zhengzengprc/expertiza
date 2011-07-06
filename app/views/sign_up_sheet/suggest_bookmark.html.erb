@@ -9,17 +9,17 @@
 		<h2>View and suggest bookmarks</h2>
 <%= link_to "View bookmarks", :controller=>'bookmark', :action=> 'list_bookmarks', :id=>session[:topicid]%>
 <br>
-<h3>Suggest New Bookmarks</h3>
+<h3>Suggest new bookmarks</h3>
 	<% form_tag(:controller=>"bookmark", :action=>'add_bookmark', :method=>"post") do%>  
 		<%= label_tag(:bookmark_title, "Title:")%><br>
 		<%= text_field_tag(:bookmark_title, "", :size=>"35")%>
 		<br><br>
-		<%= label_tag(:url, "URL/ DOI for the bookmark:") %><br>  
+		<%= label_tag(:url, "URL/DOI for the bookmark:") %><br>  
 		<%= text_field_tag(:url, "", :size=>"60") %>  
 		<br>
 		<%= submit_tag("Submit") %> 
-	<%end %>
 	
+	<%end %>
 	<br>
 	<a href=<%=@backurl%>>Back</a>
 	</body>

@@ -23,11 +23,13 @@
 		<td><%=bookmark.title %></td>
 		<td><a href=<%=bookmark.bookmark_link%> target="_blank"><%=bookmark.bookmark_link%></a></td>
 		
+		<%-# flag1? flag2?  Choose better variable names!. -%>
 		<%if @flag1==1%>
 		<%form_tag(:controller=>"bookmark", :action=>'rate_bookmark', :method=>"post") do%>
 		<td align="center">
 		
-		<%= label_tag(:rating, "Rating(scale 1-5):")%><br>
+		<%-# The "5" below should be changed to a variable! Instructors might want a different scale for their rating. -%>
+		<%= label_tag(:rating, "Rating (scale 1-5):")%><br>
 		<%= text_field_tag(:rating, "", :size=>"5")%>
 		<%= hidden_field_tag(:id, value=bookmark.id)%>
 	
