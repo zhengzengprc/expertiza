@@ -1,4 +1,3 @@
-</TR>
 <% 
    if child_nodes 
    index = 1 
@@ -6,7 +5,9 @@
 %>
 
 <!-- Start Listing -->
-<%= render :partial=> '/tree_display/entry', :locals => {:node => node, :prefix => prefix+"_"+index.to_s, :depth => depth + 1, :rowtype => rowtype } %>
+<% if node != nil%>
+	<%= render :partial=> '/student_task/entry', :locals => {:node => node, :prefix => prefix+"_"+index.to_s, :depth => depth + 1, :rowtype => rowtype } %>
+<% end %>
 <!-- End Listing -->
 <% 
    index+=1   

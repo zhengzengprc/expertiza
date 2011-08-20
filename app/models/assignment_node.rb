@@ -80,5 +80,5 @@ class AssignmentNode < Node
   # Gets any TeamNodes associated with this object   
   def get_teams
     TeamNode.get(self.node_object_id)
-  end  
+  end 
 end
