@@ -1,0 +1,35 @@
+<!--<%handle = handle%>-->
+<!--<%= "handle " + handle.to_s%>-->
+<TR <% if rowtype != nil %>CLASS="<%= rowtype %>"<% elsif prefix != nil %>ID="<%= prefix %>" style="display: none;"<% end %>>
+<% if depth != nil
+	index = 0
+	while index < depth %>
+		<TD WIDTH="2%">&nbsp;</TD>
+		<%   index +=1
+	end
+end %> 
+
+<% if child_nodes!=nil && parent_node!=nil && parent_node.type.to_s == "AssignmentNode"%>
+	<!--<%= "node id and handle (assignment)"+ parent_node.node_object_id.to_s + " " + handle.to_s%>-->
+	<% participant = Participant.find(:first, :conditions =>["parent_id = ? AND handle = ?",parent_node.node_object_id, handle])%>
+	<!--<%= "participant" + participant.to_s%>-->	
+	<td ><%= link_to parent_node.get_name , :action => 'view', :id => participant %></td>
+	<td align = "center"><%= "-"%></td>
+	<td align = "center" ><%= "-"%></td>
+	<td ><%= "Complete"%></td>
+	<td ><%= "Complete"%></td>
+	<td ><%= "denied"%></td>
+<%elsif parent_node!=nil && parent_node.type.to_s == "CourseNode"%>
+	<!--<%= "handle (course)" + handle.to_s%>-->
+	<TD WIDTH="2%" ALIGN="RIGHT">
+      <a id="<%= prefix %>Link" name="<%= prefix %>Link" href="#" <% if child_nodes.length > 0  %>onclick="toggleList('<%= prefix %>',<%= child_nodes.length %>);alternate('courseTable');return false;"><img src="/images/expand.png"><% else %>onclick="return false;"><img src="/images/noaction.png"><% end %></a></div>
+		</TD>
+	<td><%= parent_node.get_name%></td> 
+<% elsif parent_node == nil  && child_nodes!=nil%>
+	<!--<%= "handle (assignment no course)" + handle.to_s%>-->
+	<TD WIDTH="2%" ALIGN="RIGHT">
+       	<a id="<%= prefix %>Link" name="<%= prefix %>Link" href="#" <% if child_nodes.length > 0  %>onclick="toggleList('<%= prefix %>',<%= child_nodes.length %>);alternate('courseTable2');return false;"><img src="/images/expand.png"><% else %>onclick="return false;"><img src="/images/noaction.png"><% end %></a></div>
+		</TD>
+	<td><b><%= "Completed assignments not associated with a course"%></b></td>
+<%end%>
+</tr>

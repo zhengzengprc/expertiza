@@ -95,7 +95,7 @@
   <div class="topictable">
     <table class="listing" cellpadding="2">
       <tr class="taskheader">
-        <th>&nbsp;</th>
+      	<th></th>
         <th>Assignment</th>
         <th>Course</th>
         <th>Topic</th>
@@ -103,24 +103,98 @@
         <th>Stage Deadline</th>
         <th>Publishing Rights</th>
       </tr>
-
+	  <!--<%= "10 months ago " + 10.months.ago.to_s%>-->
+		<% oaIDs = []%>
       <% for participant in @participants %>
           <% if participant.assignment != nil %>
-              <tr class="listingRow">
-                <td>&nbsp;</td>
-                <td><b><%= link_to participant.assignment.name, :action => 'view', :id => participant %></b></td>
-                <td>
-                  <% participant.get_course_string %></td>
-                <td><%= participant.get_topic_string %></td>
-                <td><%= participant.assignment.get_current_stage(participant.topic_id) %></td>
-                <td><%= participant.assignment.get_stage_deadline(participant.topic_id) %></td>
-                <td align=center>
-                  <% if participant.permission_granted %>granted
-                  <% else %>denied
-                  <% end %></td>
-              </tr>
-          <% end %>
+			<% if (participant.assignment.course_id != nil && Course.find_by_id(participant.assignment.course_id).created_at >= 10.months.ago) || (participant.assignment.course_id == nil && participant.assignment.updated_at != nil && participant.assignment.updated_at >= 10.months.ago) #with a new course %>
+		  	<tr class="listingRow">
+		  		<td></td>
+		  	<td><b><%= link_to participant.assignment.name, :action => 'view', :id => participant %></b></td>
+		  	<td><%= participant.get_course_string %></td>
+		  	<td><%= participant.get_topic_string %></td>
+		  	<td><%= participant.assignment.get_current_stage(participant.topic_id) %></td>
+		  	<td><%= participant.assignment.get_stage_deadline(participant.topic_id) %></td>
+		  	<td align=center><% if participant.permission_granted %>granted
+		        	<% else %>denied
+		        	<% end %></td>
+		  	</tr>
+		   <% elsif (participant.assignment.course_id == nil && participant.assignment.updated_at != nil && participant.assignment.updated_at < 10.months.ago) #with a new course %>
+		   		<% oaIDs.push(participant.assignment.id)%>
+		   <% end%>
+		   
+		   <% end%>
+		   
       <% end %>
-    </table>
+	  
+
+<% participant = @participants[1]%>
+<% assignList = Participant.find(:all, :select => "distinct parent_id", :conditions => ["handle = ?",@participants[1].handle])%>
+<% aIDs = []
+for assignID in assignList
+	aIDs.push(assignID.parent_id)
+end%>
+</table>
+
+<% courseIDList = Assignment.find(:all, :select => "distinct course_id", :conditions => ["id in (?)",aIDs])%>
+
+<%for courseID in courseIDList%>
+	<% if courseID.course_id != nil%>
+	<% course = Course.find(:first, :conditions =>["id = ?",courseID.course_id])%>
+	  	<!--<%= "\n course name"+ course.name.to_s%>
+		<%= "\n course id"+ course.id.to_s%>-->
+		<% if course.created_at < 10.months.ago#for old courses%>
+		<% #clustering the older course's assignments%> 
+				<% parent_nodes = Node.find(:all, :conditions =>["node_object_id= ? AND type = 'CourseNode'", course.id])%>
+				<% course_assign = Assignment.find(:all,:select => "id", :conditions =>["course_id = ?", course.id])%>
+				<% #determine assignments for a particular participant%>
+				<%part_assign = Participant.find(:all,:select => "parent_id", :conditions =>["parent_id in (?) AND handle = ?", course_assign, @participants[1].handle])%>
+				<% caIDs = []
+	 	 		for part in part_assign
+      				caIDs.push(part.parent_id)
+	  			end%>
+				<% if parent_nodes != nil %>
+					<TABLE class="listing" cellpadding="2" ID="courseTable">
+						
+						<% index = 1 
+						for node in parent_nodes %>
+							<%if index % 2 == 0 
+								rowtype = "odd"
+							else
+								rowtype = "even"
+							end 
+							%>
+							<!--<%= "handle @participants[1].handle -- " + @participants[1].handle%>-->						
+							<%= render :partial=> '/student_task/entry', :locals => {:node => node, :handle => @participants[1].handle , :prefix => node.node_object_id.to_s+"_"+index.to_s, :depth => 0, :rowtype => rowtype, :assignList => caIDs} %>   
+							<% 
+							index+=1   
+						end %>
+					</TABLE>
+				<% end %>
+				<!--</td>-->
+		<%end%>			
+	<%end # end of if condition%>
+<% end #end of for loop%>	  
+	  		
+	  
+<!--<tr class="listingRow"><td><b><%= "List of completed assignments"%></b></td></tr>
+<br/>-->
+<% if !oaIDs.to_s.empty? %>
+<!--<%= "oaIDS " + oaIDs.to_s%>-->
+					<TABLE class="listing" CELLPADDING="2" ID="courseTable2">
+						
+						<% index = 1 %>
+							<%if index % 2 == 0 
+								rowtype = "odd"
+							else
+								rowtype = "even"
+							end 
+							%>
+							<!--<tr></tr><td><b><%= "List of completed assignments"%></b></td></tr>-->						
+							<%= render :partial=> '/student_task/entry', :locals => {:node => nil, :handle => @participants[1].handle , :prefix => 1.to_s+"_"+index.to_s, :depth => 0, :rowtype => rowtype, :assignList => oaIDs} %>   
+							<% 
+							index+=1%>
+					</TABLE>
+<%end%>
   </div>
 </div>

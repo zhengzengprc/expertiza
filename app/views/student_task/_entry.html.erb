@@ -1,0 +1,27 @@
+<!--<%assignList = assignList%>-->
+<!--<%handle = handle%>-->
+<!--<%= "assignList length "+assignList.to_s%>-->
+<% child_nodes = Node.find(:all, :conditions =>["node_object_id in (?) AND type = 'AssignmentNode'", assignList])%>
+<!--<%= "child nodes length "+child_nodes.to_s%>
+<% for n in child_nodes%>
+	<%= "child node "+n.get_name%>
+<% end %>-->
+<%= render :partial => '/student_task/row_header', 
+           :locals => {
+               :depth => depth, 
+               :prefix => prefix, 
+               :rowtype => rowtype,               
+               :parent_node => node,
+               :child_nodes => child_nodes,
+				:handle => handle
+            } %>			
+                       
+<%= render :partial => '/student_task/row_footer', 
+           :locals => {
+               :depth => depth, 
+               :prefix => prefix, 
+               :parent_node => node,
+               :child_nodes => child_nodes,
+               :rowtype => nil,
+				:handle => handle
+            } %>
