@@ -1,60 +1,69 @@
-Expertiza
-=========
+Project E214, Cover all student workflows with cucumber tests
 
-#### Peer review system
+Contact:  Edward Anderson (nilbus@nilbus.com)
+See https://github.com/expertiza/expertiza/issues/106.
 
-Expertiza is a web application where students can submit and peer-review learning objects (articles, code, web sites, etc). It is used in select courses at NC State and by professors at several other colleges and universities.
+Welcome to our project for our OSS project.
 
-Setup
------
+Our main work is in the features files.
 
-### NCSU VCL image
+The cucumber test plugins is intergrated into the expertiza master branch project, you can open one file in the features/student directory and run it in rubymine.
 
-The expertiza environment is already set up in [NC State's VCL](https://vcl.ncsu.edu) image "Ruby on Rails".
-If you have access, this is quickest way to get a development environment running for Expertiza.
+For the test work you should create some data for test first.
 
-If not:
+Create a account name:student, with password:password 
 
-### Tools
 
- * [Set up git](http://help.github.com/set-up-git-redirect)
- * Install Ruby 1.8.7. (Ruby 1.9.2 may work but hasn't been tested)
-   Use [rvm](http://beginrescueend.com) on Linux/OSX, or [RailsInstaller](http://railsinstaller.org) on Windows
- * `gem install bundler` (see [issues on Windows](http://matt-hulse.com/articles/2010/01/30/from-zero-to-rails3-on-windows-in-600-seconds/))
+attend_survey.feature
+Should assign a assignments name "test_team_invites"
+ to account student, and the state for the assignment should be completed. So you can see the "Take a survey" link.
 
-### Dependencies
+change_handle.feature
+Should assign a assignments name "test_team_invites"
+ to account student, and the state for the assignment should be completed. With the link "Change your handle".
 
- * libxslt development libraries [OSX: (already installed?) Ubuntu: `sudo apt-get install libxslt-dev` Fedora: `yum install libxslt-devel` Windows: ?]
- * (optional) [graphviz](http://www.graphviz.org)
- * bundled gems: `bundle install`
- 
- If anything is missing here, please report it in an issue or fix it in a pull request. Thanks!
+create_a_team.feature
+Should assign a assignments name "test_create_team"
+ to account student, and the state for the assignment should be completed. With the link "Change your handle".
 
-Contributing
-------------
+edit_team_name.feature
+Should assign a assignments name "test_Metareview" to account student, and the student already in a team, you can test change the team name.
 
- * [Fork](http://help.github.com/fork-a-repo/) the expertiza project
- * [Create a new branch](http://progit.org/book) for your contribution with a descriptive name
- * [Commit and push](http://progit.org/book) until you are happy with your contribution - follow the style guidelines below
- * Make sure to add tests for it; the tests should fail before your contribution/fix and pass afterward
- * [Send a pull request](http://help.github.com/send-pull-requests) to have your code reviewed for merging back into Expertiza
+edit_user_profile.feature
+Just run, not need instance.
 
-Style Guidelines
-----------------
+leave_team.feature
+Should assign a assignments name "test_Metareview" to account student, and the student already in a team, so you can test leave.
 
-We've had many contributors in the past who have used a wide variety of ruby coding styles. It's a mess, and we're trying to unify it.
+manage_login_users.feature
+Exist the account with name "admin", password "password".
 
-All new files/contributions should:
+manage_review.feature
+Should assign a assignments name "test_Metareview" to account student, it will fail since the review controller not work.
 
- * Use unix line endings (Windows users: configure git to use [autocrlf](http://help.github.com/line-endings))
- * Indent with 2 spaces (no tabs; configure your editor) both in ruby and erb
- * Follow the [Ruby Style Guide](http://batsov.com/Programming/Ruby/2011/09/12/ruby-style-guide.html) style for syntax, formatting, and naming
+manage_review_for_teammate.feature
+Should assign a assignments name "test_Metareview" to account student and add another guy to your team like "admin", it will fail since the review controller not work.
 
-When editing existing files:
+signup_for_topic.feature
+Should assign a assignments name "test student signup" to account student, and the admin account assign some topics which test to the student account. 
 
- * Keep the existing tabbing (use tabs instead of spaces in files that already use tabs everywhere; otherwise use spaces)
- * Keep the existing line ending style (dos/unix)
- * Follow the Ruby style Guide on code you add or edit, as above
+submit_metareview.feature
+Should assign a assignments name "test_Metareview" to account student, and assign a assign an Metareview to the "test_Metareview"  so we can test review.It will fail since the review controller not work.
 
-Please do no go crazy changing old code to match these guidelines; it will just create lots of potential merge conflicts.
-Applying style guidelines to code you add and modify is good enough. :-)
+submit_review.feature
+Should assign a assignments name "test_Metareview" to account student, and set the "test_Metareview" to random choose topic to review  so we can test review.It will fail since the review controller not work.
+
+submit_review_for_teammate.feature
+Should assign a assignments name "UNC TLT demo" to account student, and add another teamate "admin" to the student team.
+
+submit_work_to_assignment.feature
+Should assign a assignments name "test_submit_assigment" to account student, and the state of the assignment should be in submission.
+
+suggest_topic.feature
+Should assign a assignments name "test_Metareview" to account student, and use admin account assign this assignment with suggest topic feature.
+
+team_invites.feature
+Should assign a assignments name "test_team_invites" to account student, and use another account "admin" send "invite" to student account.
+
+view_resulting_scores.feature
+It includes 3 senarios, assign a assignments name "test_Metareview" to account student and have the score in view_resulting_scores.feature which it mention. It will fail since the review controller not work.
