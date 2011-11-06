@@ -1,3 +1,4 @@
+#Use admin account to login
 When /^"([^"]*)":"([^"]*)" logs into the system$/ do |name, password|
   When 'I go to the login page'
   fill_in 'login_name', :with => 'admin'
@@ -5,6 +6,7 @@ When /^"([^"]*)":"([^"]*)" logs into the system$/ do |name, password|
   should click_button 'Login'
 end
 
+#check if log in successful
 Then /^user has logged in$/ do
   node = find('.sidebar td').node().content()
   if(node.include? 'admin')

@@ -3,7 +3,8 @@ Given 'I am logged in as a student' do
   Given 'all-permissive roles are set up'
   And 'a student with the username "student" exists'
   When 'I go to the login page'
-  
+
+  #With the log in name 'student' and password 'password' to log in
   #fill_in 'User Name', :with => 'student'
   #fill_in 'password', :with => 'password'
   fill_in 'login_name', :with => 'student'
@@ -26,6 +27,7 @@ Given 'all-permissive roles are set up' do
 =end
 end
 
+#If the student do not exists, then create it
 Given /^a student with the username "(\S+)" exists$/ do |username|
   User.create({
     :name => username,
@@ -37,6 +39,7 @@ Given /^a student with the username "(\S+)" exists$/ do |username|
   })
 end
 
+#check the sidebar contains "User: #{username}"
 Then /I should be logged in as "(\S+)"/ do |username|
   #find('.sidebar td').should have_content "User: #{username}"
   node = find('.sidebar td').node().content()
